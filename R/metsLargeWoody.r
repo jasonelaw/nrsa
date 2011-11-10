@@ -250,7 +250,7 @@ metsLgWoody.1 <- function (df1, df2, df3, protocols)
                        ,list('UID'=bankgeo$UID
                        ,"PARAMETER"=bankgeo$PARAMETER
                        )
-                       ,mean
+                       ,mean, na.rm = T
                        )          
    bankgeomean$PARAMETER <- ifelse(bankgeomean$PARAMETER == 'BANKWID', 'xbkf_w' , bankgeomean$PARAMETER) 
    bankgeomean <- rename(bankgeomean, c('PARAMETER','x'),c('METRIC' , 'RESULT'))
