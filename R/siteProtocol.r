@@ -63,67 +63,7 @@ siteProtocol.1 <- function(sites, siteInfo)
   return(tt)
 }
 
-siteProtocol.1.DEPRECATED <- function(sites, siteInfo)
-# Does the work for siteProtocol() relying mostly on SAMPLED
-# ARGUMENTS:
-# sites     A vector of UID values
-# siteInfo  A dataframe with site information found in tblVISITS2
-{
-  # Use information to assess which protocol was used.
-  tt <- subset(siteInfo, UID %in% unique(sites))
 
-  # Make easy determinations of BOATABLE, WADEABLE, NONE (unsampled), Error
-  # if inconsistent, or nothing at all if something slips through the cracks.
-  tt$protocol <- ''
-
-  selection <- tt$SAMPLED %in% c('BOATABLE','PARTIAL BOATABLE') &
-               (tt$VALXSITE %in% c('BOATABLE','PARBYBOAT','ALTERED') |
-                is.na(tt$VALXSITE)
-               )
-  if(any(selection)) tt[selection,]$protocol <- 'BOATABLE'
-
-  selection <- tt$SAMPLED %in% c('BOATABLE','PARTIAL BOATABLE') &
-               !(tt$VALXSITE %in% c('BOATABLE','PARBYBOAT','ALTERED') |
-                 is.na(tt$VALXSITE)
-                )
-  if(any(selection)) tt[selection,]$protocol <- 'Error'
-
-  selection <- tt$SAMPLED %in% c('PARTIAL WADEABLE', 'WADEABLE', 'WADEABLE INTERRUPTED') &
-               (tt$VALXSITE %in% c('INTWADE','PARBYWADE','WADEABLE','ALTERED') |
-                is.na(tt$VALXSITE)
-               )
-  if(any(selection)) tt[selection,]$protocol <- 'WADEABLE'
-
-  selection <- tt$SAMPLED %in% c('PARTIAL WADEABLE', 'WADEABLE', 'WADEABLE INTERRUPTED') &
-               !(tt$VALXSITE %in% c('INTWADE','PARBYWADE','WADEABLE','ALTERED') |
-                 is.na(tt$VALXSITE)
-                )
-  if(any(selection)) tt[selection,]$protocol <- 'Error'
-
-  selection <- is.na(tt$SAMPLED) &
-               !(tt$VALXSITE %in% c('BOATABLE','PARBYBOAT','INTWADE','PARBYWADE'
-                         ,'WADEABLE'
-                         )
-                )
-  if(any(selection)) tt[selection,]$protocol <- 'NONE'
-
-  selection <- is.na(tt$SAMPLED) &
-               (tt$VALXSITE %in% c('BOATABLE','PARBYBOAT','INTWADE','PARBYWADE','WADEABLE'))
-  if(any(selection)) tt[selection,]$protocol <- 'Error'
-
-
-  # Make protocol determinations that are not so straight forward
-  selection <- tt$SAMPLED=='ALTERED' & tt$VALXSITE %in% c('BOATABLE','PARBYBOAT')
-  if(any(selection)) tt[selection,]$protocol <- 'BOATABLE'
-
-  selection <- tt$SAMPLED=='ALTERED' &
-     tt$VALXSITE %in% c('INTWADE', 'PARBYWADE', 'WADEABLE')
-  if(any(selection)) tt[selection,]$protocol <- 'WADEABLE'
-
-  tt <- subset(tt, select=c(UID, protocol))
-
-  return(tt)
-}
 
 siteProtocol.cleanup <- function(chan)
 # Clean up when siteProtocol() terminates
