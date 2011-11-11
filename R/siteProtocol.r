@@ -48,7 +48,7 @@ siteProtocol.1 <- function(sites, siteInfo)
   selection <- tt$VALXSITE %in% c('BOATABLE','PARBYBOAT','ALTERED')
   if(any(selection)) tt[selection,]$PROTOCOL <- 'BOATABLE'
 
-  selection <- tt$VALXSITE %in% c('INTWADE','PARBYWADE','WADEABLE','ALTERED')
+  selection <- tt$VALXSITE %in% c('INTWADE','PARBYWADE','WADEABLE','ALTERED','DRY')
   if(any(selection)) tt[selection,]$PROTOCOL <- 'WADEABLE'
 
   selection <- is.na(tt$VALXSITE) |
