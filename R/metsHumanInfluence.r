@@ -71,12 +71,15 @@ return(rc)
 metsHumanInfluence.1 <- function(df)
 {
 
-df2 <- df
+
+system.time({mat <- contrasts(as.factor(df$RESULT), F)
+df2 <- merge(df, mat, all.x = T, by.x = 'RESULT', by.y = 0)})
+system.time({df2 <- df
 df2$var_0 <- ifelse(df$RESULT=='0', 1, 0)
 df2$var_P <- ifelse(df$RESULT=='P', 1, 0)
 df2$var_C <- ifelse(df$RESULT=='C', 1, 0)
-df2$var_B <- ifelse(df$RESULT=='B', 1, 0)
-df2$var_CB <- df2$var_C+ df2$var_B
+df2$var_B <- ifelse(df$RESULT=='B', 1, 0)})
+df2$CB <- df2$C + df2$B
            
 ##  Calculating meanAtTransect
 meanb_hall <- aggregate(list(xb_hall=df2$var_B), list(UID=df2$UID

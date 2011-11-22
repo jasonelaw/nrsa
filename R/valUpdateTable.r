@@ -65,7 +65,7 @@ valUpdateTable <- function(inLoc, tblName)
   
   # Determine keys used in table.  Retain only columns in validation results
   # which are keys or columns that may have been edited.
-  keysUsed <- names(updateData)[names(updateData) %in% c(NRSAKeyColumns,'PARAMETER')]
+  keysUsed <- names(updateData)[names(updateData) %in% c(nrsa.options()$NRSAKeyColumns,'PARAMETER')]
 
   # Update table in database
   rc <- dbUpdate(chan, tblName, updateData, keysUsed)

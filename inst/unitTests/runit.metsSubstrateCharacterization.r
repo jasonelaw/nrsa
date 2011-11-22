@@ -54,37 +54,25 @@ metsSubstrateCharacterizationTest <- function ()
             )
             
 # return (list (a=tt, b=errs))
-          
-  
 }
-  
   
 metsSubstrateCharacterization.wadeableSubstrateData <- function()
 # Creates dataframe of wadeable protocol substrate data for unit test
 {
-  path <- 'data/SubstrateCharacterization.wadeableSubstrate.Rdata'
-  load(file.path(code.path, path))
-  return(SubstrateCharacterization.wadeableSubstrate)
+  testData('SubstrateCharacterization.wadeableSubstrate.Rdata')
 }
-
 
 metsSubstrateCharacterization.boatableThalwegSubstrateData <- function()
 # Creates dataframe of boatable protocol substrate data for unit test
 {
-  path <- "data/SubstrateCharacterization.boatableThalwegSubstrate.Rdata"
-  load(file.path(code.path, path))
-  return(SubstrateCharacterization.boatableThalwegSubstrate)
+  testData("SubstrateCharacterization.boatableThalwegSubstrate.Rdata")
 }
-
 
 metsSubstrateCharacterization.boatableLittoralSubstrateData <- function()
 # Creates dataframe of boatable protocol substrate data for unit test
 {
-  path <- "data/SubstrateCharacterization.boatableLittoralSubstrate.Rdata"
-  load(file.path(code.path, path))
-  return(SubstrateCharacterization.boatableLittoralSubstrate)
+  testData("SubstrateCharacterization.boatableLittoralSubstrate.Rdata")
 }
-
 
 metsSubstrateCharacterization.expectedResults <- function()
 # returns dataframe of expected metrics calculation results for unit test
@@ -92,10 +80,7 @@ metsSubstrateCharacterization.expectedResults <- function()
 # UID 8 is 2004  WCAP99-0817 v1
 # UID 9 is 2004  WCAP99-0817 v2
 {
-  path <- 'data/SubstrateCharacterization.expectedResults.Rdata'
-  load(file.path(code.path, path))
-  return(SubstrateCharacterization.expectedResults)
+  testData('SubstrateCharacterization.expectedResults.Rdata')
 }
-
 
 # end of file

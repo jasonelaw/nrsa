@@ -187,7 +187,7 @@ constructNRSAValidationResults <- function (df, formMetadata, siteInfo, ssFmt='E
   # Prepare validation test results for review.
   #
   # Determine table keys used in this particular table.
-  tableKeys <- names(df)[names(df) %in% NRSAKeyColumns & names(df) != 'UID']
+  tableKeys <- names(df)[names(df) %in% nrsa.options()$NRSAKeyColumns & names(df) != 'UID']
 
 
   # Order resulting dataframe by form name at each site (and any intrasite keys)

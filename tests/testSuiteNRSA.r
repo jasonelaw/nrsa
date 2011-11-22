@@ -6,6 +6,7 @@
 #
 
 require(RUnit)
+require(nrsa)
 
 test.dir <- system.file('unitTests', package = 'nrsa')
 testSuite <- defineTestSuite('nrsa', 

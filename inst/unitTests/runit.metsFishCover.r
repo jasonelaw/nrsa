@@ -61,16 +61,14 @@ metsFishCoverTest <- function ()
 metsFishCover.createData <- function()
 #
 {
-  load('data/FishCover.testData.Rdata')
-  return(FishCover.testData)
+  testData('FishCover.testData.Rdata')
 }
 
 
 metsFishCover.createResults <- function()
 #
 {
-  load('data/FishCover.expectedResults.Rdata')
-  return(FishCover.expectedResults)
+  testData('FishCover.expectedResults.Rdata')
 }
 
 # end of file

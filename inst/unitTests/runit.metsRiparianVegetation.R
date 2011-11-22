@@ -39,16 +39,14 @@ metsRiparianVegetation.makeData <- function()
 #                      0.11538462 to 0.125, pcan_n from 0.03846154 to
 #                      0.0416666666666667, and pmind_m from 0.92307692 to 1.
 {
-  load(file.path(code.path, 'data', 'RiparianVegetation.testData.Rdata'))
-  return(RiparianVegetation.testData)
+  testData('RiparianVegetation.testData.Rdata')
 }
 
 
 metsRiparianVegetation.makeExpected <- function()
 # Create dataframe of expected metrics calculations for unit test
 {
-  load(file.path(code.path, 'data', 'RiparianVegetation.expectedResults.Rdata'))
-  return(RiparianVegetation.expectedResults)  
+  testData('RiparianVegetation.expectedResults.Rdata')
 }
 
 # Benchmark results 

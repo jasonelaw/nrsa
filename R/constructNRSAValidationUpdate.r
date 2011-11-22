@@ -47,7 +47,7 @@ constructNRSAValidationUpdate <- function(valResults, siteInfo, currentData)
 
   # Determine keys used in table.  Retain only columns in validation results
   # which are keys or columns that may have been edited.
-  keysUsed <- names(siteResults)[names(siteResults) %in% NRSAKeyColumns]
+  keysUsed <- names(siteResults)[names(siteResults) %in% nrsa.options()$NRSAKeyColumns]
 
   siteResults <- siteResults[c(keysUsed, 'PARAMETER', 'RESULT'
                               ,na.omit(ifelse('UNITS' %in% names(siteResults)

@@ -62,25 +62,21 @@ metsChannelMorphology.createBankGeometryData <- function(){
   #stream : angle, undercut
   #rivers : angle, wetted width
   #read in the test data from
-  load(file.path(code.path, 'data', 'ChannelMorphology.BankGeometry.Rdata'))
-  return(ChannelMorphology.BankGeometry)
+  testData('ChannelMorphology.BankGeometry.Rdata')
 }
 
 
 metsChannelMorphology.createThalwegData <- function(){
-  load(file.path(code.path, 'data', 'ChannelMorphology.Thalweg.Rdata'))
-  return(ChannelMorphology.Thalweg)
+  testData('ChannelMorphology.Thalweg.Rdata')
 }
 
 
 metsChannelMorphology.createProtocolData <- function(){
-  load(file.path(code.path, 'data', 'ChannelMorphology.Protocol.Rdata'))
-  return(ChannelMorphology.Protocol)
+  testData('ChannelMorphology.Protocol.Rdata')
 }
 
 metsChannelMorphology.createExpectedResults <- function(){
-  load(file.path(code.path, 'data', 'ChannelMorphology.ExpectedResults.Rdata'))
-  return(ChannelMorphology.ExpectedResults)
+  testData('ChannelMorphology.ExpectedResults.Rdata')
 }
 
 

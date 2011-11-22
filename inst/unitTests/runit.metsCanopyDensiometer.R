@@ -68,8 +68,7 @@ metsCanopyDensiometer.cleanup <- function(indb)
 metsCanopyDensiometer.testData <- function()
 # creates dataframe of canopy densiometer data for unit test
 {
-  load(file.path(code.path, 'data', 'CanopyDensiometer.testData.Rdata'))
-  return(CanopyDensiometer.testData)
+  testData('CanopyDensiometer.testData.Rdata')
 }
 
 
@@ -77,6 +76,5 @@ metsCanopyDensiometer.expectedMets <- function()
 # creates dataframe of canopy densiometer metrics calculation results for unit test
 
 {
-  load(file.path(code.path, 'data', 'CanopyDensiometer.expectedResults.Rdata'))
-  return(CanopyDensiometer.expectedResults)
+  testData('CanopyDensiometer.expectedResults.Rdata')
 }

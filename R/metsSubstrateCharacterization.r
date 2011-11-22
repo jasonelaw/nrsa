@@ -181,14 +181,20 @@ metsSubstrateCharacterization.1 <- function (df1, df2, df3)
   intermediateMessage('Complete size classes summaries for streams (lumped boulder class- NOR).6', loc='end')
 
   #interpolated metrics 
-  sizes.tt <- subset(sizes, !(CLASS %in% c(drop.classes, 'BL')), select = c('CLASS', 'min', 'max'))
-  sizes.tt <- mutate(sizes.tt, min = log10(min), max = log10(max))
+  sizes.tt <- subset(sizes, 
+                     subset = !(CLASS %in% c('HP', 'RD', 'RR', 'RS', 'RC', 'OT',
+                                             'WD', 'BL')), 
+                     select = c('CLASS', 'min', 'max'))
+  sizes.tt <- transform(sizes.tt, min = log10(min), max = log10(max))
   interpdata <- subset(df1, df1$RESULT %in% c('XB','SB','CB','GC','GF','SA','FN'))
   calcs <- interpolatePercentile(interpdata, 'RESULT', c(16, 50, 84), 
                                  c('lsub2d16inor','lsub2d50inor', 'lsub2d84inor'),
                                  sizes.tt)
-  calcs <- mutate(calcs, d16 = 10^lsub2d16inor, d50 = 10^lsub2d50inor,
-                     d84 = 10^lsub2d84inor)
+  calcs$d16 <- 10^calcs$lsub2d16inor
+  calcs$d50 <- 10^calcs$lsub2d50inor
+  calcs$d84 <- 10^calcs$lsub2d84inor
+#   calcs <- transform(calcs, d16 = 10^lsub2d16inor, d50 = 10^lsub2d50inor,
+#                      d84 = 10^lsub2d84inor)
   calcs <- melt(calcs, id.var = 'UID', variable.name = 'METRIC', 
                 value.name = 'RESULT')
  
