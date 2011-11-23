@@ -15,4 +15,4 @@ testSuite <- defineTestSuite('nrsa',
                              testFuncRegexp = "^.+Test$")
 testResult <- runTestSuite(testSuite)
 testResultFile <- system.file('tests','nrsa.html', package = 'nrsa')
-printTextProtocol(testResult, showDetails = TRUE)
+printTextProtocol(testResult, showDetails = F)

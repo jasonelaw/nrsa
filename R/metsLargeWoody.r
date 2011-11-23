@@ -267,6 +267,8 @@ metsLgWoody.1 <- function (df1, df2, df3, protocols)
                               )
                          ,sum, na.rm=TRUE
                          )
+    
+  lgWoodSums$PARAMETER <- paste('rch', tolower(lgWoodSums$PARAMETER), sep = '')
 
   lgWoodSums$PARAMETER <- ifelse(lgWoodSums$PARAMETER == 'DLDLL', 'rchdldll' , lgWoodSums$PARAMETER)      
   lgWoodSums$PARAMETER <- ifelse(lgWoodSums$PARAMETER == 'DLDML', 'rchdldml' , lgWoodSums$PARAMETER)     
