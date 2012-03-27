@@ -378,10 +378,10 @@ metsBankMorphology.inputData <- function()
                               )
 
   
-testData <- read.table(bob, header=TRUE,stringsAsFactors=FALSE)
- 
+  testData <- read.table(bob, header=TRUE,stringsAsFactors=FALSE)
   close (bob)
-return(testData)
+  testData$TRANSDIR <- 1:nrow(testData)
+  return(testData)
 }
 
 

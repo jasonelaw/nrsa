@@ -148,6 +148,7 @@ metsBankMorphology.1 <- function (df1, protocols)
     wade.bank.melt <- melt(wade.bank, measure.var = 'RESULT')
     wade.bank <- dcast(wade.bank.melt, UID + TRANSECT + TRANSDIR ~ PARAMETER)
     streammets <- ddply(wade.bank, .(UID), CalcWadeBank)
+    streammets <- melt(streammets, id.var = 'UID', variable.name = 'METRIC', value.name = 'RESULT')
     intermediateMessage('.3')
   }
 
@@ -168,6 +169,7 @@ metsBankMorphology.1 <- function (df1, protocols)
     boatmets <- CalcBoatAngleMets(boat.bank$UID, boat.bank$ANGLE)
     ww <- CalcBoatNoWettedWidth(boat.bank$UID, boat.bank$WETWID)
     boatmets <- rbind(boatmets, ww)
+    boatmets$UID <- as.integer(levels(boatmets$UID))[boatmets$UID]
   }
   mets <- rbind(boatmets, streammets)
  
