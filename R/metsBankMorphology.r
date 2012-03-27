@@ -162,8 +162,8 @@ metsBankMorphology.1 <- function (df1, protocols)
     boat.bank <- dcast(boat.bank.melt, UID + TRANSECT ~ PARAMETER)
     
     # convert to factor to ensure all options present in table
-    boat.bank$ANGLE <- as.factor(boat.bank$ANGLE)
-    levels(boat.bank$ANGLE) <- c('0-5', '5-30', '30-75', '75-100')
+    boat.bank$ANGLE <- factor(as.character(boat.bank$ANGLE), 
+                              levels = c('0-5', '5-30', '30-75', '75-100'))
     
     # calculate boatable metrics
     boatmets <- CalcBoatAngleMets(boat.bank$UID, boat.bank$ANGLE)
