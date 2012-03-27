@@ -147,7 +147,7 @@ metsBankMorphology.1 <- function (df1, protocols)
     wade.bank$RESULT <- as.numeric(wade.bank$RESULT)
     wade.bank.melt <- melt(wade.bank, measure.var = 'RESULT')
     wade.bank <- dcast(wade.bank.melt, UID + TRANSECT + TRANSDIR ~ PARAMETER)
-    streammets <- ddply(wade.bank, .(UID), CalcWadeBank)
+    streammets <- ddply(wade.bank, .(UID), CalcWadeBankMets)
     streammets <- melt(streammets, id.var = 'UID', variable.name = 'METRIC', value.name = 'RESULT')
     intermediateMessage('.3')
   }
