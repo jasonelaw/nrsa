@@ -88,15 +88,8 @@ metsSubstrateCharacterization.1 <- function (df1, df2, df3)
  
 {
   # An 8 number summary (5 quantiles, mean, sd, IQR) is used in several places
-  # for metrics.  This function calculates that summary
-  eightnum <- function(x){
-    qnts <- quantile(x, probs = c(0.16, 0.25, 0.5, 0.75, 0.84), 
-                     type = 2, names = F)
-    mn <- mean(x)
-    std <- sd(x) 
-    iqr <- IQR(x, type = 2)
-    return(c(qnts, mn, std, iqr))
-  }
+  # for metrics.  summary.nrsa in NARSShared does it.
+  
   #do the calculations
  
   #convert the size classes to the charDia (geometric mean of the extreme sizes)
@@ -154,12 +147,12 @@ metsSubstrateCharacterization.1 <- function (df1, df2, df3)
     lDiam.ttbl <- na.omit(x$lDiam.ttbl)
     diam.ttbl <- na.omit(x$diam.ttbl)
     ans <- c(# mm calcs
-             eightnum(lDiam.mm),
+             summary.nrsa(lDiam.mm),
              # summaries for the tt dataset (NOR) (ldiam AND diam)
              mean(lDiam.tt), 10^mean(lDiam.tt), sd(lDiam.tt), mean(diam.tt), 
              sd(diam.tt),
              # bl calcs: all the same metrics for the subset with the lumped boulder classes
-             eightnum(lDiam.bl),
+             summary.nrsa(lDiam.bl),
              # ttbl calcs: special few extra summaries that use the lumped boulder class for the NOR
              mean(lDiam.ttbl), sd(lDiam.ttbl), mean(diam.ttbl), sd(diam.ttbl))
     names(ans) <- 
@@ -267,7 +260,7 @@ metsSubstrateCharacterization.1 <- function (df1, df2, df3)
                     select = c('UID', 'RESULT', 'lDiam'))
   f <- function(x){
     lDiam <- na.omit(x$lDiam)
-    ans <- c(count(x$RESULT), eightnum(lDiam))
+    ans <- c(count(x$RESULT), summary.nrsa(lDiam))
     names(ans) <- c('n', 'lsub_d16', 'lsub_d25', 'lsub_d50', 'lsub_d75', 
                     'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr')
     return(ans)

@@ -51,7 +51,7 @@ metsBankMorphology <- function ()
 
 
   #determine protocol used for each site
-  protocols <- siteProtocol (unique(df1$UID))
+  protocols <- siteProtocol(unique(df1$UID))
 
   intermediateMessage ('set_protocols.2', loc='start')
 
@@ -71,6 +71,54 @@ metsBankMorphology <- function ()
 #sample_type PHAB_CHANW ..................wadeable
 #sample_type CHANBANKB, CHANBFRONT........boatable
 
+CalcWadeBankMets <- function(x){
+  n_ba <- count(x$ANGLE)
+  angle.mets <- summary.nrsa(x$ANGLE, probs = c(0.25, 0.5, .75), na.rm = T)
+  n_un <- count(x$UNDERCUT)
+  under.mets <- summary.nrsa(x$UNDERCUT, probs = c(0.25, 0.5, .75), na.rm = T)
+  mets <- c(n_ba, angle.mets, n_un, under.mets)
+  names(mets) <- c('n_ba', 'bka_q1','medbk_a', 'bka_q3', 'xbka', 'sdbk_a', 
+                   'intqbka', 'n_un', 'bkun_q1', 'medbkun', 'bkun_q3',  'xun', 
+                   'sdun', 'intqbkun')
+  mets
+}
+
+CalcBoatNoWettedWidth <- function(uid, wetwid){
+  ww <- aggregate(wetwid, list('UID' = uid), count)
+  ww$METRIC <- 'n_w'
+  names(ww)[2] <- 'RESULT'
+  ww <- subset(ww, select = c('UID', 'METRIC', 'RESULT'))
+  ww
+}
+
+CalcBoatAngleMets <- function(uid, angle){
+  ang.counts <- table(UID = uid, METRIC = angle)
+  ang.prop <- prop.table(ang.counts, 1) * 100
+  ang.counts <- addmargins(ang.counts, margin = 2)
+  
+  # reformat results
+  boatmets1 <- as.data.frame(ang.prop, responseName = 'RESULT')
+  boatmets2 <- as.data.frame(ang.counts, responseName = 'RESULT')
+  boatmets2 <- subset(boatmets2, METRIC == 'Sum')
+  boatmets <- rbind(boatmets1, boatmets2)
+  levels(boatmets$METRIC) <- list(bap_low = '0-5', bap_med = '5-30', 
+                                  bap_stp = '30-75', bap_vstp = '75-100', 
+                                  n_ba = 'Sum')
+  
+  # Modal bank angle
+  ang.prop.list <- as.data.frame(unclass(ang.prop))
+  bangmode <- modalClass2(ang.prop.list)
+  bangmode <- data.frame(UID = dimnames(ang.prop)[[1]], METRIC = 'bangmode', RESULT = bangmode)
+  bangmode$RESULT <- as.factor(bangmode$RESULT)
+  levels(bangmode$RESULT) <- list('low' = '0-5', 'med' = '5-30', 'stp' = '30-75',
+                                  'vst' = '75-100', 'low-med' = '0-5, 5-30', 
+                                  'med-stp' = '5-30, 30-75', 
+                                  'stp-vst' = '30-75, 75-100')
+  bangmode$RESULT <- addNA2(bangmode$RESULT, 'None')
+  rbind(boatmets, bangmode)
+}
+
+
 metsBankMorphology.1 <- function (df1, protocols)
 
 #Returns a dataframe of calculations if successful or a character string describing the problem if one was encountered.
@@ -80,391 +128,51 @@ metsBankMorphology.1 <- function (df1, protocols)
 #protocols   dataframe relating UID to the sampling protocol used at that site
 
 {
-
+  #  
   intermediateMessage('BankMorphology mets', loc='start')
+  
   #initialize datasets for final rbind
   boatmets<-NULL
-  stream<-NULL
+  streammets<-NULL
 
   #start with splitting up streams and rivers.
+  bank <- merge(df1, protocols, by='UID', all.x=TRUE, all.y=FALSE)
+  bank <- subset(bank, (PROTOCOL == 'WADEABLE' & 
+                        PARAMETER %in% c('ANGLE', 'UNDERCUT')) | 
+                       (PROTOCOL == 'BOATABLE' & 
+                        PARAMETER %in% c('ANGLE', 'WETWID')))
 
-  mm <- merge(df1, protocols, by='UID', all.x=TRUE, all.y=FALSE)
-   
-  mmstr <- subset (mm, mm$PROTOCOL=='WADEABLE')
-
-
-  #angle (must reshape to do these calculations)
-
-  if (nrow(mmstr)>0) {
-    ang <- subset (mmstr, mmstr$PARAMETER=='ANGLE')
-    ang$RESULT <- as.numeric(ang$RESULT)  ## NAs by coersion
-
-    ct <- aggregate(ang$RESULT
-                       ,list('UID'=ang$UID
-                       )
-                       ,count
-                       )
-                       
-    ct$METRIC <- 'n_ba'
-    ct <- rename(ct, 'x', 'RESULT')
-
-    mn <- aggregate(ang$RESULT
-                       ,list('UID'=ang$UID
-                       )
-                       ,mean , na.rm=TRUE
-                       )
-    mn$METRIC <- 'xbka'
-    mn <- rename(mn, 'x', 'RESULT')
-
-    stt <- aggregate(ang$RESULT
-                       ,list('UID'=ang$UID
-                       )
-                       ,sd  , na.rm=TRUE
-                       )
-    stt$METRIC <- 'sdbk_a'
-    stt <- rename(stt, 'x', 'RESULT')
-                       
-    iqq <- aggregate(ang$RESULT
-                       ,list('UID'=ang$UID
-                       )
-                       ,iqr
-                       )
-    iqq$METRIC <- 'intqbka'
-    iqq <- rename(iqq, 'x', 'RESULT')
-
-    med <- aggregate(ang$RESULT
-                       ,list('UID'=ang$UID
-                       )
-                       ,median , na.rm=TRUE
-                       )
-                       
-    med$METRIC <- 'medbk_a'
-    med <- rename(med,'x', 'RESULT')
-    
-    upq1 <- aggregate(ang$RESULT
-                       ,list ('UID'=ang$UID
-                       )
-                       ,quantile, 0.25, na.rm=TRUE, names=FALSE, type=2
-                       )
-                       
-    upq1$METRIC <- 'bka_q1'
-    upq1 <- rename(upq1, 'x', 'RESULT')
-
-    upq3 <- aggregate(ang$RESULT
-                     ,list ('UID'=ang$UID)
-                     ,quantile, .75, na.rm=TRUE, names=FALSE, type=2
-                     )
-    upq3$METRIC <- 'bka_q3'
-    upq3 <- rename(upq3, 'x', 'RESULT')
-
-    #put these together
-
-    bkangle <- rbind (ct, mn, stt, iqq, med, upq1, upq3)
-    intermediateMessage('.1')
-
-    #do this same step for undercut (streams)
-
-    unct <- subset (mmstr, mmstr$PARAMETER=='UNDERCUT')
-    unct$RESULT <- as.numeric(unct$RESULT)
-
-    ct <- aggregate(unct$RESULT
-                       ,list('UID'=unct$UID
-                       )
-                       ,count
-                       )
-
-    ct$METRIC <- 'n_un'
-    ct <- rename(ct, 'x', 'RESULT')
-
-    mn <- aggregate(unct$RESULT
-                       ,list('UID'=unct$UID
-                       )
-                       ,mean , na.rm=TRUE
-                       )
-    mn$METRIC <- 'xun'
-    mn <- rename(mn,'x', 'RESULT')
-    
-    
-    
-    
-
-    stt <- aggregate(unct$RESULT
-                       ,list('UID'=unct$UID
-                       )
-                       ,sd , na.rm=TRUE
-                       )
-    stt$METRIC <- 'sdun'
-    stt <- rename(stt, 'x', 'RESULT')
-
-    iqq <- aggregate(unct$RESULT
-                       ,list('UID'=unct$UID
-                       )
-                       ,iqr
-                       )
-    iqq$METRIC <- 'intqbkun'
-    iqq <- rename(iqq, 'x', 'RESULT')
-
-    med <- aggregate(unct$RESULT
-                       ,list('UID'=unct$UID
-                       )
-                       ,median , na.rm=TRUE
-                       )
-
-    med$METRIC <- 'medbkun'
-    med <- rename(med, 'x', 'RESULT')
-
-    upq1 <- aggregate(unct$RESULT
-                       ,list ('UID'=unct$UID
-                       )
-                       ,quantile, 0.25, na.rm=TRUE, names=FALSE, type=2
-                       )
-
-    upq1$METRIC <- 'bkun_q1'
-    upq1 <- rename(upq1, 'x', 'RESULT')
-
-    upq3 <- aggregate(unct$RESULT
-                       ,list ('UID'=unct$UID
-                       )
-                       ,quantile, 0.75, na.rm=TRUE, names=FALSE, type=2
-                       )
-    upq3$METRIC <- 'bkun_q3'
-    upq3 <- rename(upq3, 'x', 'RESULT')
-
-    #put these together
-
-    undercut <- rbind (ct, mn, stt, iqq, med, upq1, upq3)
-    intermediateMessage('.2')
-
-
-    #put together undercut and angle
-
-    stream <- rbind(bkangle, undercut)
+  wade.bank <- subset(bank, PROTOCOL == 'WADEABLE')
+  if (nrow(wade.bank)>0) {
+    wade.bank$RESULT <- as.numeric(wade.bank$RESULT)
+    wade.bank.melt <- melt(wade.bank, measure.var = 'RESULT')
+    wade.bank <- dcast(wade.bank.melt, UID + TRANSECT + TRANSDIR ~ PARAMETER)
+    streammets <- ddply(wade.bank, .(UID), CalcWadeBank)
     intermediateMessage('.3')
   }
-#   iq4step  <- quantile(ang$RESULT, type=2, na.rm=TRUE, names=FALSE)
-   
-#   mmstrw <- reshape(mmstr, idvar='UID', direction='wide', timevar='METRIC')
-#  names(mmstr) <- gsub('RESULT\\.', '', names(mmstr))
-
 
 #Rivers (bank angle and other mets.)
 
 #bang_mode, bap_low, bap_med, bap_mis, bap_stp, bap_vst, n_ba, n_w
 
-  mmboat <- subset (mm, mm$PROTOCOL=='BOATABLE')
-  
-  angb <- subset (mmboat, mmboat$PARAMETER=='ANGLE')
-
-  if(nrow(angb)>0) {
-    ct <- aggregate(angb$RESULT
-                   ,list('UID'=angb$UID)
-                   ,count
-                   )
-    ct$METRIC <- 'n_ba'
-    ct <- rename(ct, 'x', 'n_ba')
-    intermediateMessage('.4')
-
-
-    #use the total ang count to get other counts
-
-    bap_low <- subset (mmboat, mmboat$PARAMETER=='ANGLE' )
-    bap_low <- aggregate(bap_low$RESULT
-                        ,list('UID'=bap_low$UID)
-                        ,function (RESULT) {sum(RESULT=='0-5')}
-                        )
-    bap_low <- rename(bap_low, 'x', 'low')
+  boat.bank <- subset (bank, PROTOCOL=='BOATABLE')
+  if (nrow(boat.bank) > 0){
+    boat.bank.melt <- melt(boat.bank, measure.var = 'RESULT')
+    boat.bank <- dcast(boat.bank.melt, UID + TRANSECT ~ PARAMETER)
     
+    # convert to factor to ensure all options present in table
+    boat.bank$ANGLE <- as.factor(boat.bank$ANGLE)
+    levels(boat.bank$ANGLE) <- c('0-5', '5-30', '30-75', '75-100')
     
-    bb <- merge(ct, bap_low,  by='UID', all.x=TRUE, all.y=FALSE)
-    intermediateMessage('.5')
-
-
-    bb$RESULT <- (bb$low/bb$n_ba) * 100
-    bb$low <- NULL
-    bb$n_ba <- NULL
-    bb$METRIC <- NULL
-    bb$METRIC <- 'bap_low'
-
-    bap_med <- subset (mmboat, mmboat$PARAMETER=='ANGLE')
-    bap_med <- aggregate(bap_med$RESULT
-                        ,list('UID'=bap_med$UID)
-                        ,function (RESULT) {sum(RESULT=='5-30')}
-                        )
-    bap_med <- rename(bap_med, 'x', 'med')
-    bb1 <- merge(ct, bap_med,  by='UID', all.x=TRUE, all.y=FALSE)
-    
-    intermediateMessage('.6')
-
-    if(nrow(bb1)>0) {
-      bb1$RESULT <- (bb1$med/bb1$n_ba) *100
-      bb1$med <- NULL
-      bb1$n_ba <- NULL
-      bb1$METRIC <- NULL
-      bb1$METRIC <- 'bap_med'
-    }
- 
-    bap_stp <- subset (mmboat, mmboat$PARAMETER=='ANGLE' )
-    bap_stp <- aggregate(bap_stp$RESULT
-                        ,list('UID'=bap_stp$UID)
-                        , function (RESULT) {sum(RESULT=='30-75')}
-                        )
-    bap_stp <- rename(bap_stp, 'x', 'stp')
-      
-    bb2 <- merge(ct, bap_stp,  by='UID', all.x=TRUE, all.y=FALSE)
-    
-    if(nrow(bb2)>0) {
-      bb2$RESULT <- (bb2$stp/bb2$n_ba) *100
-      bb2$stp <- NULL
-      bb2$n_ba <- NULL
-      bb2$METRIC <- NULL
-      bb2$METRIC <- 'bap_stp'
-    }
- 
-    bap_vst <- subset (mmboat, mmboat$PARAMETER=='ANGLE' )
-    bap_vst <- aggregate(bap_vst$RESULT
-                        ,list('UID'=bap_vst$UID)
-                        ,function (RESULT) {sum(RESULT=='75-100')}
-                        )
-    bap_vst<- rename(bap_vst, 'x', 'vst')
-    bb3 <- merge(ct, bap_vst,  by='UID', all.x=TRUE, all.y=FALSE)
-    
-   intermediateMessage('.7')
-
-   if(nrow(bb3)>0) {
-     bb3$RESULT <- (bb3$vst/bb3$n_ba) *100
-     bb3$vst <- NULL
-     bb3$n_ba <- NULL
-     bb3$METRIC <- NULL
-     bb3$METRIC <- 'bap_vst'
-   }
- 
-  # Configuring ct for rbind
-  ct <- rename(ct,'n_ba','RESULT')
-  ct <- subset(ct, select=c('UID','METRIC','RESULT'))
-
-  intermediateMessage('.8')
-
-  bb4 <- rbind (bb, bb1,bb2,bb3,ct)
-    
-#    bb4 <- merge(bb, bap_med,  by='UID', all.x=TRUE, all.y=FALSE)
-#    bb2 <- merge(bb1, bap_stp,  by='UID', all.x=TRUE, all.y=FALSE)
-#    bb3 <- merge(bb2, bap_vst,  by='UID', all.x=TRUE, all.y=FALSE)
-   
-
-#calculate the 'n' for wetted width  
-    
-  angb <- subset (mmboat, mmboat$PARAMETER=='WETWID')
-  angb$RESULT <- as.numeric(angb$RESULT)
-
-  ww <- aggregate(angb$RESULT
-                 ,list('UID'=angb$UID)
-                 ,count
-                 )
-                       
-  ww$METRIC <- 'n_w'
-  ww <- rename(ww, 'x', 'RESULT')
-    
-  boat <- rbind (bb4, ww)
-    
-  
-  intermediateMessage('.9')
-
-  #work on the BANGMODE code for rivers.
-  bang <- subset(df1
-                ,PARAMETER=='ANGLE' &
-                 RESULT %in% c('0-5','5-30','30-75','75-100')
-                )
-
-  tt <- aggregate(bang$RESULT=='0-5'
-                 ,list('UID'=bang$UID)
-                 ,mean, na.rm=TRUE
-                 )
-  lowbap <- rename(tt, 'x', 'xlow')
-
-  tt <- aggregate(bang$RESULT=='5-30'
-                 ,list('UID'=bang$UID)
-                 ,mean, na.rm=TRUE
-                 )
-  medbap <- rename(tt, 'x', 'xmed')
-
-  tt <- aggregate(bang$RESULT=='30-75'
-                 ,list('UID'=bang$UID)
-                 ,mean, na.rm=TRUE
-                 )
-  stpbap <- rename(tt, 'x', 'xstp')
-
-  tt <- aggregate(bang$RESULT=='75-100'
-                 ,list('UID'=bang$UID)
-                 ,mean, na.rm=TRUE
-                 )
-  vstbap <- rename(tt, 'x', 'xvst')
-
- 
-  intermediateMessage('.10')
-  
-  # Determine color mode (most common bank angle)
-  fracbangmode<-merge(lowbap, medbap
-                   ,by='UID'
-                   ,all=TRUE
-                   ,sort=FALSE
-                   )
-  fracbangmode<-merge(fracbangmode, stpbap
-                   ,by='UID'
-                   ,all=TRUE
-                   ,sort=FALSE
-                   )
-  fracbangmode<-merge(fracbangmode, vstbap
-                   ,by='UID'
-                   ,all=TRUE
-                   ,sort=FALSE
-                   )
-
-  intermediateMessage('.11')
-
-
-  modebang <- subset(fracbangmode, select='UID')
-  modebang$bsobang <- NA
-  for(i in 1:nrow(modebang)) {
-      modebang$bsobang[i] <- modalClass(fracbangmode[i,]
-                                         ,c('xlow','xmed','xstp','xvst'
-                                           )
-                                         ,c('0-5','5-30','30-75','75-100'
-                                         )
-                                         )
+    # calculate boatable metrics
+    boatmets <- CalcBoatAngleMets(boat.bank$UID, boat.bank$ANGLE)
+    ww <- CalcBoatNoWettedWidth(boat.bank$UID, boat.bank$WETWID)
+    boatmets <- rbind(boatmets, ww)
   }
-
-  intermediateMessage('.12')
-
-  modebang$METRIC <- 'bangmode'
-  modebang <- rename(modebang, 'bsobang', 'RESULT')
-    
-  modebang$RESULT <- ifelse(modebang$RESULT =='0-5', 'low', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='5-30', 'med', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='30-75', 'stp', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='75-100', 'vst', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='0-5, 5-30', 'low-med', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='5-30, 30-75', 'med-stp', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT =='30-75, 75-100', 'stp-vst', modebang$RESULT)
-  modebang$RESULT <- ifelse(modebang$RESULT %in% c('low', 'med','stp', 'vst'
-                                                  ,'low-med','med-stp', 'stp-vst'
-                                                  )
-                           ,modebang$RESULT, 'None'
-                           )
-
-  boatmets <- rbind (modebang, boat)
- 
-}
-
- metsfakeo <- rbind (boatmets, stream)
+  mets <- rbind(boatmets, streammets)
  
   intermediateMessage('  Done.', loc='end')
-  return(metsfakeo)
-
+  return(mets)
   }
-  
 
-
-
-
- #test of metsBankMorphology function
 
