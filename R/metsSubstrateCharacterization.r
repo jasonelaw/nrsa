@@ -186,12 +186,9 @@ metsSubstrateCharacterization.1 <- function (df1, df2, df3)
   calcs$d16 <- 10^calcs$lsub2d16inor
   calcs$d50 <- 10^calcs$lsub2d50inor
   calcs$d84 <- 10^calcs$lsub2d84inor
-#   calcs <- transform(calcs, d16 = 10^lsub2d16inor, d50 = 10^lsub2d50inor,
-#                      d84 = 10^lsub2d84inor)
   calcs <- melt(calcs, id.var = 'UID', variable.name = 'METRIC', 
                 value.name = 'RESULT')
  
-
 #moving on to counts and percentages for these, want to count SIZE_CLS/XSIZE_CLS THE SAME,
 #there are three 'n' values associated with these counts
 # realallsize.... every size class

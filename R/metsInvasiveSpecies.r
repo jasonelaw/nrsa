@@ -28,15 +28,8 @@ metsInvasiveSpecies <- function()
                  
 intermediateMessage('Invasive species metrics calculations', loc='start')
 intermediateMessage('.1 Read in data', loc='end')
-on.exit(odbcClose(chan))
-##  Reading in data from tblINVASIVELEGACY2
-chan <- odbcConnect('NRSA2')
-tblINVASIVELEGACY2 <- fetchNRSATable(chan,'tblINVASIVELEGACY2')
-
-## Retataining invasive legacy data
-df <- subset(tblINVASIVELEGACY2, PARAMETER %in% c('E_WTRMILF','HYDRILLA','W_HYACINTH',
-             'YLW_FLTHEAR','P_LSTRIFE','G_REED','FLWR_RUSH','SALT_CED','MF_ROSE',
-             'SPURGE','NO_INVASIVES'), select=c('UID','TRANSECT','PARAMETER','RESULT'))
+species <- PortlandList()
+df <- getInvasiveData(species)
 
 ## Calculate the metrics
 intermediateMessage('.2 call function metsInvasiveSpecies.1', loc='end')
@@ -48,9 +41,29 @@ rc <- writeNRSACalcResults(mets, 'metsInvasiveSpecies.csv')
         
 intermediateMessage('  Done.', loc='end')
 return(rc)
-
 }
 
+EpaList <- function(){
+  c('E_WTRMILF', 'HYDRILLA', 'W_HYACINTH', 'YLW_FLTHEAR', 'P_LSTRIFE', 'G_REED',
+    'FLWR_RUSH', 'SALT_CED', 'MF_ROSE', 'SPURGE', 'NO_INVASIVES')
+}
+
+PortlandList <- function(){
+  c("TSN24852", "TSN36089", "TSN41335", "TSN30414", "TSN30705", 
+    "TSN20889", "TSN29393", "TSN43194", "TSN25864", "TSN184481", 
+    "TSN503154")
+}
+
+getInvasiveData <- function(parameters){
+  on.exit(odbcClose(chan))
+  chan <- odbcConnect('NRSA2')
+  data <- fetchNRSATable(chan, 'tblINVASIVELEGACY2')
+
+  df <- subset(data,
+               PARAMETER %in% parameters, 
+               select=c('UID','TRANSECT','PARAMETER','RESULT'))
+  return(df)
+}
 
 metsInvasiveSpecies.1 <- function(df)
 {
