@@ -1,0 +1,24 @@
+\name{calculateCanopyCover}
+\alias{calculateCanopyCover}
+\title{Calculates Canopy Densiometer metrics}
+\usage{
+  calculateCanopyCover(uid, is.bank, densiometer)
+}
+\arguments{
+  \item{uid}{a vector of site-visits}
+
+  \item{is.bank}{whether the measurement is a bank
+  measurement or not}
+
+  \item{densiometer}{a vector of densiometer measurments
+  from 0-17.}
+}
+\description{
+  \code{calculateCanopyCover} calculates these canopy cover
+  metrics from the densiometer readings: Wadeable Protocal:
+  xcdenmid xcdenbk vcdenmid vcdenbk nbnk nmid.
+}
+\details{
+  Boatable Protocal: xcdenbk vcdenbk nbnk
+}
+

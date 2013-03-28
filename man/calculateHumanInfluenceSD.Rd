@@ -1,0 +1,25 @@
+\name{calculateHumanInfluenceSD}
+\alias{calculateHumanInfluenceSD}
+\title{Calculate human influence standard deviation metrics}
+\usage{
+  calculateHumanInfluenceSD(uid, transect, result)
+}
+\arguments{
+  \item{uid}{a vector that differentiates among sites or
+  site visits.}
+
+  \item{transect}{a vector of transect names for the site}
+
+  \item{result}{a vector of results 0 (not present), P
+  (present > 10 m), C (present < 10 m), B (present on
+  bank)}
+}
+\value{
+  returns a dataframe with three columns: uid, metric,
+  result
+}
+\description{
+  This function calculates the human influence standard
+  deviation metrics.
+}
+

@@ -10,7 +10,7 @@
 #          the expected number of transects is still 9.
 #  3/10/10 cws Handling case of no clear mode; correcting overall logic of test.
 #
-require(RUnit)
+require(RUnit) 
 
 nWadeableStationsPerTransect <- function(thal)
 # Estimates the intended number of wadeable thalweg stations at each transect

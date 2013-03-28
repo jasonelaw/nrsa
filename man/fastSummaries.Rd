@@ -1,0 +1,37 @@
+\name{fastSummaries}
+\alias{fastSummaries}
+\title{Helper function for fast summaries}
+\usage{
+  fastSummaries(X, INDEX, FUN, drop = T, ...)
+}
+\arguments{
+  \item{X}{a vector or matrix}
+
+  \item{INDEX}{a list of factors}
+
+  \item{FUN}{a function that accepts two arguments a
+  numeric matrix or vector and a grouping vector and
+  returns a vector of summary statistics for each member of
+  the group}
+}
+\value{
+  a data.frame with the grouping variables and the output
+  of FUN applied to each unique group
+}
+\description{
+  \code{fastSummaries} is a helper function that accepts a
+  vector or matrix, a list of grouping factors, and
+  function that calculates summaries by group.
+}
+\examples{
+d <- expand.grid(uid = 1:2000, transects = LETTERS[1:11], zone = 1:2, class = 1:12)
+d$result <- rpois(nrow(d), .5)
+f <- function(x, i, ...){
+ cbind(sm = igroupSums(x, i),
+       me = igroupMeans(x, i),
+       mn = igroupMins(x, i),
+       mx = igroupMaxs(x, i))
+}
+system.time(fastSummaries(d$result, d[c('uid', 'class', 'zone')], FUN = f))
+}
+

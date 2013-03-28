@@ -10,7 +10,54 @@
 # 4/14/2010 mrc write a unit test for fetchNRSATable
 #               exclude datalines for sidechannels when PROTOCOL is BOATABLE
 
-fetchNRSATable <- function (chan, tblName, at=NULL, where=NULL, filterSideChannels=TRUE)
+#'@export
+fetchNRSAResults <- function(..., chan, tblName, operator = 'AND', wide = FALSE){
+  op <- options()
+  on.exit(options(op))
+  options(useFancyQuotes = FALSE)
+  pars <- list(...)
+  pars <- lapply(pars, function(x) paste("(", toString(sQuote(x)), ")"))
+  pars <- paste(names(pars), pars, sep = " IN ", collapse = sprintf(" %s ", operator))
+  query <- sprintf("SELECT * FROM %s WHERE %s;",
+                   tblName,
+                   pars)
+  if (inherits(chan, "SQLiteConnection")){
+    df <- dbGetQuery(con, query)
+    if('date' %in% names(df)){
+      class(df$date) <- class(Sys.time())
+    }
+  } else if (inherits(chan, 'RODBC')){
+    df <- sqlQuery(chan, query, errors = TRUE)
+  } else {
+    stop('Data connection is not supported')
+  }
+  n.par <- length(unique(df$parameter))
+  n.subpar <- length(unique(df$subparameter))
+  
+  if (wide && all(is.na(df$subparameter))){
+    if(any(tapply(df$unit, df$parameter, function(x) length(unique(x))) > 1)){
+      warning('Some parameters have have more than unit in the same vector!')
+    }
+    levs <- unique(df$parameter)
+    dfm <- melt(df, id.var = c('batchno', 'entity', 'observation_id', 'date', 'parameter', 'method', 'observer', 'equipment'), measure.var = 'result')
+    df <- dcast(dfm, ... ~ parameter)
+    df[levs] <- lapply(df[levs], type.convert)
+  } else if (wide && identical(n.par, 1L)){
+    if(any(tapply(df$unit, df$subparameter, function(x) length(unique(x))) > 1)){
+      warning('Some parameters have have more than unit in the same vector!')
+    }
+    levs <- unique(df$subparameter)
+    dfm <- melt(df, id.var = c('batchno', 'entity', 'observation_id', 'date', 'parameter', 'subparameter', 'method', 'observer', 'equipment'), measure.var = 'result')
+    df <- dcast(dfm, ... ~ subparameter)
+    df[levs] <- lapply(df[levs], type.convert)
+  } else {
+    df$result <- type.convert(df$result)
+  }
+  return(df)
+}
+
+
+fetchNRSATable <- function(chan, tblName, at=NULL, where=NULL, filterSideChannels=TRUE){
 # Retrieves the specified NRSA table via an ODBC connection and standardizes
 # the contents as follows:
 #   a) Changes numeric column 'BATCHNO' to character column 'UID'
@@ -26,7 +73,7 @@ fetchNRSATable <- function (chan, tblName, at=NULL, where=NULL, filterSideChanne
 #                  a subset of the table.
 # ASSUMPTIONS:
 #
-{
+
 
  if (filterSideChannels==TRUE) {
 

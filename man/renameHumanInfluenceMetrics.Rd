@@ -1,0 +1,22 @@
+\name{renameHumanInfluenceMetrics}
+\alias{renameHumanInfluenceMetrics}
+\title{Renames metrics for human influence}
+\usage{
+  renameHumanInfluenceMetrics(group, metric)
+}
+\arguments{
+  \item{group}{a vector of groups based on the names passed
+  to meltMetrics}
+
+  \item{metric}{a vector metric indicators}
+}
+\description{
+  Renames human influence metrics based on a group variable
+  (created by meltMetrics) and a metric variable (created
+  during grouping operations).  See calculateHumanInfluence
+  code for how the group vector and metric vector are
+  created and what the values are. This is definitely not
+  to be called outside the nrsa package because it depends
+  expicitly on the code in calculateHumanInfluence.
+}
+

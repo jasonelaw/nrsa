@@ -11,11 +11,6 @@ require(RODBC)
 
 #get and fix the Wood table
 
-
-
-
-
-
 valStructWood <- function(df, test='all')
 
 # Performs structure checks on the NRSA table tblWood2.  Returns NULL if

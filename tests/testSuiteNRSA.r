@@ -4,10 +4,8 @@
 #
 # 02/18/10 cws Created.
 #
-
 require(RUnit)
 require(nrsa)
-
 test.dir <- system.file('unitTests', package = 'nrsa')
 testSuite <- defineTestSuite('nrsa', 
                              dirs           = test.dir, 

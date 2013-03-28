@@ -48,7 +48,7 @@ metsChannelChar <- function()
   return(rc)
 }
 # Function definitions
-metsChannelChar.1 <- function(indat, chanCon){
+metsChannelChar.1 <- function(uid, constraint, shor2rip, see.over.bank){
   # Does all the real work for metsChannelChar.
   #
   # Args:
@@ -58,17 +58,21 @@ metsChannelChar.1 <- function(indat, chanCon){
   # Returns:
   #   Returns a dataframe of calculations if successful.
   # Make the data wide
+  #'@importFrom NARSShared count
   mindat <- melt(indat, measure.var = 'RESULT')
   mindat$value <- as.character(mindat$value)
   cindat <- dcast(mindat, UID + TRANSECT ~ PARAMETER, 
                   subset = .(PARAMETER %in% c('CONSTRT', 'SHOR2RIP', 'SEEOVRBK')))
-  cindat$SHOR2RIP <- FactorToNumeric(cindat$SHOR2RIP)
-  levels(cindat$CONSTRT) <- list('pctch_b' = 'B', 'pctch_c' = 'C', 
-                                 'pctch_n' = 'N', 'pctch_u' = 'U')
+  x <- data.frame(uid = uid, constraint = constraint, shor2rip = shor2rip,
+                  see.over.bank = see.over.bank)
+  x$shor2rip <- FactorToNumeric(x$shor2rip)
+  levels(x$constraint) <- list('pctch_b' = 'B', 'pctch_c' = 'C', 
+                               'pctch_n' = 'N', 'pctch_u' = 'U')
+  x$see.over.bank <- x$see.over.bank == 'YES'
   # Calculate all of the metrics
   calc <- function(x){
-    c(prop.table(table(x$CONSTRT)) * 100,
-      "pct_ovrb" = sum(x$SEEOVRBK == 'YES', na.rm=T) / count(x$SEEOVRBK) * 100,
+    c(prop.table(table(x$constraint)) * 100,
+      "pct_ovrb" = sum(x$see.over.bank, na.rm=T) / count(x$SEEOVRBK) * 100,
       "xshor2vg" = mean(x$SHOR2RIP, na.rm = T),
       "mxshor"   = max(x$SHOR2RIP, na.rm = T),
       "mnshor"   = min(x$SHOR2RIP, na.rm = T))
@@ -77,17 +81,38 @@ metsChannelChar.1 <- function(indat, chanCon){
   # Transform from wide to long metrics
   out    <- melt(out, id.var = 'UID', variable.name = 'METRIC',
                  value.name = 'RESULT')
-  # Get channel constraint metrics and rename them           
-  ccMets <- rename(chanCon[c('UID','PARAMETER','RESULT')], 'PARAMETER', 'METRIC')
-  ccMets$METRIC <- 
-    factor(x      = ccMets$METRIC, 
-           levels = c("BANKFULL", "CONSTRNT", "FEATURES", "PATTERN", 
-                      "PERCENT", "VALLEY", "VALLYBOX"),
-           labels = c("conbankfull", "constraint", "confeatures", "conpattern",
-                      "conpercent", "convalley", "convalleybox"))
-  ccMets$METRIC <- as.character(ccMets$METRIC)
-  ccMets$METRIC[is.na(ccMets$METRIC)] <- 'UNKNOWN!!'
+
   mets <- rbind(out, ccMets)
   return(mets)
 }
 
+calculateChannelChar <- functionfunction(uid, constraint, shor2rip, see.over.bank){
+  x <- data.frame(uid = uid, constraint = constraint, shor2rip = shor2rip,
+                  see.over.bank = see.over.bank)
+  x$shor2rip <- FactorToNumeric(x$shor2rip)
+  levels(x$constraint) <- list('pctch_b' = 'B', 'pctch_c' = 'C', 
+                               'pctch_n' = 'N', 'pctch_u' = 'U')
+  x$see.over.bank <- x$see.over.bank == 'YES'
+  
+  pcb_ovrb <- igroupMeans(x$see.over.bank, x$uid, na.rm = T)
+  xshor2vg <- igroupMeans(x$shor2rip, x$uid, na.rm = T)
+  mxshor <- igroupMaxs(x$shor2rip, x$uid, na.rm = T)
+  mnshor <- igroupMins(x$shor2rip, x$uid, na.rm = T)
+  mets <- data.frame(uid = uid, pcb_ovrb, xshor2vg = xshor2vg,
+                     mxshor = mxshor, mnshor = mnshor)
+  meltMetrics(mets)
+}
+
+getChannelConstraint <- function(uid, parameter, result){
+  x <- data.frame(uid = uid, metric = parameter, result = result)  
+  x$metric <- 
+    factor(x      = x$metric, 
+           levels = c("BANKFULL", "CONSTRNT", "FEATURES", "PATTERN", 
+                      "PERCENT", "VALLEY", "VALLYBOX"),
+           labels = c("conbankfull", "constraint", "confeatures", "conpattern",
+                      "conpercent", "convalley", "convalleybox"))
+if(any(!is.na(x$metric))){
+  stop('There are unknown parameter values in getChannelConstraint')
+}
+  return(x)
+}

@@ -1,9 +1,8 @@
 # siteProtocol.r
 #
 # 03/25/10 cws Changed protocol to PROTOCOL for consistency.
-require(RODBC)
 
-siteProtocol <- function(sites)
+siteProtocol <- function(sites){
 # Relates NRSA UID values to the protocol used to sample them, based on the
 # information recorded on the Stream Verification form.
 # Returns a dataframe with columns UID and protocol, and one row per unique
@@ -20,16 +19,16 @@ siteProtocol <- function(sites)
 #   ALTERED, BOATABLE, DRYNOVISIT, DRYVISIT, IMPOUNDED, INACCPERM, INACCTEMP,
 #   INTWADE, MAPERROR, NOTBOAT, NOTWADE, OTHR_NSP, OTHR_NST, PARBYBOAT,
 #   PARBYWADE, WADEABLE, WETLAND or NA
-{
   # Get sampling information recorded on Stream Verification form
-  chan <- odbcConnect('NRSA2')
-  on.exit(siteProtocol.cleanup(chan))
-  siteInfo <- fetchNRSATable(chan, 'tblVISITS2', at=NULL, where=NULL, filterSideChannels=FALSE)
-  if(is.character(siteInfo)) return(siteInfo)
-
-  rr <- siteProtocol.1(sites, siteInfo)
-  
-  return(rr)
+  dsn  <- nrsa.options()$NRSADSN
+  chan <- odbcConnect(dsn)
+  on.exit(odbcClose(chan))
+  site.info <- sqlFetch(chan, 'VERIFICATION')
+  levs      <- unique(site.info[, c('BATCHNO', 'VALXSITE')])
+  levels(levs$VALXSITE) <- list(BOATABLE = c('BOATABLE','PARBYBOAT','ALTERED'),
+                                WADEABLE = c('INTWADE','PARBYWADE','WADEABLE','ALTERED','DRY', 'INTWADE'))
+  protocol <- mapvalues(sites, levs$BATCHNO, as.character(levs$VALXSITE),  warn_missing = FALSE)
+  return(protocol[, drop = T])
 }
 
 siteProtocol.1 <- function(sites, siteInfo)
@@ -61,14 +60,6 @@ siteProtocol.1 <- function(sites, siteInfo)
   tt <- subset(tt, select=c(UID, PROTOCOL))
   
   return(tt)
-}
-
-
-
-siteProtocol.cleanup <- function(chan)
-# Clean up when siteProtocol() terminates
-{
-  odbcClose(chan)
 }
 
 # end of file

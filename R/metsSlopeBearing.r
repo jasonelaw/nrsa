@@ -12,7 +12,6 @@
 #  5/27/10 cws Updated code to use INCREMNT occuring only at A 0, reflecting
 #              the current data organization.  Modified unit test accordingly.
 #
-
 require(RODBC)
 require(RUnit)
 
@@ -28,7 +27,6 @@ metsSlopeBearing <- function()
 # ARGUMENTS:
 # none
 {
-
   chan <- odbcConnect('NRSA2')
   on.exit(close(chan))
   thal <- fetchNRSATable(chan, 'tblTHALWEG2')
