@@ -8,8 +8,8 @@
 
 # Library and source statements
 #source('S:/jlaw/pawmap/source/NRSA/myVersions/JSharedCode.R')
-require(RODBC)
-require(RUnit)
+#require(RODBC)
+#require(RUnit)
 
 metsChannelChar <- function()
 # Calculates Channel Characteristic metrics:
@@ -86,7 +86,7 @@ metsChannelChar.1 <- function(uid, constraint, shor2rip, see.over.bank){
   return(mets)
 }
 
-calculateChannelChar <- functionfunction(uid, constraint, shor2rip, see.over.bank){
+calculateChannelChar <- function(uid, constraint, shor2rip, see.over.bank){
   x <- data.frame(uid = uid, constraint = constraint, shor2rip = shor2rip,
                   see.over.bank = see.over.bank)
   x$shor2rip <- FactorToNumeric(x$shor2rip)
