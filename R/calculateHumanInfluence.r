@@ -13,12 +13,13 @@
 #'@importFrom plyr ddply rbind.fill mapvalues arrange
 #'@export
 calculateHumanInfluence <- function(uid, parameter, result){
-  stopifnot(length(uid) == c(length(parameter), length(result)))
+  #TODO: Add a 'bank hardening' metric which is sum of percentages for each transect.
+  stopifnot(length(uid) == c(length(parameter), length(uid) == length(result)))
   levels(parameter) <- tolower(levels(parameter))
-  is.ag <- parameter %in% c('row', 'past')
-  ag.pars <- as.character(unique(parameter[is.ag]))
+  ag.pars <- c('row', 'past')
   noag.pars <- setdiff(levels(parameter), ag.pars)
-  # Calculate sums by parameter category and divide by number of observations per parameter
+  # Calculate sums by parameter category over the transects and transect directions
+  # and divide by number of observations per parameter.  
   denom <- table(uid, parameter)
   tbl <- table(uid, parameter, result)
   tbl.CB <- tbl[,, 'B', drop = F] + tbl[,, 'C', drop = F]
@@ -101,4 +102,32 @@ renameHumanInfluenceMetrics <- function(group, metric){
   #Special cases
   revalue(metrics, c('w1h_noag' = 'w1_hnoag', 'w1h_ag' = 'w1_hag', 
                      'w1h_all'  = 'w1_hall', 'xcb_hnoag' = 'xcb_hnag'))
+}
+
+#'Calculates a bank hardening metric for City of Portland use.
+#'
+#'Calculates a bank hardening metric for City of Portland use.  The percentage of bank
+#'where either bldg, pave, wall, or road are marked 'B' is calculated.
+#'@param uid a vector that differentiates among sites or site visits.
+#'@param transect a vector of transect indicators
+#'@param plot a vector of transect direction indicators
+#'@param parameter a vector of parameter names for the 11 human influence parameters
+#'@param result a vector of results 0 (not present), P (present > 10 m), 
+#'C (present < 10 m), B (present on bank)
+#'@importFrom plyr ddply
+#'@export
+calculateBankHardening <- function(uid, transect, plot, parameter, result){
+  x <- data.frame(uid = uid, transect = transect, plot = plot, parameter = parameter, result = result)
+  x <- subset(x, parameter %in% c('build', 'pave', 'wall', 'road'))
+  plot.data <- ddply(x, .(uid, transect, plot), function(x){
+    if(all(is.na(x$result))){
+      return(c(is.hardened = NA))
+    } else {
+      return(c(is.hardened = any(x$result %in% 'B')))
+    } 
+  })
+  plot.data$is.hardened <- factor(plot.data$is.hardened, levels = c('TRUE', 'FALSE'))
+  ans <- ddply(plot.data, .(uid), function(x) c(result = unname(prop.table(table(x$is.hardened))['TRUE'])))
+  ans$metric <- 'bankhard'
+  return(ans[,c('uid', 'metric', 'result')])
 }
