@@ -1,0 +1,21 @@
+\name{calculateShoreToVegDistance}
+\alias{calculateShoreToVegDistance}
+\title{Calculates summaries of shore to vegetation distance}
+\usage{
+  calculateShoreToVegDistance(uid, shor2rip)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{shor2rip}{a vector of distances from the shore to}
+}
+\value{
+  a 'metric' data.frame (i.e., one with uid, metric, result
+  fields)
+}
+\description{
+  Calculates the metrics xshor2vg, mxshor, mnshor which
+  summarize the shore to riparian vegetation distance over
+  the reach.  For boatable sites only.
+}
+

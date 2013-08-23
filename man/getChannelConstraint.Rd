@@ -1,0 +1,24 @@
+\name{getChannelConstraint}
+\alias{getChannelConstraint}
+\title{Formats the channel constraint form data as metrics}
+\usage{
+  getChannelConstraint(uid, parameter, result)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{parameter}{a vector of parameters including:
+  BANKFULL, CONSTRNT, FEATURES, PATTERN, PERCENT, VALLEY,
+  VALLYBOX}
+
+  \item{result}{a vector of results for each parameter}
+}
+\value{
+  a 'metric' data.frame
+}
+\description{
+  Formats the channel constraint form data as metrics.
+  There is only one form per site so no calculations are
+  required; just some formatting. For boatable sites only.
+}
+

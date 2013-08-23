@@ -1,0 +1,17 @@
+\name{removeSideChannels}
+\alias{removeSideChannels}
+\title{Removes side channels from a data frame}
+\usage{
+  removeSideChannels(x, transect)
+}
+\arguments{
+  \item{x}{a data frame}
+
+  \item{transect}{a vector of transect codes of the same
+  length as rows in \code{x}}
+}
+\description{
+  \code{removeSideChannels} removes side channels from a
+  dataframe using the transect codes
+}
+
