@@ -1,3 +1,7 @@
+calculateSlopeMetrics <- function(){
+  
+}
+
 # metsSlopeBearing.r
 #
 # 02/01/10 cws created.

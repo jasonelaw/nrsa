@@ -48,12 +48,12 @@ metsChannelMorphology <- function ()
 
   #read in the data from tblBankMorphology2, tblThalweg2
 
-  chan <- odbcConnect ('NRSA2')
+  chan <- odbcConnect('NRSA_REP_32')
   df1 <- fetchNRSATable(chan, 'tblBankGeometry2')
-  df2 <- fetchNRSATable (chan, 'tblThalweg2')
+  df2 <- fetchNRSATable(chan, 'tblThalweg2')
   
   df1 <- subset(df1, df1$PARAMETER %in% c('BANKHGT', 'INCISHGT', 'WETWID', 'BANKHT', 'INCISED', 'BANKWID'))
-  df2 <- subset (df2, df2$PARAMETER %in% c('DEPTH', 'WETWIDTH', 'DEP_SONR', 'DEP_POLE'))
+  df2 <- subset(df2, df2$PARAMETER %in% c('DEPTH', 'WETWIDTH', 'DEP_SONR', 'DEP_POLE'))
 
   intermediateMessage ('fetch_data.1')
   #determine protocol used for each site
