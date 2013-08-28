@@ -7,7 +7,8 @@
 \arguments{
   \item{uid}{a vector of site identifiers}
 
-  \item{shor2rip}{a vector of distances from the shore to}
+  \item{shor2rip}{a vector of distances from the shore to
+  riparian vegeatation}
 }
 \value{
   a 'metric' data.frame (i.e., one with uid, metric, result

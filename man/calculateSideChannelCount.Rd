@@ -1,0 +1,27 @@
+\name{calculateSideChannelCount}
+\alias{calculateSideChannelCount}
+\title{Calculates number of side channel transects: 'sidecnt'}
+\usage{
+  calculateSideChannelCount(uid, transect)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{transect}{the unique vector of transects for each
+  site}
+}
+\value{
+  a 'metric' data.frame
+}
+\description{
+  Calculates the number of side channel transects for
+  wadeable sites only.  These are transects that are marked
+  with an 'X' prefix in the database.  The metric name is
+  'sidecnt'. The inputs are just the vector of site
+  identifiers and transect identifiers for each site.
+}
+\examples{
+d <- expand.grid(uid = 1:10, transect = c(LETTERS, 'XA'))
+calculateSideChannelCount(d$uid, d$transect)
+}
+

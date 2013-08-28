@@ -1,0 +1,20 @@
+\name{calculateBoatAngleMetrics}
+\alias{calculateBoatAngleMetrics}
+\title{Calculate boat protocol bank angle metrics}
+\usage{
+  calculateBoatAngleMetrics(uid, angle)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{angle}{a vector of bank angle categories: '0-5',
+  '5-30', '30-75', '75-100'.}
+}
+\value{
+  a 'metric' data.frame
+}
+\description{
+  Calculate boat protocol bank angle metrics: bangmode,
+  bap_low, bap_med, bap_mis ,bap_stp, bap_vst, n_ba.
+}
+

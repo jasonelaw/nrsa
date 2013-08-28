@@ -5,7 +5,6 @@
 \alias{summaryby}
 \alias{siteProtocol}
 \alias{quickUnitsCheck}
-\alias{nWadeableStationsPerTransect}
 \alias{neightborBasedValidation}
 \alias{NA_filler}
 %- Also NEED an '\alias' for EACH other topic documented here.

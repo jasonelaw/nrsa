@@ -1,0 +1,34 @@
+\name{calculateWadeableReachLength}
+\alias{calculateWadeableReachLength}
+\title{Calculates the reach length for a wadeable site}
+\usage{
+  calculateWadeableReachLength(uid, n.station, increment)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{n.station}{the number of station per transect}
+
+  \item{increment}{the distance between stations at a
+  wadeable site}
+}
+\value{
+  a 'metric' data.frame
+}
+\description{
+  Calculates the reach length for a wadeable site using the
+  number of stations per transect and the increment between
+  stations.  The number of stations per transect must be
+  calculated using \link{nWadeableStationsPerTransect}
+  prior to passing to this function.  There is one unique
+  increment per site and as many n.station as there are
+  transects at a site.
+}
+\examples{
+increment <- expand.grid(uid = 1:10, increment = 1.5)
+d <- expand.grid(uid = 1:10, transects = LETTERS[1:11], station = 0:9)
+n.sta <- nWadeableStations(d$uid, d$transects, d$station, by = 'site')
+d <- merge(increment, n.sta, by = 'uid')
+calculateWadeableReachLength(d$uid, d$n.sta, d$increment)
+}
+

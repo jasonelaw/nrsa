@@ -1,0 +1,30 @@
+\name{calculateWadeBankMetrics}
+\alias{calculateWadeAngleMetrics}
+\alias{calculateWadeBankMetrics}
+\alias{calculateWadeUndercutMetrics}
+\title{Calculates wadeable bank metrics}
+\usage{
+  calculateWadeBankMetrics(uid, angle, undercut)
+
+  calculateWadeUndercutMetrics(undercut)
+
+  calculateWadeAngleMetrics(angle)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{angle}{a vector of bank angle measurements}
+
+  \item{undercut}{a vector of bank undercut measurements}
+}
+\value{
+  a 'metric' data.frame
+}
+\description{
+  Calculates wadeable bank metrics: n_ba, bka_q1, medbk_a,
+  bka_q3, xbka, sdbk_a, intqbka, n_un, bkun_q1, medbkun,
+  bkun_q3, xun, sdun, intqbkun.  The functions without uid
+  arguments return named vectors of metrics and operate on
+  a single site of measurements.
+}
+
