@@ -3,18 +3,21 @@
 #'Calculates the metrics xshor2vg, mxshor, mnshor which summarize the shore to
 #'riparian vegetation distance over the reach.  For boatable sites only.
 #'@param uid a vector of site identifiers
-#'@param shor2rip a vector of distances from the shore to
+#'@param shor2rip a vector of distances from the shore to riparian vegeatation
 #'@importFrom Rigroup igroupMeans igroupMaxs igroupMins
 #'@return a 'metric' data.frame (i.e., one with uid, metric, result fields)
 #'@export
 calculateShoreToVegDistance <- function(uid, shor2rip){
   uid <- as.factor(uid)
-  shor2rip <- FactorToNumeric(shor2rip)
-  xshor2vg <- igroupMeans(shor2rip, uid, na.rm = T)
-  mxshor   <- igroupMaxs( shor2rip, uid, na.rm = T)
-  mnshor   <- igroupMins( shor2rip, uid, na.rm = T)
-
-  mets <- data.frame(uid = levels(uid), xshor2vg, mxshor, mnshor)
+  if(is.factor(shor2rip)){
+    shor2rip <- FactorToNumeric(shor2rip)
+  }
+  f <- function(x){
+    c(xshor2vg = mean(x$shor2rip, na.rm = T),
+      mxshor   = max(x$shor2rip, na.rm = T),
+      mnshor   = min(x$shor2rip, na.rm = T))
+  }
+  mets <- ddply(data.frame(uid, shor2rip), .(uid), f)
   meltMetrics(mets)
 }
 
@@ -60,7 +63,7 @@ calculateChannelConstraint <- function(uid, constraint){
   levels(constraint) <- list('pctch_b' = 'B', 'pctch_c' = 'C', 
                              'pctch_n' = 'N', 'pctch_u' = 'U')
   tbl <- prop.table(table(uid = uid, metric = constraint), margin = 1) * 100
-  as.data.frame.table(tbl, responseName = 'result')
+  allFacToChar(as.data.frame.table(tbl, responseName = 'result'))
 }
 
 #' Formats the channel constraint form data as metrics
@@ -84,5 +87,5 @@ getChannelConstraint <- function(uid, parameter, result){
 if(any(is.na(x$metric))){
   stop('There are unknown parameter values in getChannelConstraint')
 }
-  return(x)
+  return(allFacToChar(x))
 }

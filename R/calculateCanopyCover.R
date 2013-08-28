@@ -24,15 +24,17 @@ calculateCanopyCover <- function(uid, is.bank, densiometer){
       n     = count(x$result))
   }
   mets <- ddply(x, .(uid, is.bank), calc)
-  mets <- melt(mets, id.var = c('uid', 'is.bank'), variable.name = 'metric', value.name = 'result')
+  mets <- melt(mets, id.var = c('uid', 'is.bank'), 
+               variable.name = 'metric', 
+               value.name = 'result')
   
   # clean up to make it look pretty
   mets$metric <- as.factor(paste(mets$metric, mets$is.bank, sep = ''))
-  mets$uid <- as.factor(mets$uid)
+  mets$uid    <- as.factor(mets$uid)
   mets <- subset(mets, select = c('uid', 'metric', 'result'))
-  #mets <- allFacToChar(mets)
   is.na(mets$result) <- is.nan(mets$result)
-  progressReport('Densiometer metrics done')
-  return(arrange(mets, uid, metric))
+  mets <- arrange(allFacToChar(mets), uid, metric)
+  progressReport('Canopy cover metrics done')
+  return(mets)
 }
 

@@ -10,31 +10,32 @@ calculateChannelHabitatProportions <- function(uid, habitat, is.wadeable){
   #compute individual metrics
   all.codes <- c('FA','CA','RA','RI','GL','PB', 'PP','PD','PL','PT','P','DR', 'PO')
   habitat <- factor(as.character(habitat), levels = all.codes)
-  chan.hab.counts <- table(UID = uid, METRIC = habitat)
+  chan.hab.counts <- table(uid = uid, metric = habitat)
   chan.hab.pcts <- prop.table(chan.hab.counts, 1) * 100
   
   #compute summed metrics
-  pct.fast <- rowSums(chan.hab.pcts[, c('FA', 'CA', 'RA', 'RI')])
-  pct.slow <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'GL', 'PO')])
-  pct.pool <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'PO')])
+  pct.fast <- rowSums(chan.hab.pcts[, c('FA', 'CA', 'RA', 'RI'), drop = F])
+  pct.slow <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'GL', 'PO'), drop = F])
+  pct.pool <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'PO'), drop = F])
   composite.mets <- 
-    data.frame(UID    = names(pct.fast),
-               METRIC = rep(c('pct_fast', 'pct_slow', 'pct_pool'), each = length(pct.fast)),
-               RESULT = c(pct.fast, pct.slow, pct.pool))
+    data.frame(uid    = names(pct.fast),
+               metric = rep(c('pct_fast', 'pct_slow', 'pct_pool'), each = length(pct.fast)),
+               result = c(pct.fast, pct.slow, pct.pool))
   
   # remove metrics that are specific to either wadeable or boatable.
-  wade.uids <- unique(uid[!is.boatable])
-  boat.uids <- unique(uid[is.boatable])
+  wade.uids <- unique(uid[is.wadeable])
+  boat.uids <- unique(uid[!is.wadeable])
   wade.only <- c('PB', 'PP', 'PD', 'PL', 'PT', 'P')
   boat.only <- 'PO'
-  chan.hab.pcts <- as.data.frame(chan.hab.pcts, responseName = 'RESULT')
+  chan.hab.pcts <- as.data.frame(chan.hab.pcts, responseName = 'result')
+  chan.hab.pcts <- allFacToChar(chan.hab.pcts)
   chan.hab.pcts <- subset(chan.hab.pcts, 
-                          subset = !((METRIC %in% boat.only & UID %in% wade.uids) |
-                                     (METRIC %in% wade.only & UID %in% boat.uids)))
+                          subset = !((metric %in% boat.only & uid %in% wade.uids) |
+                                     (metric %in% wade.only & uid %in% boat.uids)))
   # remove 'PO' sum because it is redudant with pct_pool
-  chan.hab.pcts <- subset(chan.hab.pcts, METRIC != 'PO')
-  chan.hab.pcts$METRIC <- paste('pct_', tolower(chan.hab.pcts$METRIC), sep = '')
-  mets <- rbind(chan.hab.pcts, composite.mets)
+  chan.hab.pcts <- subset(chan.hab.pcts, metric != 'PO')
+  chan.hab.pcts$metric <- paste('pct_', tolower(chan.hab.pcts$metric), sep = '')
+  mets <- rbindMetrics(chan.hab.pcts, composite.mets)
   return(mets)
 }
 
