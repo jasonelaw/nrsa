@@ -1,7 +1,7 @@
 meltMetrics <- function(...){
   # If arg is a mat assumes that it has dimnames uid x metric
   args <- list(...)
-  ldply(args, function(x){
+  ans <- ldply(args, function(x){
     if (is.data.frame(x)){
       return(melt(x, id.var = 'uid', variable.name = 'metric', 
                   value.name = 'result'))
@@ -12,6 +12,8 @@ meltMetrics <- function(...){
       stop("Arguments must either matrix or data.frame")
     }
   })
+  ans <- data.frame(allFacToChar(ans))
+  arrange(ans, uid, metric)
 }
 
 castMetrics <- function(...){
@@ -28,5 +30,5 @@ rbindMetrics <- function(...){
   stopifnot(all(sapply(x, checkNames)))
   x <- lapply(x, allFacToChar)
   ans <- rbind.fill(x)
-  ans[, c('uid', 'metric', 'result')]
+  arrange(ans[, c('uid', 'metric', 'result')], uid, metric)
 }
