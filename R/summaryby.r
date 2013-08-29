@@ -1,3 +1,4 @@
+#'@export
 summaryby<- function(xxx,yyy,zzz)
   {
    # This function uses aggregate to determine a statistic (mean, count, sd,
