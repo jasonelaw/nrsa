@@ -5,18 +5,28 @@
   calculateChannelMetrics(uid, bankwid, incishgt, bankhgt)
 }
 \arguments{
-  \item{uid}{}
+  \item{uid}{a vector of site identifiers}
 
-  \item{wetwid}{}
+  \item{bankwid}{a vector of bankfull width measurements;
+  sum of extra transect pairs}
 
-  \item{bankwid}{}
+  \item{incishgt}{a vector of incision heights; max of
+  extra transect pairs}
 
-  \item{incishgt}{}
-
-  \item{bankhgt}{}
+  \item{bankhgt}{a vector of bankfull heights; max of extra
+  transect pairs}
 }
 \description{
-  Calculate channel metrics
+  Calculate the channel metrics: xbkf_w, sdbkf_w, n_bw,
+  xinc_h, sdinc_h, n_incis, xbkf_h, sdbkf_h, n_bh.
+}
+\details{
+  The EPA uses data where the extra transect - transect
+  pairs have been joined. The \code{bankwid} argument is
+  the sum of the extra transect pairs, the \code{incishgt}
+  and \code{bankhgt} arguments are the max of the extra
+  transect pairs.  These can be calculated using
+  \link{joinExtraTransects}.
 }
 \examples{
 d <- data.frame(uid = rep(1:10, 11), wetwid = runif(110), bankwid = runif(110), incishgt = runif(110), bankhgt = runif(110))

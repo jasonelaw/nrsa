@@ -8,13 +8,14 @@
   \item{uid}{a vector of site identifiers}
 
   \item{wetwid}{a vector of wetted widths; uses the max of
-  the transect - extra transect pair}
+  the extra transect pairs}
 }
 \value{
   a 'metric' data.frame
 }
 \description{
-  Calculates wetted width metrics
+  Calculates wetted width metrics: xwidth, sdwidth, and
+  n_w.
 }
 \details{
   Uses the max wetted width of the transect - extra

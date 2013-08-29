@@ -1,0 +1,31 @@
+\name{calculateTransectRatios}
+\alias{calculateTransectRatios}
+\title{Calculates metrics of bankfull width to (bankfull height + depth) ratios}
+\usage{
+  calculateTransectRatios(uid, bankwid, bankhgt, depth)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{bankwid}{a vector of bankfull widths; EPA uses the
+  sum of the extra transects.}
+
+  \item{bankhgt}{a vector of bankfull heights; EPA uses the
+  mean of the extra transects.}
+
+  \item{depth}{a vector of thalweg depths}
+}
+\description{
+  This function calculates summary metrics of the ratio:
+  bankfull width / (bankfull height + thalweg depth).  The
+  mean and count of measurements are calculated.
+}
+\details{
+  The EPA calculations used extra trnasects in these
+  calculations: sum of the bankfull widths at the extra
+  transect and regular transect and the mean of the
+  bankfull height at the extra transect and the regular
+  transect. These values are returned by the
+  \link{joinExtraTransects} function.
+}
+

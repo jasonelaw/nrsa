@@ -15,4 +15,8 @@
   function.  This allows us to do the join in one pass
   rather than separately.
 }
+\examples{
+d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), station = c(0,0), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
+do.call('joinExtraTransects', d)
+}
 
