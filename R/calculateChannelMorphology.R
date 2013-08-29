@@ -32,9 +32,9 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
         bankhgt.mn  = mean(x$bankhgt, na.rm = T)))
   }
   ans <- ddply(x, .(uid, transect, station), f)
-  ans$incishgt <- ifelse(is.na(ans$incishgt) | ans$incishgt == 0, 
-                         ans$bankhgt.mx, 
-                         ans$incishgt)
+  ans$incishgt.mx <- ifelse(is.na(ans$incishgt.mx) | ans$incishgt.mx == 0, 
+                            ans$bankhgt.mx, 
+                            ans$incishgt.mx)
   replaceInfNaN <- function(x){
     x[!is.finite(x)] <- NA
     return(x)
@@ -112,8 +112,8 @@ calculateWettedWidthMetrics <- function(uid, wetwid){
 #' These are station level data (i.e., from the thalweg form) and so do not need any special
 #' extra transect treatment.
 #' @param uid a vector site identifiers
-#' @param wetwid
-#' @param depth
+#' @param wetwid a vector of wetted widths
+#' @param depth a vector of thalweg depths
 #' @return a 'metric' data.frame
 #' @export
 #' @importFrom plyr ddply

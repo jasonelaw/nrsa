@@ -7,9 +7,9 @@
 \arguments{
   \item{uid}{a vector site identifiers}
 
-  \item{wetwid}{}
+  \item{wetwid}{a vector of wetted widths}
 
-  \item{depth}{}
+  \item{depth}{a vector of thalweg depths}
 }
 \value{
   a 'metric' data.frame
