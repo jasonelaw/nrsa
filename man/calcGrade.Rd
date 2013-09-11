@@ -1,0 +1,35 @@
+\name{calcGrade}
+\alias{calcGrade}
+\title{Calculate the grade from rise and run}
+\usage{
+  calcGrade(rise, run,
+    unit = c("proportion", "percent", "angle"),
+    is.slope.length = F)
+}
+\arguments{
+  \item{rise}{a vector of slope rise values}
+
+  \item{run}{a vector of slope run values}
+
+  \item{unit}{what unit should the grade be returned in}
+
+  \item{is.slope.length}{logical, TRUE if the run vector is
+  actually a slope length}
+}
+\value{
+  a vector of grade values
+}
+\description{
+  Calculate the grade from rise and run.  The grade can be
+  returned as a proportion, percent or angle in radians.
+  In addition, the run can be input as a slope length. In
+  this case, the actual run is first calculated using the
+  pythagorean theorem and then used in subsequent
+  calculations.
+}
+\references{
+  “Grade (slope).” Wikipedia, the Free Encyclopedia,
+  September 2, 2013.
+  \url{http://en.wikipedia.org/w/index.php?title=Grade_(slope)&oldid=571239608}.
+}
+

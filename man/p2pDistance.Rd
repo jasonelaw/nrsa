@@ -1,0 +1,19 @@
+\name{p2pDistance}
+\alias{p2pDistance}
+\title{Returns a vector of point to point distances for a line.}
+\usage{
+  p2pDistance(x, y)
+}
+\arguments{
+  \item{x}{a two column matrix}
+}
+\value{
+  a vector of distances
+}
+\description{
+  For a line which is represented by a two dimensional
+  matrix with x and y coordinate columns, this function
+  returns a vector of distances from each point to the next
+  point.  The vector is of length \code{nrow(x) - 1}.
+}
+
