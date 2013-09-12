@@ -1,0 +1,25 @@
+\name{fillMissingLWD}
+\alias{fillMissingLWD}
+\title{Fill in missing LWD volume.}
+\usage{
+  fillMissingLWD(v1w_msq, xfc_lwd)
+}
+\arguments{
+  \item{v1w_msq}{a vector of v1w_msq metrics for each site;
+  m^3 of lwd / m^2 channel}
+
+  \item{xfc_lwd}{a vector of xfc_lwd metrics for each site}
+}
+\value{
+  a modified vector of v1w_msq metrics
+}
+\description{
+  Fill in missing LWD volume as 0 when no LWD fishcover
+  (i.e., xfc_lwd == 0) otherwise we really can't guess.
+}
+\examples{
+fillMissingLWD(NA, 1)
+fillMissingLWD(NA, 0)
+fillMissingLWD(3, 1)
+}
+

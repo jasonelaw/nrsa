@@ -15,11 +15,11 @@
 }
 \description{
   Calculates the ip_score metric from the NRSA metrics.
-  This is just the sum of the other metric scores for the
-  site.  The metric is somewhat concerning if a survey
-  doesn't use the stock EPA invasives list, because the
-  metrics would be incomparable.  The mean might be a
-  better metric, although not much better
+  This is just the sum of the other invasice species metric
+  scores for the site.  The metric is somewhat concerning
+  if a survey doesn't use the stock EPA invasives list,
+  because the metrics would be incomparable.  The mean
+  might be a better metric, although not much better.
 }
 \details{
   For the ip_score to be useful, each site must have the

@@ -5,7 +5,7 @@
 \usage{
   calculateAngleMetrics(uid, azimuth, distance)
 
-  calculateSlopeMetrics(uid, transect, slope, proportion)
+  calculateSlopeMetrics()
 }
 \arguments{
   \item{uid}{a vector of site identifiers}
@@ -32,17 +32,19 @@
   transect spacing as \code{sum(distance)} and proportion
   as \code{distance / sum(distance)} \item Calculate grade
   (as %) from boatable elevation change measurements in
-  centimeters.  \item Calculate angle metrics using
-  \code{calculateAngleMetrics} \item Calculate bearing
-  using \code{calculateSlopeMetrics} } The overall working
-  of \code{calculateAngleMetrics} differs somewhat than the
+  centimeters, if applicable.  \item Calculate angle
+  metrics using \code{calculateAngleMetrics} \item
+  Calculate slope metrics using
+  \code{calculateSlopeMetrics} } The overall working of
+  \code{calculateAngleMetrics} differs somewhat than the
   EPA code.  EPA calculated total distances East and North
   at each transect, then summed to get the total distance
-  East and North for the site.  This code treats the
-  channel geometry as a single line string and calculates
-  the length of the line string and the distance from the
-  first to last point.  It calculates xbearing as the
-  azimuth between the first and last points.
+  East and North for the site.
+  \code{calculateAngleMetrics} treats the channel geometry
+  as a single line string and calculates the length of the
+  line string and the distance from the first to last
+  point.  It calculates xbearing as the azimuth between the
+  first and last points.
 }
 \examples{
 d <- data.frame(uid = c(1,1), azimuth = c(180,90), distance = c(1,1))

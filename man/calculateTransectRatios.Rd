@@ -21,7 +21,7 @@
   mean and count of measurements are calculated.
 }
 \details{
-  The EPA calculations used extra trnasects in these
+  The EPA calculations used extra transects in these
   calculations: sum of the bankfull widths at the extra
   transect and regular transect and the mean of the
   bankfull height at the extra transect and the regular

@@ -21,5 +21,7 @@
 }
 \examples{
 uid <- rep(1:10, each = 11)
+see.over.bank <- sample(c('YES', 'NO'), n = 10 * 11, replace = T)
+calculateProportionSeeOverBank(uid, see.over.bank)
 }
 

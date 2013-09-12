@@ -35,12 +35,13 @@
   idrohv, iqrucb, iqrohv.
 }
 \examples{
-df <- expand.grid(uid = 1:4000, transect = LETTERS[1:10],
+df <- expand.grid(uid = 1:10, transect = LETTERS[1:10],
                   parameter = c("ALGAE", "BOULDR", "BRUSH", "LVTREE",
                                 "MACPHY", "OVRHNG", "STRUCT", "UNDCUT", "WOODY"))
 df$cover <- sample(0:4, size = nrow(df), replace = T)
 fc <- formatFishCover(df$uid, df$parameter, df$cover)
 fcm <- calculateFishCoverMeans(fc$uid, fc$parameter, fc$cover)
-fcsd <- calculateBankCoverVar(fc$uid, fc$parameter, fc$cover)
+fcsd <- with(subset(fc, parameter \%in\% c('ohv', 'ucb')),
+             calculateBankCoverVar(uid, parameter, cover))
 }
 
