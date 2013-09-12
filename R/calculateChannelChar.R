@@ -18,7 +18,9 @@ calculateShoreToVegDistance <- function(uid, shor2rip){
       mnshor   = min(x$shor2rip, na.rm = T))
   }
   mets <- ddply(data.frame(uid, shor2rip), .(uid), f)
-  meltMetrics(mets)
+  mets <- meltMetrics(mets)
+  progressReport("Finished with shore to vegetation metrics.")
+  return(mets)
 }
 
 #' Calculates the proportion of the reach over which you can see over the bank
@@ -33,6 +35,8 @@ calculateShoreToVegDistance <- function(uid, shor2rip){
 #' @export
 #' @examples
 #' uid <- rep(1:10, each = 11)
+#' see.over.bank <- sample(c('YES', 'NO'), n = 10 * 11, replace = T)
+#' calculateProportionSeeOverBank(uid, see.over.bank)
 calculateProportionSeeOverBank <- function(uid, see.over.bank){
   uid <- as.factor(uid)
   if (!is.logical(see.over.bank)){
@@ -41,7 +45,9 @@ calculateProportionSeeOverBank <- function(uid, see.over.bank){
   pct_ovrb <- igroupMeans(see.over.bank, uid, na.rm = T)
   mets <- data.frame(uid      = levels(uid),
                      pct_ovrb = pct_ovrb)
-  meltMetrics(mets)
+  mets <- meltMetrics(mets)
+  progressReport("Finished with pct_ovrb.")
+  return(mets)
 }
 
 #' Calculate the channel constraint metrics
@@ -63,7 +69,9 @@ calculateChannelConstraint <- function(uid, constraint){
   levels(constraint) <- list('pctch_b' = 'B', 'pctch_c' = 'C', 
                              'pctch_n' = 'N', 'pctch_u' = 'U')
   tbl <- prop.table(table(uid = uid, metric = constraint), margin = 1) * 100
-  allFacToChar(as.data.frame.table(tbl, responseName = 'result'))
+  mets <- allFacToChar(as.data.frame.table(tbl, responseName = 'result'))
+  progressReport('Finished with channel constraint metrics.')
+  return(mets)
 }
 
 #' Formats the channel constraint form data as metrics

@@ -16,6 +16,7 @@ calculateSideChannelCount <- function(uid, transect){
   is.side.channel <- transect %in% kXtraTransects
   sidecnt <- tapply(is.side.channel, uid, sum)
   sidecnt <-convertNamedVectorToMetricDF(sidecnt)
+  progressReport("Finished side channel count: sidecnt.")
   return(sidecnt)
 }
 
@@ -37,7 +38,8 @@ calculatePercentSideChannel <- function(uid, transect, is.sidechannel){
   i <- transect %in% kXtraTransect
   pct_side <- tapply(is.sidechannel[i], uid[i], mean, na.rm = T) * 100
   pct_side <- convertNamedVectorToMetricDF(pct_side)
-  pct_side
+  progressReport('Finished percent side channel: pct_side.')
+  return(pct_side)
 }
 
 #' Calculates the reach length for a boatable site
@@ -52,7 +54,9 @@ calculatePercentSideChannel <- function(uid, transect, is.sidechannel){
 calculateBoatableReachLength <- function(uid, actransp){
   actransp <- ifelse(actransp <= 0, NA, actransp)
   reachlen <- tapply(actransp, uid, sum, na.rm = T)
-  convertNamedVectorToMetricDF(reachlen)
+  ans <- convertNamedVectorToMetricDF(reachlen)
+  progressReport("Finished boatable reach length: reachlen.")
+  return(ans)
 }
 
 #' Calculates the reach length for a wadeable site
@@ -78,7 +82,9 @@ calculateWadeableReachLength <- function(uid, n.station, increment){
   increment <- tapply(increment, uid, unique)
   # There are 1 fewer increments than number of stations, so we must substract one
   reachlen  <- n.station * increment - increment
-  convertNamedVectorToMetricDF(reachlen)
+  ans <- convertNamedVectorToMetricDF(reachlen)
+  progressReport("Finished boatable reach length: reachlen.")
+  return(ans)
 }
 
 #' Determines whether a site was sampled from x site validation data
@@ -94,5 +100,6 @@ isSiteSampled <- function(uid, valxsite){
   kSampledCategories <- c('BOATABLE','PARBYBOAT','ALTERED',
                           'INTWADE','PARBYWADE','WADEABLE')
   sampled <- ifelse(valxsite %in% kSampledCategories,'Y','N')
-  data.frame(uid = uid, metric = 'sampled', result = sampled)
+  ans <- data.frame(uid = uid, metric = 'sampled', result = sampled)
+  return(ans)
 }

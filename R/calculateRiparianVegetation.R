@@ -126,6 +126,7 @@ calculateRiparianVegetation <- function(uid, transect, transdir, parameter, resu
   is.na(out$RESULT) <- is.nan(out$RESULT)
   out$RESULT <- as.character(out$RESULT)
   out$METRIC <- as.factor(as.character(out$METRIC))
+  progressReport("Finished with riparian vegetation metrics.")
   return(out)
 }
 

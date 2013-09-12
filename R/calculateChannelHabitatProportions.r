@@ -36,6 +36,7 @@ calculateChannelHabitatProportions <- function(uid, habitat, is.wadeable){
   chan.hab.pcts <- subset(chan.hab.pcts, metric != 'PO')
   chan.hab.pcts$metric <- paste('pct_', tolower(chan.hab.pcts$metric), sep = '')
   mets <- rbindMetrics(chan.hab.pcts, composite.mets)
+  progressReport('Finished with channel habitat metrics.')
   return(mets)
 }
 

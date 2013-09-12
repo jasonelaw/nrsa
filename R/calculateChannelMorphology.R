@@ -1,11 +1,3 @@
-sumNA <- function(x, ...){
-  if(all(is.na(x))){
-    return(NA)
-  } else {
-    sum(x, ...)
-  }
-}
-
 #' Join extra side channel transects
 #' 
 #' This function joins the extra side channel transects with the parallel transect.
@@ -77,6 +69,7 @@ calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
   ans$metric <- paste(ans$metric, ans$parameter, sep = '.')
   ans$metric <- revalue(ans$metric, kNamesMap)
   ans$parameter <- NULL
+  progressReport("Finished with channel metrics: xbkf_w, sdbkf_w, n_bw, xinc_h, sdinc_h, n_incis, xbkf_h, sdbkf_h, n_bh.")
   return(ans)
 }
 
@@ -130,7 +123,9 @@ calculateThalwegRatios <- function(uid, wetwid, depth){
       'n_wdr'    = count(x$wdratio))
   }
   ans <- ddply(x, .(uid), f)
-  meltMetrics(ans)
+  ans <- meltMetrics(ans)
+  progressReport("Finished with thalweg depth ratios: xwxd, sdwxd, n_wd, xwd_rat, sdwd_rat, n_wdr")
+  return(ans)
 }
 
 #' Calculates metrics of bankfull width to (bankfull height + depth) ratios
@@ -139,7 +134,7 @@ calculateThalwegRatios <- function(uid, wetwid, depth){
 #' (bankfull height + thalweg depth).  The mean and count of measurements are
 #' calculated.  
 #' 
-#' The EPA calculations used extra trnasects in these calculations: 
+#' The EPA calculations used extra transects in these calculations: 
 #' sum of the bankfull widths at the extra transect and regular transect and the
 #' mean of the bankfull height at the extra transect and the regular transect.  
 #' These values are returned by the \link{joinExtraTransects} function.
@@ -157,7 +152,9 @@ calculateTransectRatios <- function(uid, bankwid, bankhgt, depth){
       'n_bfrat'  = count(x$bfwd))
   }
   ans <- ddply(x, 'uid', f)
-  meltMetrics(ans)
+  ans <- meltMetrics(ans)
+  progressReport("Finished with transect ratios: bfwd_rat, n_bfrat")
+  return(ans)
 }
 
 #' Calculate thalweg depth metrics: xdepth, sddepth, n_d
@@ -192,5 +189,15 @@ calculateThalwegDepthMetrics <- function(uid, is.wadeable, depth, units = c('m',
       n_d     = count(x$depth))
   }
   ans <- ddply(x, .(uid), f)
-  meltMetrics(ans)
+  ans <- meltMetrics(ans)
+  progressReport('Finished with thalweg depth metrics: xdepth, sddepth, n_d.')
+  return(ans)
+}
+
+sumNA <- function(x, ...){
+  if(all(is.na(x))){
+    return(NA)
+  } else {
+    sum(x, ...)
+  }
 }

@@ -24,7 +24,9 @@ calculateWadeBankMetrics <- function(uid, angle, undercut){
     c(calculateWadeAngleMetrics(x$angle),
       calculateWadeUndercutMetrics(x$undercut))
   })
-  arrange(allFacToChar(ans), uid, metric)
+  ans <- arrange(allFacToChar(ans), uid, metric)
+  progressReport("Finished with wadeable bank metrics.")
+  return(ans)
 }
 
 #' @rdname calculateWadeBankMetrics
@@ -56,12 +58,11 @@ calculateWadeAngleMetrics <- function(angle){
 #' @param wetwid a vector of wetted width measurements
 #' @return a 'metric' data.frame
 #' @export
-#' @importFrom plyr revalue
-#' @importFrom NARSShared modalClass2 addNA2
 calculateBoatNumberWettedWidth <- function(uid, wetwid){
   x   <- data.frame(as.character(uid), wetwid)
   ans <- ddply(x, "uid", summarize, result = count(wetwid))
   ans$metric <- "n_w"
+  progressReport("Finished with boatable metric n_w.")
   ans
 }
 
@@ -79,7 +80,7 @@ calculateBoatAngleMetrics <- function(uid, angle){
   kModalAngleMetricMap <- c(`0-5` = "low", `5-30` = "med", `30-75` = "stp", 
                             `75-100` = "vst", `0-5, 5-30` = "low-med", 
                             `5-30, 30-75` = "med-stp", `30-75, 75-100` = "stp-vst")
-  kAngleMetricMap <- c(`0-5` = "bap_low", `5-30` = "bap_med", `30-75` = "bap_stp", 
+  kAngleMetricMap <- c(`0-5` = "bap_low", `5-30` = "bap_med", `30-75` = "bap_stp",
                        `75-100` = "bap_vstp")
   
   angle <- factor(as.character(angle), 
@@ -99,11 +100,7 @@ calculateBoatAngleMetrics <- function(uid, angle){
                          result = bangmode)
   bangmode$metric <- revalue(bangmode$metric, kModalAngleMetricMap)
   bangmode$result <- addNA2(as.factor(bangmode$result), 'None')
-  
-  return(rbindMetrics(ang.prop, n_ba, bangmode))
+  mets <- rbindMetrics(ang.prop, n_ba, bangmode)
+  progressReport("Finished with boatable bank angle metrics.")
+  return(mets)
 }
-
-
-
-
-

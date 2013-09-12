@@ -19,13 +19,14 @@
 #' @importFrom Rigroup igroupMeans
 #' @export
 #' @examples
-#' df <- expand.grid(uid = 1:4000, transect = LETTERS[1:10], 
+#' df <- expand.grid(uid = 1:10, transect = LETTERS[1:10], 
 #'                   parameter = c("ALGAE", "BOULDR", "BRUSH", "LVTREE", 
 #'                                 "MACPHY", "OVRHNG", "STRUCT", "UNDCUT", "WOODY"))
 #' df$cover <- sample(0:4, size = nrow(df), replace = T)
 #' fc <- formatFishCover(df$uid, df$parameter, df$cover)
 #' fcm <- calculateFishCoverMeans(fc$uid, fc$parameter, fc$cover)
-#' fcsd <- calculateBankCoverVar(fc$uid, fc$parameter, fc$cover)
+#' fcsd <- with(subset(fc, parameter %in% c('ohv', 'ucb')),
+#'              calculateBankCoverVar(uid, parameter, cover))
 calculateFishCoverMeans <- function(uid, parameter, cover){
   isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
   isBig     <- c('rck', 'hum', 'ucb', 'lwd')
@@ -56,10 +57,11 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
   index.mets <- ddply(xc, .(uid), sum.calc)
   index.mets <- meltMetrics(index.mets)
   x$metric   <- paste(x$metric, x$parameter, sep = '_')
-  rbind(subset(x, select = c('uid', 'metric', 'result')),
-        index.mets)
+  mets <- rbind(subset(x, select = c('uid', 'metric', 'result')),
+                index.mets)
+  progressReport("Fish cover means finished.")
+  return(mets)
 }
-
 
 #'@rdname calculateFishCoverMeans
 #'@param parameter For calculateBankCoverVar, should a vector of 'ohv' or 'ucb' codes.
@@ -82,7 +84,8 @@ calculateBankCoverVar <- function(uid, parameter, cover){
   mets$metric <- ifelse(mets$metric == 'sdfc', 
                         paste(mets$metric, mets$parameter, sep = "_"), 
                         paste(mets$metric, mets$parameter, sep = ""))
-  subset(mets, select = c('uid', 'metric', 'result'))
+  mets <- subset(mets, select = c('uid', 'metric', 'result'))
+  progressReport('Bank cover variation metrics finished.')
 }
 
 #' Format fish cover data for calculations
@@ -112,5 +115,6 @@ formatFishCover <- function(uid, parameter, cover){
   levels(x$parameter) <- ParameterMetricMap
   x$cover <- coverVals[as.character(x$cover)]
   x$is.bankcover <- x$parameter %in% isBankCover
+  progressReport('Fish cover data formatted.')
   return(x)
 }

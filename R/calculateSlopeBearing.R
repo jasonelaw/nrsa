@@ -47,7 +47,9 @@ calculateAngleMetrics <- function(uid, azimuth, distance){
     c(xbearing = unname(xbearing), sinu = sinu)
   }
   ans <- ddply(x, .(uid), f)
-  return(meltMetrics(ans))
+  ans <- meltMetrics(ans)
+  progressReport("Angle metrics completed.")
+  return(ans)
 }
 
 #' @rdname calculateAngleMetrics
@@ -67,7 +69,9 @@ calculateSlopeMetrics <- function(uid, transect, slope, proportion){
       nslp   = count(x$tmean))
   }
   ans <- ddply(tmean, .(uid), f)
-  return(meltMetrics(ans))
+  ans <- meltMetrics(ans)
+  progressReport('Slope metrics completed.')
+  return(ans)
 }
 
 #' Returns a vector of point to point distances for a line.

@@ -19,15 +19,16 @@ calculatePropTranInvPresent <- function(uid, species, is.present){
   ans$metric <- paste0('f_', ans$species)
   ans$metric <- mapvalues(ans$metric, EpaList(), names(EpaList()))
   ans$species <- NULL
+  progressReport("Finished invasive species metrics.")
   return(ans)
 }
 
 #' Calculate total invasive score
 #' 
 #' Calculates the ip_score metric from the NRSA metrics.  This is just the sum of
-#' the other metric scores for the site.  The metric is somewhat concerning if 
+#' the other invasice species metric scores for the site.  The metric is somewhat concerning if 
 #' a survey doesn't use the stock EPA invasives list, because the metrics would
-#' be incomparable.  The mean might be a better metric, although not much better
+#' be incomparable.  The mean might be a better metric, although not much better.
 #' 
 #' For the ip_score to be useful, each site must have the same number and identity
 #' of invasive species.  For this implementation, the metrics are subsetted
@@ -41,7 +42,8 @@ calculatePropTranInvPresent <- function(uid, species, is.present){
 calculateInvasiveScore <- function(uid, metric, result, FUN = sum){
   i <- as.character(metric) %in% names(EpaList())
   ip_score <- tapply(result[i], uid[i], FUN)
-  convertNamedVectorToMetricDF(ip_score)
+  ans <- convertNamedVectorToMetricDF(ip_score)
+  progressReport("Finished invasive species score metric: ip_score")
 }
 
 EpaList <- function(){

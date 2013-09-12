@@ -21,28 +21,28 @@ calculateHumanInfluence <- function(uid, parameter, result){
   # Calculate sums by parameter category over the transects and transect directions
   # and divide by number of observations per parameter.  
   denom <- table(uid, parameter)
-  tbl <- table(uid, parameter, result)
+  tbl   <- table(uid, parameter, result)
   tbl.CB <- tbl[,, 'B', drop = F] + tbl[,, 'C', drop = F]
   dimnames(tbl.CB)[[3]] <- 'CB'
-  tbl <- abind(tbl, tbl.CB, along = 3)
+  tbl  <- abind(tbl, tbl.CB, along = 3)
   hall <- sweep(tbl, 1:2, denom, '/')
   # Do the weighted sums
   w1h <- sweep(hall[,,c('0','P', 'C', 'B')], 3, c(0.0, 0.6667, 1.0, 1.5), '*')
   w1h <- margin.table(w1h, 1:2)
-  w1_hag <- rowSums(w1h[, ag.pars])
+  w1_hag   <- rowSums(w1h[, ag.pars])
   w1_hnoag <- rowSums(w1h[, noag.pars])
-  w1_hall <- w1_hag + w1_hnoag
-  w1h <- cbind(w1h, ag = w1_hag, noag = w1_hnoag, all = w1_hall)
+  w1_hall  <- w1_hag + w1_hnoag
+  w1h      <- cbind(w1h, ag = w1_hag, noag = w1_hnoag, all = w1_hall)
   # Add sums across the parameters
   hag   <- margin.table(hall[, ag.pars,, drop = F], c(1,3))
   hnoag <- margin.table(hall[, noag.pars,, drop = F], c(1,3))
   hall  <- margin.table(hall, c(1,3))
   # Put everything together and clean up names
-  ans <- meltMetrics(hag = hag, hnoag = hnoag, hall = hall, w1h = w1h)
-  ans2 <- ddply(subset(ans, metric %in% c('B', 'C', 'P')), .(.id, uid), summarize, result = sum(result))
-  #ans2 <- rename(ans2, c(.id = 'metric'))
-  ans <- rbind.fill(ans, ans2)
-  ans <- subset(ans, !(metric %in% '0'))
+  ans  <- meltMetrics(hag = hag, hnoag = hnoag, hall = hall, w1h = w1h)
+  ans2 <- ddply(subset(ans, metric %in% c('B', 'C', 'P')), .(.id, uid), 
+                summarize, result = sum(result))
+  ans  <- rbind.fill(ans, ans2)
+  ans  <- subset(ans, !(metric %in% '0'))
   ans$metric <- renameHumanInfluenceMetrics(ans$.id, ans$metric)
   ans$.id <- NULL
   progressReport('Done with human influence mean mets')
@@ -129,5 +129,6 @@ calculateBankHardening <- function(uid, transect, plot, parameter, result){
   plot.data$is.hardened <- factor(plot.data$is.hardened, levels = c('TRUE', 'FALSE'))
   ans <- ddply(plot.data, .(uid), function(x) c(result = unname(prop.table(table(x$is.hardened))['TRUE'])))
   ans$metric <- 'bankhard'
+  progressReport("Finished with bank hardening metric: bankhard.")
   return(ans[,c('uid', 'metric', 'result')])
 }
