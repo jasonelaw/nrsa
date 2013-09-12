@@ -240,6 +240,11 @@ fillMissingLWD <- function(v1w_msq, xfc_lwd){
 }
 
 #' Not even sure what this modified metric is...
+#' 
+#' Wish I knew.
+#' @param xslope mean site slope
+#' @param sddepth standard deviation of thalweg depth
+#' @return the s_rp100 metric
 #' @export
 calculateS_RP100 <- function(xslope, sddepth){
   k1 <- -0.44767
@@ -250,9 +255,10 @@ calculateS_RP100 <- function(xslope, sddepth){
 }
 
 #' Make slope slightly positive
+#' @param 
 #' @export
 forceSlopeGt0 <- function(slope){
-  ifelse(slope > 0, slope, 0.01)
+  pmax(0.01, slope)
 }
 #' Convert boatable depth units from m to cm
 #' @param x a depth based metric measured in m
@@ -260,5 +266,7 @@ forceSlopeGt0 <- function(slope){
 #' @return a vector of depth metrics in cm
 #' @export
 fixBoatableDepthUnits <- function(x, is.wadeable){
-  ifelse(is.wadeable, x, x * 100)
+  i <- !is.wadeable
+  x[i] <- x[i] * 100
+  return(x)
 }
