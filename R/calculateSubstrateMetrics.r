@@ -1,15 +1,13 @@
 #'Add substrate size variables to wadeable data
 #'
-#'The substrate size metrics are calculated on variables representing four different
-#'sets of the size class data.
-#'This function convert the size classes to a diameter and logDiameter for each
-#'of those size classes (geometric mean of the
-#'extreme sizes) for each of these sets.
-#'There are three data sets we need to work with
-#'(1) ALL the size_classes  (mm)
-#'(2) subclasses excluding HP, RD, RR, RS, RC, OT, WD   (tt)
-#'(3) subclasse INCLUDES all classes and lumps the boulder class (XB+SB= BL)  (bl)
-#'(4) subclasses excluding HP, RD, RR, RS, RC, OT, WD, and lumps the boulder class (XB+SB= BL)  (ttbl)
+#'The substrate size metrics are calculated on variables representing four
+#'different sets of the size class data. This function convert the size classes
+#'to a diameter and logDiameter for each of those size classes (geometric mean
+#'of the extreme sizes) for each of these sets. There are three data sets we
+#'need to work with (1) ALL the size_classes (mm) (2) subclasses excluding HP,
+#'RD, RR, RS, RC, OT, WD (tt) (3) subclasses including all classes and lumps the
+#'boulder class (XB+SB= BL)  (bl) (4) subclasses excluding HP, RD, RR, RS, RC,
+#'OT, WD, and lumps the boulder class (XB+SB= BL)  (ttbl)
 #'
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size class codes
@@ -22,12 +20,12 @@
 #'size.class =c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'))
 #'addBoatSubstrateSizes(d$uid, d$size.class)
 addWadeSubstrateSizes <- function(uid, size.class){
-
-  x <- data.frame(UID = uid, RESULT = size.class)
-  result.levels <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", "XB", "BL", "RS", "RR", "RC")
-  x$RESULT <- factor(x$RESULT, levels = result.levels)
+  x <- data.frame(uid = uid, result = size.class)
+  result.levels <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", 
+                     "XB", "BL", "RS", "RR", "RC")
+  x$result <- factor(x$result, levels = result.levels)
   sizes <-
-    data.frame('CLASS' = structure(1:15,
+    data.frame('class' = structure(1:15,
                                    .Label = result.levels, 
                                    class = "factor"),
                'min'   = c(NA, NA, NA, NA, 0.001, 0.06, 2, 16, 64, 250, 1000,
@@ -36,7 +34,7 @@ addWadeSubstrateSizes <- function(uid, size.class){
                            4000, 8000, 8000, 8000))
   sizes$diam <- apply(sizes[,2:3], 1, gmean)
   sizes$lDiam <- log10(sizes$diam)
-  # Modify RESULT field to create the four subsets mentioned above
+  # Modify result field to create the four subsets mentioned above
   bl <- list(OT = "OT", WD = "WD", HP = "HP", FN = "FN", SA = "SA", GF = "GF", 
              GC = "GC", CB = "CB", BL = c("XB", "SB"), RS = "RS", RR = "RR", 
              RC = "RC")
@@ -44,27 +42,27 @@ addWadeSubstrateSizes <- function(uid, size.class){
              XB = "XB")
   ttbl <- list(FN = "FN", SA = "SA", GF = "GF", GC = "GC", CB = "CB", 
                BL = c("XB", "SB"))
-  x$result.ttbl <- x$result.tt <- x$result.bl <- x$RESULT
+  x$result.ttbl <- x$result.tt <- x$result.bl <- x$result
   levels(x$result.bl) <- bl
   levels(x$result.tt) <- tt
   levels(x$result.ttbl) <- ttbl
-  x <- merge(x, sizes[, c('CLASS', 'min', 'max')], by.x = 'RESULT', by.y = 'CLASS', all.x = TRUE)
-  for (i in c('RESULT', 'result.tt', 'result.bl', 'result.ttbl')){
+  x <- merge(x, sizes[, c('class', 'min', 'max')], by.x = 'result', by.y = 'class', all.x = TRUE)
+  for (i in c('result', 'result.tt', 'result.bl', 'result.ttbl')){
     suffix <- sprintf('.%s', strsplit(i, '\\.')[[1]][2])
-    x <- merge(x, sizes[,c('CLASS', 'diam', 'lDiam')], 
-               by.x = i, by.y = 'CLASS', all.x = TRUE,
+    x <- merge(x, sizes[,c('class', 'diam', 'lDiam')], 
+               by.x = i, by.y = 'class', all.x = TRUE,
                suffixes = c('', suffix))
   }
-  x <- x[, c('UID', 'RESULT', 'result.tt', 'min', 'max', 'lDiam', 
+  x <- x[, c('uid', 'result', 'result.tt', 'min', 'max', 'lDiam', 
              'lDiam.tt', 'diam.tt', 'lDiam.bl', 'lDiam.ttbl', 'diam.ttbl')]
-  progressReport('Create numeric size classes for wadeable')
+  progressReport('Created numeric size classes for wadeable')
   x
 }
 
 #'@rdname addWadeSubstrateSizes
 #'@export
 addBoatSubstrateSizes <- function(uid, size.class){
-  x <- data.frame(UID = uid, RESULT = size.class)
+  x <- data.frame(uid = uid, result = size.class)
   # SIZE_CLS from the rivers have slightly different gmeans.
   sizes <- data.frame(class = c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'),
                       min = c(4000, 250, 64, 2, 0.06, 0.001, NA),
@@ -75,14 +73,14 @@ addBoatSubstrateSizes <- function(uid, size.class){
                         labels = c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'))
   sizes$diam <- apply(sizes[,2:3], 1, gmean)
   sizes$lDiam <- log10(sizes$diam)
-  ans <- merge(x, sizes, by.x = 'RESULT', by.y = 'class', all.x = TRUE)
-  ans$RESULT.no.ot <- as.factor(ans$RESULT)
-  levels(ans$RESULT.no.ot) <- list(BH = 'BH', BL = 'BL', CB = 'CB', GR = 'GR', SA = 'SA', FN = 'FN')
+  ans <- merge(x, sizes, by.x = 'result', by.y = 'class', all.x = TRUE)
+  ans$result.no.ot <- as.factor(ans$result)
+  levels(ans$result.no.ot) <- list(BH = 'BH', BL = 'BL', CB = 'CB', GR = 'GR', SA = 'SA', FN = 'FN')
   all.levels <- c('BH', 'BL', 'CB', 'GR', 'SA', 'FN', 'OT')
-  ans$RESULT <- factor(ans$RESULT,
+  ans$result <- factor(ans$result,
                        levels = all.levels,
                        labels =  paste('pct_', tolower(all.levels), sep = ''))
-  progressReport('Create numeric size classes for non-wadeable')
+  progressReport('Created numeric size classes for non-wadeable')
   return(ans)
 }
 
@@ -99,7 +97,6 @@ addBoatSubstrateSizes <- function(uid, size.class){
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size classes
 #'
-#'@importFrom NARSShared summary.nrsa interpolatePercentile2
 #'@importFrom plyr ddply
 #'@importFrom reshape2 melt
 #'@export
@@ -132,7 +129,7 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
         'lsub_d75', 'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr', 
         'lsub_dmm_nor', 'lsubd_sd_nor', 'sub_dmm_nor', 'subd_sd_nor')
     # substrate category proportions
-    tbl <- table(x$RESULT)
+    tbl <- table(x$result)
     n     <- sum(tbl[c('RS', 'RR', 'RC', 'HP', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA', 'FN')])
     n_nor <- sum(tbl[c('XB', 'SB', 'CB', 'GC', 'GF','SA', 'FN')])
     proportions <- prop.table(tbl) * 100
@@ -158,11 +155,10 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
   }
   breaks.df <- na.omit(unique(x[,c('result.tt', 'min', 'max')]))
   breaks <- log10(sort(unique(c(breaks.df$min, breaks.df$max))))
-  metrics <- ddply(x, .(UID), calcAggrMets, .drop = FALSE, breaks = breaks,
-                   .progress = 'text')
+  metrics <- ddply(x, .(uid), calcAggrMets, .drop = FALSE, breaks = breaks,
+                   .progress = plyrProgress())
   metrics <- calcCompositeMets(metrics)
-  metrics <- melt(metrics, id.var = 'UID', variable.name = 'METRIC', 
-                  value.name = 'RESULT')
+  metrics <- meltMetrics(metrics)
   progressReport('Finished wadeable substrate metrics.')
   return(metrics)
 }
@@ -183,7 +179,6 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size classes
 #'
-#'@importFrom NARSShared summary.nrsa interpolatePercentile2
 #'@importFrom plyr ddply
 #'@importFrom reshape2 melt
 #'@export
@@ -191,50 +186,36 @@ calculateBoatThalwegSubstrateMetrics <- function(uid, size.class){
   x <- addBoatSubstrateSizes(uid, size.class)
   f <- function(x){
     lDiam <- na.omit(x$lDiam)
-    sizes <- c(count(x$RESULT.no.ot), summary.nrsa(lDiam))
+    sizes <- c(count(x$result.no.ot), summary.nrsa(lDiam))
     names(sizes) <- c('n', 'lsub_d16', 'lsub_d25', 'lsub_d50', 'lsub_d75', 
                       'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr')
-    proportions <- prop.table(table(x$RESULT)) * 100
+    proportions <- prop.table(table(x$result)) * 100
     return(c(sizes, proportions))
   }
-  metrics <- ddply(x, .(UID), f, .progress = 'text')
+  metrics <- ddply(x, .(uid), f, .progress = plyrProgress())
   metrics$pct_safn <- metrics$pct_sa + metrics$pct_fn
-  metrics <- melt(metrics, id.var  = 'UID',
-               variable.name = 'METRIC',
-               value.name    = 'RESULT')
+  metrics <- meltMetrics(metrics)
   progressReport('Finished non-wadeable thalweg substrate metrics.')
   return(metrics)
 }
 
-#'Calculate non-wadeable substrate metrics
-#'
-#'\code{calculateBoatSubstrateMetrics} is used to calculate non-wadeable substrate metrics
-#'
-#'@param uid a vector of site-visit indicators
-#'@param parameter a vector of parameter codes
-#'@param size.class a vector size classes
-#'
-#'@importFrom plyr ddply
+#'@rdname calculateBoatThalwegSubstrateMetrics
+#'@param db dominant, bottom substrate classes
+#'@param ds dominant, shoreline substrate classes
+#'@param sb secondary, bottom substrate classes
+#'@param ss secondary, shoreline substrate classes
 #'@importFrom reshape2 melt
 #'@export
-calculateBoatLittoralSubstrateMetrics <- function(uid, parameter, result){
-  result <- factor(result,
-                   levels = c('RS', 'RR', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA',
-                              'FN', 'HP', 'WD', 'OT', 'BL', 'OM', 'RC'))
-  x <- data.frame(UID = uid, PARAMETER = parameter, RESULT = result)
-  metrics <- ddply(x, .(UID, PARAMETER), function(x) prop.table(table(x$RESULT)) * 100,
-                   .progress = 'text')                     
-  metrics <- melt(metrics, id.var  = c('UID', 'PARAMETER'), 
-                  variable.name = 'METRIC', 
-                  value.name    = 'RESULT')
-  metrics$PARAMETER <- factor(metrics$PARAMETER,
-                           levels = c('c_size_substrate(dominant,bottom)',
-                                      'c_size_substrate(dominant,shoreline)',
-                                      'c_size_substrate(secondary,bottom)',
-                                      'c_size_substrate(secondary,shoreline)'),
-                           labels = c('db', 'ds', 'sb', 'ss'))
-  metrics$METRIC <- paste('pct_', metrics$PARAMETER, tolower(metrics$METRIC), sep = '')
-  metrics$PARAMETER <- NULL
-  progressReport('Finished non-wadeable littoral substrate metrics.', loc='end')
+calculateBoatLittoralSubstrateMetrics <- function(uid, db, ds, sb, ss){
+  kAllowedClasses <- c('RS', 'RR', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA',
+                       'FN', 'HP', 'WD', 'OT', 'BL', 'OM', 'RC')
+  x <- data.frame(uid, db, ds, sb, ss)
+  x <- melt(x, id.var = 'uid', variable.name = 'parameter', value.name = 'metric')
+  x$metric <- factor(x$metric, levels = kAllowedClasses)
+  metrics <- prop.table(table(x), 1:2)
+  metrics <- as.data.frame(metrics, responseName = 'result')
+  metrics$metric <- paste('pct_', metrics$parameter, tolower(metrics$metric), sep = '')
+  metrics$parameter <- NULL
+  progressReport('Finished non-wadeable littoral substrate metrics.')
   return(metrics)
 }
