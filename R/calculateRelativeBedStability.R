@@ -46,7 +46,7 @@
 #'                                 "WADEABLE", "WADEABLE", "WADEABLE", 
 #'                                 "WADEABLE", "WADEABLE", "WADEABLE", "WADEABLE")), 
 #'               .Names = c("UID", "lsub_dmm", "lsub2dmm", "rp100", "sddepth", "v1w_msq", "xbkf_h", 
-#'                          "xbkf_w", "xdepth", "xfc_lwd", "xslope", "xwidth", "PROTOCOL"), 
+#'                          "xbkf_w", "xdepth", "xfc_lwd", "xslope", "xwidth", "PROTOCOL"),
 #'               row.names = c(NA, -11L), 
 #'               class = "data.frame")
 #' x$xslope  <- forceSlopeGt0(x$xslope)
@@ -171,11 +171,15 @@ calculateCriticalDiameterKaufmann <- function(xdepth, xslope, rp100, xbkf_h, v1w
   Rb3       <- 0.65 * Dbf_th
   rp        <- rp100 / 100
   s         <- xslope / 100
-  viscosity <- 0.00000102
-  sub_dm    <- (10^lsub_dmm) / 1000
+  viscosity <- 1.02e-6
+  sub_dm    <- 10 ^ (lsub_dmm - 3)# is (10^lsub_dmm) / 1000 because 10^lsub_dmm * 10^-3 = 10^(lsub_dmm - 3)
   
-  # Total hydraulic resistance, eqn 13b
-  Ct_rpwd <- 1.21 * (rp^1.08) * ((rp + v1w_msq)^0.638) * (Dbf_th^-3.32)
+  # Total hydraulic resistance, eqn 13b commented out.  Original parameterization
+  # of eqn 13a is used.
+  #Ct_rpwd <- 1.21 * (rp^1.08) * ((rp + v1w_msq)^0.638) * (Dbf_th^-3.32)
+  reg.mat  <- log10(cbind(10, rp, rp + v1w_msq, Dbf_th))
+  reg.pars <- c(0.0835, 1.08, 0.638, -3.32)
+  Ct_rpwd <- 10 ^ drop(reg.mat %*% reg.pars)
   
   # Hydraulic resistance due to particles
   Cp3_mill <- pmax(0.002, (1/8) * (2.03 * log10(12.2 * Rb3 / sub_dm))^(-2))
@@ -184,7 +188,7 @@ calculateCriticalDiameterKaufmann <- function(xdepth, xslope, rp100, xbkf_h, v1w
   Rrpw3 <- Rb3 * (pmin(1, Cp3_mill / Ct_rpwd) ^ (1 / 3))
   
   # Reynolds number at bankfull, eqn 14
-  ReyP3 <- ((g * Rb3 * s)^0.5) * sub_dm / viscosity
+  ReyP3 <- sqrt(g * Rb3 * s) * sub_dm / viscosity
   
   # Shields parameter, eqn 15a, 15b.  Note 15a uses an abbreviated value of
   # the exponent in the case of small Reynolds numbers
@@ -206,18 +210,19 @@ calculateCriticalDiameterKaufmann <- function(xdepth, xslope, rp100, xbkf_h, v1w
 #' @param lsub_dmm mean log10(substrate diameter)
 #' @param lsub2dmm mean log2(substrate diameter)
 #' @param ltest critical diameter (crude)
-#' @param ldmb_bw4 critical diamter (refined) old version
+#' @param ldmb_bw4 critical diameter (refined) old version
 #' @param ldmb_bw5 critical diameter (refined)
-#' @param  s_ldmb_bw5 critical diameter (refined) with s_rp100 rather than rp100
+#' @param s_ldmb_bw5 critical diameter (refined) with s_rp100 rather than rp100
 #' @param ldcbf_g08 critial diameter from Kauffman 2007
 #' @return a matrix of relative bed stability metrics.
 #' @export
 calculateRelativeBedStability <- function(lsub_dmm, lsub2dmm, ltest, ldmb_bw4, ldmb_bw5, s_ldmb_bw5, ldcbf_g08){
   ld   <- cbind(ltest, ldmb_bw4, ldmb_bw5, s_ldmb_bw5, ldcbf_g08)
   ans1 <- lsub_dmm - ld
-  ans2 <- lsub2dmm - ld[, 3:4]
+  ans2 <- lsub2dmm - ld[, 3:4, drop = F]
   ans  <- cbind(ans1, ans2)
   colnames(ans) <- c('lrbs_tst', 'lrbs_bw4', 'lrbs_bw5', 's_lrbs_bw5', 'lrbs_g08', 'lrbs_bw6', 's_lrbs_bw6')
+  progressReport('Finished calculating relative bed stability metrics.')
   return(ans)
 }
 
@@ -255,12 +260,18 @@ calculateS_RP100 <- function(xslope, sddepth){
 }
 
 #' Make slope slightly positive
-#' @param 
+#' 
+#' Make slopes slightly positive if they are less than 0.01.
+#' @param slope a vector of slopes
+#' @return a vector of slopes with slopes < .01, replaced by 0.01
 #' @export
 forceSlopeGt0 <- function(slope){
   pmax(0.01, slope)
 }
+
 #' Convert boatable depth units from m to cm
+#' 
+#' Convert boatable depth units from m to cm.
 #' @param x a depth based metric measured in m
 #' @param x logical, \code{TRUE} if the site was wadeable
 #' @return a vector of depth metrics in cm
