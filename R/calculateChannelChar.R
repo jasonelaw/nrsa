@@ -10,7 +10,7 @@
 calculateShoreToVegDistance <- function(uid, shor2rip){
   uid <- as.factor(uid)
   if(is.factor(shor2rip)){
-    shor2rip <- FactorToNumeric(shor2rip)
+    shor2rip <- convertFactorToNumeric(shor2rip)
   }
   f <- function(x){
     c(xshor2vg = mean(x$shor2rip, na.rm = T),

@@ -11,7 +11,6 @@
 #' @export
 #' @aliases calculateWadeAngleMetrics calculateWadeUndercutMetrics
 #' @importFrom plyr ddply
-#' @importFrom NARSShared count
 calculateWadeBankMetrics <- function(uid, angle, undercut){
   if (!is.numeric(angle)){
     angle <- as.numeric(as.character(angle))
@@ -74,7 +73,6 @@ calculateBoatNumberWettedWidth <- function(uid, wetwid){
 #' @param angle a vector of bank angle categories: '0-5', '5-30', '30-75', '75-100'.
 #' @return a 'metric' data.frame
 #' @export
-#' @importFrom NARSShared modalClass2 addNA2 count
 #' @importFrom plyr revalue
 calculateBoatAngleMetrics <- function(uid, angle){
   kModalAngleMetricMap <- c(`0-5` = "low", `5-30` = "med", `30-75` = "stp", 

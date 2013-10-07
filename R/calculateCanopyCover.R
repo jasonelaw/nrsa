@@ -12,7 +12,6 @@
 #'@param densiometer a vector of densiometer measurments from 0-17.
 #'@importFrom plyr ddply mapvalues '.'
 #'@importFrom reshape2 melt
-#'@importFrom NARSShared count
 #'@export
 calculateCanopyCover <- function(uid, is.bank, densiometer){
   is.bank <- mapvalues(is.bank, c(F, T), c('mid', 'bnk'))

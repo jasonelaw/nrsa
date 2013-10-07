@@ -67,7 +67,6 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
 #'@param parameter For calculateBankCoverVar, should a vector of 'ohv' or 'ucb' codes.
 #'@importFrom plyr ddply
 #'@importFrom reshape2 melt
-#'@importFrom NARSShared idr iqr
 #'@export
 calculateBankCoverVar <- function(uid, parameter, cover){
   stopifnot(parameter %in% c('ohv', 'ucb'))

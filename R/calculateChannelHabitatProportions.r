@@ -14,13 +14,12 @@ calculateChannelHabitatProportions <- function(uid, habitat, is.wadeable){
   chan.hab.pcts <- prop.table(chan.hab.counts, 1) * 100
   
   #compute summed metrics
-  pct.fast <- rowSums(chan.hab.pcts[, c('FA', 'CA', 'RA', 'RI'), drop = F])
-  pct.slow <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'GL', 'PO'), drop = F])
-  pct.pool <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'PO'), drop = F])
-  composite.mets <- 
-    data.frame(uid    = names(pct.fast),
-               metric = rep(c('pct_fast', 'pct_slow', 'pct_pool'), each = length(pct.fast)),
-               result = c(pct.fast, pct.slow, pct.pool))
+  pct_fast <- rowSums(chan.hab.pcts[, c('FA', 'CA', 'RA', 'RI'), drop = F])
+  pct_slow <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'GL', 'PO'), drop = F])
+  pct_pool <- rowSums(chan.hab.pcts[, c('PP', 'PD', 'PB', 'PL', 'PT', 'P', 'PO'), drop = F])
+  composite.mets <- rbindMetrics(convertNamedVectorToMetricDF(pct_fast),
+                                 convertNamedVectorToMetricDF(pct_slow),
+                                 convertNamedVectorToMetricDF(pct_pool))
   
   # remove metrics that are specific to either wadeable or boatable.
   wade.uids <- unique(uid[is.wadeable])

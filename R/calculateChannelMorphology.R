@@ -83,7 +83,6 @@ calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
 #' @param wetwid a vector of wetted widths; uses the max of the extra transect pairs
 #' @return a 'metric' data.frame
 #' @importFrom plyr ddply
-#' @importFrom NARSShared count
 #'@export
 calculateWettedWidthMetrics <- function(uid, wetwid){
   x <- data.frame(uid, wetwid)
@@ -173,7 +172,6 @@ calculateTransectRatios <- function(uid, bankwid, bankhgt, depth){
 #' @param desired output units.  Can be one of \code{"m"}, \code{"cm"}, or \code{"mixed"}.
 #' @return a 'metric' data.frame
 #' @importFrom plyr ddply
-#' @importFrom NARSShared count
 #' @export
 calculateThalwegDepthMetrics <- function(uid, is.wadeable, depth, units = c('m', 'cm', 'mixed')){
   #ensure units match: some notes and code about converting from m to cm
