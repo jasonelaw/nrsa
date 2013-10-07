@@ -1,3 +1,4 @@
+#'@export
 meltMetrics <- function(...){
   # If arg is a mat assumes that it has dimnames uid x metric
   args <- list(...)
@@ -13,14 +14,17 @@ meltMetrics <- function(...){
     }
   })
   ans <- data.frame(allFacToChar(ans))
+  is.na(ans$result) <- !is.finite(ans$result)
   arrange(ans, uid, metric)
 }
 
+#'@export
 castMetrics <- function(...){
   x <- rbindMetrics(...)
   dcast(x, uid ~ metric, value.var = 'result')
 }
 
+#'@export
 rbindMetrics <- function(...){
   x <- list(...)
   checkNames <- function(x){
@@ -30,5 +34,16 @@ rbindMetrics <- function(...){
   stopifnot(all(sapply(x, checkNames)))
   x <- lapply(x, allFacToChar)
   ans <- rbind.fill(x)
+  is.na(ans$result) <- !is.finite(ans$result)
   arrange(ans[, c('uid', 'metric', 'result')], uid, metric)
 }
+
+#'@export
+mergeMetrics <- function(...){
+  metrics <- list(...)
+  metrics <- rbind.fill(metrics)
+  metrics <- melt(metrics, id.var = 'uid', na.rm = T)
+  metrics <- dcast(metrics, uid ~ variable)
+  return(metrics)
+}
+
