@@ -23,7 +23,6 @@
 #' @param station a vector of station identifiers
 #' @param by 
 #' @importFrom plyr ddply
-#' @importFrom NARSShared modalvalue modalCount
 #' @export
 #' @examples
 #' 
@@ -32,9 +31,15 @@
 #' nWadeableStationsPerTransect(d$uid, d$transects, d$station)
 nWadeableStations <- function(uid, transect, station, by = c('transect', 'site')){
   by <- match.arg(by)
+#   if (is.factor(transect)){
+#     transect <- as.character(transect)
+#   }
+#   if (is.factor(station) | is.character(station)){
+#     station <- as.integer(as.character(station))
+#   }
   x <- data.frame(uid, transect, station)
   f <- function(x){
-    st.last     <- tapply(x$station, x$transect, max)
+    st.last     <- tapply(x$station, x$transect[,drop = T], max)
     st.mode     <- modalvalue(st.last)
     st.mode.cnt <- modalCount(st.last)
     if (st.mode.cnt > 6){

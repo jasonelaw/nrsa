@@ -59,14 +59,14 @@ PortlandList <- function(){
     "TSN503154")
 }
 
-getInvasiveData <- function(parameters){
-  on.exit(odbcClose(chan))
-  chan <- odbcConnect('NRSA2')
-  data <- fetchNRSATable(chan, 'tblINVASIVELEGACY2')
-
-  df <- subset(data,
-               PARAMETER %in% parameters, 
-               select=c('UID','TRANSECT','PARAMETER','RESULT'))
-  return(df)
-}
+# getInvasiveData <- function(parameters){
+#   on.exit(odbcClose(chan))
+#   chan <- odbcConnect('NRSA2')
+#   data <- fetchNRSATable(chan, 'tblINVASIVELEGACY2')
+# 
+#   df <- subset(data,
+#                PARAMETER %in% parameters, 
+#                select=c('UID','TRANSECT','PARAMETER','RESULT'))
+#   return(df)
+# }
 
