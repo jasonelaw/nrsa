@@ -1,41 +1,35 @@
 formatRiparianVegetation <- function(uid, transect, transdir, parameter, result){
-  visrip <- data.frame(UID = uid, TRANSECT = transect, TRANSDIR = transdir, 
-                       PARAMETER = parameter, RESULT = result)
+  visrip <- data.frame(uid, transect, transdir, parameter, result)
   # Vegetative cover pars; names used to rename later
   veg.cov <- c(xcl = 'CANBTRE', xcs = 'CANSTRE', xmw = 'UNDWDY', 
                xmh = 'UNDNWDY', xgw = 'GCWDY', xgh = 'GCNWDY',
                xgb = 'BARE')  
-  # Parameters needed for presence calculations
-  pres <- c("CANBTRE", "CANSTRE", "UNDWDY", "UNDNWDY", "GCWDY", "GCNWDY")
-  
+  # Parameters needed for presence versus category calculations
+  p.pars <- c("CANBTRE", "CANSTRE", "UNDWDY", "UNDNWDY", "GCWDY", "GCNWDY")
+  r.pars  <- c("UNDERVEG", "CANVEG", "CANBTRE", "CANSTRE", 
+                 "UNDWDY", "UNDNWDY", "GCWDY", "GCNWDY", "BARE")
   # Create necessary presence (P_) and result (R_) variables
-  visrip$PRESENCE <- visrip$RESULT != '0'
-  names(visrip) <- replace2(names(visrip), c('RESULT', 'PRESENCE'), c('R', 'P'))
+  visrip$presence <- visrip$result != '0'
+  visrip          <- rename(visrip, c('result' = 'R', 'presence' = 'P'))
   vm <- melt(visrip, measure.var = c('R', 'P'))
-  sub.expr <- .((PARAMETER %in% c("UNDERVEG", "CANVEG", "CANBTRE", "CANSTRE", 
-                                  "UNDWDY", "UNDNWDY", "GCWDY", "GCNWDY", "BARE") &
-                   variable == 'R') |
-                  (PARAMETER %in% c("CANBTRE", "CANSTRE", "UNDWDY",
-                                    "UNDNWDY", "GCWDY", "GCNWDY") & 
-                     variable == 'P'))
-  vc <- dcast(vm, UID + TRANSECT + TRANSDIR ~ variable + PARAMETER, 
-              subset = sub.expr)
+  sub.expr <- (parameter %in% r.pars  & variable == 'R') |
+                (parameter %in% p.pars & variable == 'P')
+  vc <- dcast(vm, uid + transect + transdir ~ variable + parameter, subset = sub.expr)
   # Ensure that all the levels are present; in case some weren't used in the data.
-  vc$R_UNDERVEG <- as.factor(vc$R_UNDERVEG)
-  vc$R_CANVEG <- as.factor(vc$R_CANVEG)
-  levels(vc$R_UNDERVEG) <- list(c = 'C', d = 'D', e = 'E', m = 'M', n = 'N')
-  levels(vc$R_CANVEG)   <- list(c = 'C', d = 'D', e = 'E', m = 'M', n = 'N')
+  cov.cat <- c(C = 'c', D = 'd', E = 'e', M = 'm', N = 'n')
+  vc$R_UNDERVEG <- factor(vc$R_UNDERVEG, levels = names(cov.cat), labels = cov.cat)
+  vc$R_CANVEG   <- factor(vc$R_CANVEG,   levels = names(cov.cat), labels = cov.cat)
   # Vegetation class area cover characterizations -- individual classes
   # Use arithmetic means of end points to numerically characterize each cover
   # class.  This section just converts the 0:5 to the end points.
-  veg.cov <- replace(veg.cov, seq_along(veg.cov), paste('R', veg.cov, sep = '_'))
-  pres <- paste('P', pres, sep = '_')
+  veg.cov <- mapvalues(veg.cov, veg.cov, paste0('R_', veg.cov))
+  p.pars  <- paste0('P_', p.pars, sep = '_')
   vc[veg.cov] <- lapply(vc[veg.cov], function(x){
     x <- as.factor(x)
     x <- revalue(x, c('0' = 0, '1' = 0.05, '2' = 0.25, '3' = 0.575, '4' = 0.875))
-    FactorToNumeric(x)
+    convertFactorToNumeric(x)
   })
-  vc[pres] <- lapply(vc[pres], CharacterToLogical)
+  #vc[p.pars] <- lapply(vc[p.pars], CharacterToLogical)
   vc
 }
 
@@ -53,7 +47,6 @@ formatRiparianVegetation <- function(uid, transect, transdir, parameter, result)
 #'@return a data frame of riparian vegetation metrics
 #'@importFrom reshape2 melt dcast
 #'@importFrom plyr '.' split_indices id split_labels
-#'@importFrom NARSShared FactorToNumeric CharacterToLogical rowSumsProtectNA quick.table '%&%'
 #'@export
 calculateRiparianVegetation <- function(uid, transect, transdir, parameter, result){
   vc <- formatRiparianVegetation(uid, transect, transdir, parameter, result)
@@ -82,50 +75,31 @@ calculateRiparianVegetation <- function(uid, transect, transdir, parameter, resu
   vc$xpcmg  <- (vc$P_CANBTRE | vc$P_CANSTRE) & (vc$P_UNDWDY | vc$P_UNDNWDY) & 
                (vc$P_GCWDY   | vc$P_GCNWDY)
   vc$xpmgw  <- (vc$P_UNDWDY %&% vc$P_GCWDY)
+  
   # Rename veg.cov to metric names for those parameters                                      
-  names(vc) <- replace2(names(vc), veg.cov, names(veg.cov))
+  names(vc) <- mapvalues(names(vc), veg.cov, names(veg.cov))
+  
   # Calculate all of the metrics
-  calc <- function(rows){
-    c(pmid = quick.table(vc$R_UNDERVEG[rows]),
-      pcan = quick.table(vc$R_CANVEG[rows]),
-      # calculate mean for vegetative cover and combinations of vegetative cover
-      colMeans(vcmat[rows,], na.rm = T)
-      )
-  }
   # List of vegetative cover and combo metrics that need means calculated.
-  mean.mets <- c("xcl", "xcs", "xmw", "xmh", "xgw", "xgh", "xgb","xc", "xm", 
-                 "xcmw", "xcm", "xg", "xcmgw", "xcmg","xpcan", "xpmid", 
-                 "xpgveg", "xpcm", "xpmg", "xpcmg", "xpmgw")
-  # The next 6 lines do the same thing as the commented ddply(vc, .(UID), calc)
-  # line below, but they do it faster because a copy is not made of vc.  I
-  # converted the numeric columns to a matrix because the matrix subscripting is
-  # faster than dataframe subscripting. Cuts calculation time by ~ 40%
-  ids     <- id(vc[c('UID')], drop = TRUE)
-  vcmat   <- as.matrix(vc[mean.mets])
-  indices <- plyr:::split_indices(ids, n = attr(ids, 'n'))
-  out     <- vapply(indices, calc, numeric(31))
-  labels  <- split_labels(vc[c('UID')], drop = F, id = ids)
-  out <- cbind(labels, t(out))
-  # Uncomment the following lines (and comment lines 73-93 above) to try the plyr version
-#  calc <- function(x){
-#    mean.mets <- c("xcl", "xcs", "xmw", "xmh", "xgw", "xgh", "xgb","xc", "xm", 
-#        "xcmw", "xcm", "xg", "xcmgw", "xcmg","xpcan", "xpmid", 
-#        "xpgveg", "xpcm", "xpmg", "xpcmg", "xpmgw")
-#    c(pmid = prop.table(table(x$R_UNDERVEG)),
-#        pcan = prop.table(table(x$R_CANVEG)),
-#        # calculate mean for vegetative cover and combinations of vegetative cover
-#        colMeans(x[,mean.mets], na.rm = T)
-#    )
-#  }
-#  out <- ddply(vc, .(UID), calc)
-  # reshape data back to long format
-  out <- melt(data = out, id.var = 'UID', variable.name = 'METRIC', 
-              value.name = 'RESULT')
+   mean.mets <- c("xcl", "xcs", "xmw", "xmh", "xgw", "xgh", "xgb","xc", "xm", 
+                  "xcmw", "xcm", "xg", "xcmgw", "xcmg","xpcan", "xpmid", 
+                  "xpgveg", "xpcm", "xpmg", "xpcmg", "xpmgw")
+
+  vcmat     <- as.matrix(vc[mean.mets])
+  mean.mets <- rowmean(vcmat, vc$uid, reorder = T, na.rm = T)
+  rownames(mean.mets) <- sort(unique(vc$uid))
+  mean.mets   <- meltMetric(mean.mets)
+  
+  pmid <- prop.table(table(uid = vc$uid, metric = vc$R_UNDERVEG), 1)
+  pcan <- prop.table(table(uid = vc$uid, metric = vc$R_CANVEG), 1)
+  pmid <- as.data.frame(pmid, responseName = 'result')
+  pcan <- as.data.frame(pcan, responseName = 'result')
+  pcan$metric <- paste0('pcan_', pcan$metric)
+  pmid$metric <- paste0('pmid_', pmid$metric)
+  
+  mets <- rbindMetrics(mean.mets, pmid, pcan)
   # Fix some names; convert NaN to NA; coerce some data types
-  levels(out$METRIC) <- gsub('.', '_', tolower(levels(out$METRIC)), fixed = T)
-  is.na(out$RESULT) <- is.nan(out$RESULT)
-  out$RESULT <- as.character(out$RESULT)
-  out$METRIC <- as.factor(as.character(out$METRIC))
+  is.na(mets$result) <- is.nan(mets$RESULT)
   progressReport("Finished with riparian vegetation metrics.")
   return(out)
 }
