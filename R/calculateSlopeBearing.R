@@ -5,7 +5,7 @@
 #' 
 #' The general strategy for calculationg slope and bearing metrics using these functions is:
 #' \enumerate{
-#'    \item Calculate wadeable transect spacing for wadeable as: \code{increment * nWadeableStationsPerTransect}
+#'    \item Calculate transect spacing for wadeable as: \code{increment * nWadeableStationsPerTransect}
 #'    \item Calculate wadeable distance for each slope/bearing as \code{transp * proportion}
 #'    \item Calculate boatable transect spacing as \code{sum(distance)} and proportion as \code{distance / sum(distance)}
 #'    \item Calculate grade (as %) from boatable elevation change measurements in centimeters, if applicable.
@@ -56,9 +56,19 @@ calculateAngleMetrics <- function(uid, azimuth, distance){
 #' @importFrom plyr ddply
 #' @export
 calculateSlopeMetrics <- function(uid, transect, slope, proportion){
-  ones <- tapply(proportion, list(uid, transect), sum)
-  stopifnot(all(ones == 1))
+  uid <- as.character(uid)
+  ones <- tapply(proportion, list(uid, transect), sum) == 1
+  ones <- apply(ones, 1, all)
+  drop.uids <- names(ones)[ones]
+  if (!all(ones)){
+    warning("There are transects whose proportions don't sum to 1")
+  }
   x <- data.frame(uid, transect, slope, proportion)
+  low.n <- tapply(!is.na(x$slope), x$uid, sum) < 3
+  low.n.uids <- F
+  if (any(low.n)){
+    warning('There are site with less than three slopes: no xslope or vslope reported')
+  }
   f <- function(x){
     c(tmean = weighted.mean(x$slope, x$proportion, na.rm = T))
   }
@@ -70,8 +80,24 @@ calculateSlopeMetrics <- function(uid, transect, slope, proportion){
   }
   ans <- ddply(tmean, .(uid), f)
   ans <- meltMetrics(ans)
+  is.na(ans$result) <- ans$metric %in% c('xslope', 'vslope') & ans$uid %in% low.n.uids
   progressReport('Slope metrics completed.')
   return(ans)
+}
+
+#' @export
+fillSlopeBearingData <- function(uid, transect, is.wadeable, increment, n.station, distance, proportion, slope_percent, slope_cm, azimuth, is.slope.length = F){
+  transpc <- increment * n.station
+  i <- interaction(uid, transect, drop = T)
+  dsum <- tapply(distance, i, sum)[i]
+  transpc     <- ifelse(is.wadeable, transpc, dsum)
+  distance    <- ifelse(is.wadeable, transpc * proportion, distance)
+  proportion  <- ifelse(is.wadeable, proportion, distance / transpc)
+  
+  slope <- ifelse(is.na(slope_percent), 
+                  calcGrade(slope_cm, distance * 100, unit = 'percent', is.slope.length = is.slope.length),
+                  slope_percent)
+  return(data.frame(uid, transect, is.wadeable, transpc, distance, proportion, slope, azimuth))
 }
 
 #' Returns a vector of point to point distances for a line.
@@ -126,7 +152,7 @@ calcGrade <- function(rise, run, unit = c('proportion', 'percent', 'angle'), is.
 #' point (assumed to be (0,0)).
 #' @param azimuth a vector of azimuth angles in degrees
 #' @param distance a vector of distances
-#' @param start the coordinates of the starting point for the traverse
+#' @param start the coordinates of the starting point for the traverse as a length two vector
 #' @return the coordinates for the traverse
 #' @export
 coordinatesFromTraverse <- function(azimuth, distance, start = c(0,0)){
