@@ -104,6 +104,7 @@ observedLWDTransects <- function(uid, transect, count, in.bankfull){
 #'@param diameter the diamter cateogry of the lwd piece 
 #'@param count vector of counts of LWD pieces
 #'@importFrom reshape2 melt
+#'@importFrom plyr revalue
 #'@export
 calculateLWDCounts <- function(uid, in.bankfull, length, diameter, count){
   x <- data.frame(count = count, uid = uid, in.bankfull = in.bankfull, 
@@ -126,23 +127,22 @@ calculateLWDCounts <- function(uid, in.bankfull, length, diameter, count){
   
   mar.counts <- melt(mar.counts, c('uid', 'in.bankfull', 'length.name', 'diameter.name'), 
                      value.name = 'result')
-  fix <- list(t = 'Sum')
-  levs <-
-    list(smdrydia = "rchdsdtl", smwetdia = "rchwsdtl", 
-         smdiatot = "rchtsdtl", mddrydia = "rchdmdtl", mdwetdia = "rchwmdtl", 
-         mddiatot = "rchtmdtl", lgdrydia = "rchdldtl", lgwetdia = "rchwldtl", 
-         lgdiatot = "rchtldtl", xldrydia = "rchdxdtl", xlwetdia = "rchwxdtl", 
-         xldiatot = "rchtxdtl", shdrylen = "rchdtdsl", shwetlen = "rchwtdsl", 
-         shlentot = "rchttdsl", mddrylen = "rchdtdml", mdwetlen = "rchwtdml", 
-         mdlentot = "rchttdml", lgdrylen = "rchdtdll", lgwetlen = "rchwtdll", 
-         lglentot = "rchttdll", rchdryt = "rchdtdtl", rchwett = "rchwtdtl", 
-         rchwdt = "rchttdtl") 
+  fix <- c(Sum = 't')
+  levs <- c(rchdsdtl = "smdrydia", rchwsdtl = "smwetdia", 
+            rchtsdtl = "smdiatot", rchdmdtl = "mddrydia", rchwmdtl = "mdwetdia", 
+            rchtmdtl = "mddiatot", rchdldtl = "lgdrydia", rchwldtl = "lgwetdia", 
+            rchtldtl = "lgdiatot", rchdxdtl = "xldrydia", rchwxdtl = "xlwetdia", 
+            rchtxdtl = "xldiatot", rchdtdsl = "shdrylen", rchwtdsl = "shwetlen", 
+            rchttdsl = "shlentot", rchdtdml = "mddrylen", rchwtdml = "mdwetlen", 
+            rchttdml = "mdlentot", rchdtdll = "lgdrylen", rchwtdll = "lgwetlen", 
+            rchttdll = "lglentot", rchdtdtl = "rchdryt", rchwtdtl = "rchwett", 
+            rchttdtl = "rchwdt")
   mar.counts <- within(mar.counts, {
-    length.name      <- replace.levels(length.name, fix)
-    diameter.name    <- replace.levels(diameter.name, fix)
-    in.bankfull <- replace.levels(in.bankfull, list(t = 'Sum', w = 'TRUE', d = 'FALSE'))
+    length.name   <- revalue(length.name, fix)
+    diameter.name <- revalue(diameter.name, fix)
+    in.bankfull   <- revalue(in.bankfull, c('Sum' = 't', 'TRUE' = 'w','FALSE' = 'd'))
     metric <- tolower(paste('rch', in.bankfull, diameter.name, 'd', length.name, 'l', sep = ''))
-    metric <- replace.levels(as.factor(metric), levs)
+    metric <- revalue(as.factor(metric), levs)
   })
   progressReport("Finished calculating counts of lwd in each size class.")
   mar.counts
