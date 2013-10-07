@@ -20,7 +20,7 @@
   mean of the extreme sizes) for each of these sets. There
   are three data sets we need to work with (1) ALL the
   size_classes (mm) (2) subclasses excluding HP, RD, RR,
-  RS, RC, OT, WD (tt) (3) subclasse INCLUDES all classes
+  RS, RC, OT, WD (tt) (3) subclasses including all classes
   and lumps the boulder class (XB+SB= BL) (bl) (4)
   subclasses excluding HP, RD, RR, RS, RC, OT, WD, and
   lumps the boulder class (XB+SB= BL) (ttbl)

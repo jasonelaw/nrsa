@@ -13,6 +13,6 @@
   a vector of depth metrics in cm
 }
 \description{
-  Convert boatable depth units from m to cm
+  Convert boatable depth units from m to cm.
 }
 

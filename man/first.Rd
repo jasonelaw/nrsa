@@ -1,0 +1,30 @@
+\name{first}
+\alias{first}
+\alias{last}
+\title{Identify the first and last elements for each run in a vector}
+\usage{
+  first(x, na.as.group = F)
+
+  last(x, na.as.group = F)
+}
+\arguments{
+  \item{x}{a vector with runs}
+
+  \item{a}{logical vector; \code{TRUE} if it is the first
+  or last of a run}
+}
+\description{
+  For an input vector which contains a sequence of runs,
+  these functions identify the first and last points in
+  each run.  They return a logical vector.
+}
+\details{
+  These functions use \link{rle} to compute a run length
+  encoding for the vector and extract the first and last
+  elements in each run from the lengths of each run.
+}
+\examples{
+first(c(1,1,2,2))
+last(c(1,1,2,2))
+}
+

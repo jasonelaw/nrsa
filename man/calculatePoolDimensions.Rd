@@ -1,0 +1,39 @@
+\name{calculatePoolDimensions}
+\alias{calculatePoolDimensions}
+\title{Residual depths from a thalweg profile}
+\usage{
+  calculatePoolDimensions(distance, depth, slope)
+}
+\arguments{
+  \item{distance}{a vector of distances along a thalweg
+  profile}
+
+  \item{depth}{a vector of thalweg profile depth
+  measurements}
+
+  \item{slope}{a site wide average slope of length 1}
+}
+\value{
+  a n * n lower diagonal matrix containing the residual
+  depths.  Each column represents the residual depths
+  calculated treating a different thalweg point as the base
+  depth.
+}
+\description{
+  Calculate residual pool depths from a thalweg profile
+  containing distance depth and slope, treating every depth
+  as a possible base depth.
+}
+\details{
+  The resulting residual depths are returned in the lower
+  triangle of a n * n matrix, where n is the number of
+  depths.  The diagonal of the matrix represents the
+  succesive base points. Each row after the diagonal gives
+  the residual depths relative to the base point for that
+  column.  Any row with a residual depth > 0 is in a pool
+  represents a thalweg point that is in a pool.
+}
+\examples{
+allResidualDepth(0:9, runif(10), .01)
+}
+

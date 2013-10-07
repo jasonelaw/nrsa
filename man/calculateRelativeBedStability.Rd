@@ -12,7 +12,7 @@
 
   \item{ltest}{critical diameter (crude)}
 
-  \item{ldmb_bw4}{critical diamter (refined) old version}
+  \item{ldmb_bw4}{critical diameter (refined) old version}
 
   \item{ldmb_bw5}{critical diameter (refined)}
 

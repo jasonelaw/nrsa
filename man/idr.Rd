@@ -1,0 +1,22 @@
+\name{idr}
+\alias{idr}
+\title{Interdecile range}
+\usage{
+  idr(x, method = 2)
+}
+\arguments{
+  \item{x}{numeric vector}
+}
+\value{
+  the interdecile range
+}
+\description{
+  Returns interdecile range (90%-10% of population,
+  assuming gaussian distribution) of the specified data.
+  Quantile calculation type 2 matches SAS to within 10^-6
+  100% of the time (for 2008 data); this is at odds with
+  the R documentation which specifies type 3 imitates SAS.
+  FWIW, type 5 differs from SAS only 7% of the time under
+  the same conditions.
+}
+

@@ -1,0 +1,19 @@
+\name{is.subset}
+\alias{is.subset}
+\title{Is the set a subset of another set.}
+\usage{
+  is.subset(a, b)
+}
+\arguments{
+  \item{a}{a set}
+
+  \item{b}{the set to test a agains}
+}
+\value{
+  logical, \code{TRUE} if a is a subset of b
+}
+\description{
+  Returns TRUE if elements in vector a are a subset of the
+  elements in vector b, or FALSE otherwise.
+}
+

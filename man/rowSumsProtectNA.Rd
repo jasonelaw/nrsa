@@ -1,0 +1,24 @@
+\name{rowSumsProtectNA}
+\alias{rowSumsProtectNA}
+\title{Protect rowSums from a row which is all NA; return NA instead of 0.}
+\usage{
+  rowSumsProtectNA(x)
+}
+\arguments{
+  \item{x}{a matrix}
+}
+\value{
+  the sum of the rows
+}
+\description{
+  Does essentially what \code{rowSums(., na.rm = T))} does
+  except that it returns NA for any row that is all NA.
+  Uses a matrix oriented approach which is very fast.
+}
+\examples{
+m <- matrix(c(NA), ncol = 6, nrow = 1)
+m
+rowSums(m, na.rm = T)
+rowSumsProtectNA(m)
+}
+

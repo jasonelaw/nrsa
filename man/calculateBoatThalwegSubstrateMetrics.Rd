@@ -1,13 +1,25 @@
 \name{calculateBoatThalwegSubstrateMetrics}
+\alias{calculateBoatLittoralSubstrateMetrics}
 \alias{calculateBoatThalwegSubstrateMetrics}
 \title{Calculate non-wadeable substrate metrics}
 \usage{
   calculateBoatThalwegSubstrateMetrics(uid, size.class)
+
+  calculateBoatLittoralSubstrateMetrics(uid, db, ds, sb,
+    ss)
 }
 \arguments{
   \item{uid}{a vector of site-visit indicators}
 
   \item{size.class}{a vector size classes}
+
+  \item{db}{dominant, bottom substrate classes}
+
+  \item{ds}{dominant, shoreline substrate classes}
+
+  \item{sb}{secondary, bottom substrate classes}
+
+  \item{ss}{secondary, shoreline substrate classes}
 }
 \description{
   \code{calculateBoatSubstrateMetrics} is used to calculate

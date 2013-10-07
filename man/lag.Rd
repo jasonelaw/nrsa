@@ -1,0 +1,21 @@
+\name{lag}
+\alias{lag}
+\title{Lag a vector}
+\usage{
+  lag(x, k)
+}
+\arguments{
+  \item{x}{a vector}
+
+  \item{k}{the lag}
+}
+\value{
+  a lagged vector
+}
+\description{
+  Returns the lag of a vector.
+}
+\examples{
+lag(1:5)
+}
+

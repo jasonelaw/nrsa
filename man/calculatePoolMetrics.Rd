@@ -1,0 +1,34 @@
+\name{calculatePoolMetrics}
+\alias{calculatePoolMetrics}
+\title{Calculate residual pool metrics}
+\usage{
+  calculatePoolMetrics(uid, pool, depth, length, area,
+    reachlen, ...)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{pool}{a pool identifier; unique for each pool
+  within a site}
+
+  \item{depth}{the residual pool depth for that point in
+  the profile}
+
+  \item{length}{the residual pool length for that point in
+  the profile}
+
+  \item{area}{the residual pool area for that point in the
+  profile}
+
+  \item{reachlen}{a vector of reach lengths for each uid;}
+}
+\value{
+  a metric data.frame
+}
+\description{
+  Calculates residual pool metrics from data set where the
+  residual pool length, depth, and area have been
+  calculated separately for each depth in a thalweg
+  profile.
+}
+

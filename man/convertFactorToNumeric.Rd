@@ -1,0 +1,24 @@
+\name{convertFactorToNumeric}
+\alias{convertFactorToNumeric}
+\title{A shortcut for the common idiom to turn factors back into the numeric values
+represented in their labels (rather than the integers used to encode the
+factor as as.numeric would do.  See ?factor.}
+\usage{
+  convertFactorToNumeric(x)
+}
+\arguments{
+  \item{x}{a factor}
+}
+\value{
+  a numeric vector
+}
+\description{
+  A shortcut for the common idiom to turn factors back into
+  the numeric values represented in their labels (rather
+  than the integers used to encode the factor as as.numeric
+  would do.  See ?factor.
+}
+\examples{
+convertFactorToNumeric(factor(rnorm(10)))
+}
+

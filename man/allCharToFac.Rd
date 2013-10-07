@@ -1,0 +1,26 @@
+\name{allCharToFac}
+\alias{allCharToFac}
+\alias{allFacToChar}
+\title{Turns all character variables in a data frame to factors or vice versa.}
+\usage{
+  allCharToFac(x)
+
+  allFacToChar(x)
+}
+\arguments{
+  \item{x}{a data frame}
+}
+\value{
+  a data frame where all the characters have been turned
+  into factors or vice versa.
+}
+\description{
+  Turns all character variables in a data frame to factors.
+}
+\examples{
+data(iris)
+str(iris)
+str(iris <- allFacToChar(iris))
+str(allCharToFac(iris))
+}
+

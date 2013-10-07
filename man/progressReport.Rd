@@ -1,18 +1,25 @@
 \name{progressReport}
+\alias{plyrProgress}
 \alias{progressReport}
-\title{Print a progress report
-This function prints a progress report.  The time is appended so that the
-elapsed time between reports can be used to track calculation progress.}
+\title{Print a progress report}
 \usage{
   progressReport(msg)
+
+  plyrProgress(progress = "text")
 }
 \arguments{
   \item{msg}{the message to be printed}
+
+  \item{progress}{the name of the plyr progress reporter to
+  use.}
 }
 \description{
-  Print a progress report This function prints a progress
-  report.  The time is appended so that the elapsed time
-  between reports can be used to track calculation
-  progress.
+  This function prints a progress report.  The time is
+  appended so that the elapsed time between reports can be
+  used to track calculation progress. The printing of
+  progress reports is controlled by the \link{nrsa.options}
+  function. Additionally \code{plyrProgress} will be used
+  to print the progress bars for ddply functions when
+  \code{nrsa.options(ProgressReports = TRUE)}.
 }
 

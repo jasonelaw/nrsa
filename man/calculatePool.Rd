@@ -1,0 +1,30 @@
+\name{calculatePool}
+\alias{calculatePool}
+\title{Determine which depths in a vector of depths represent pools}
+\usage{
+  calculatePool(distance, depth, slope, uid = NULL,
+    convert.stack = F)
+}
+\arguments{
+  \item{distance}{a vector of cumulative distance for the
+  thalweg profile}
+
+  \item{depth}{a vector of thalweg profile depths}
+
+  \item{slope}{the average site slope; if uid is passed
+  this is expected to be a vector as long as the other
+  arguments.  Otherwise it may be a length 1 numeric.}
+
+  \item{uid}{a vector of site identifiers: pools are
+  calculated separately for each site}
+
+  \item{convert.stack}{logical, if \code{TRUE} the slope is
+  converted using the formula of Stack (1988).}
+}
+\description{
+  Determine which depths in a vector of depths represent
+  pools and return information about them.  A residual pool
+  is any area in a pool that holds water when the discharge
+  is 0.
+}
+

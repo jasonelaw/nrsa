@@ -1,0 +1,21 @@
+\name{identifyIncompleteSites}
+\alias{identifyIncompleteSites}
+\title{Identify incomplete sites}
+\usage{
+  identifyIncompleteSites(uid, loc, depth,
+    minimum.proportion = 0.85)
+}
+\arguments{
+  \item{uid}{a vector of site identifiers}
+
+  \item{loc}{a vector of thalweg sequence ids}
+
+  \item{depth}{a vector of thalweg depths}
+
+  \item{minimum}{proportion of non-missing depths}
+}
+\description{
+  Identify sites whose proportion of non-missing depths
+  falls below a minimum.
+}
+

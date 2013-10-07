@@ -11,7 +11,7 @@
   \item{distance}{a vector of distances}
 
   \item{start}{the coordinates of the starting point for
-  the traverse}
+  the traverse as a length two vector}
 }
 \value{
   the coordinates for the traverse

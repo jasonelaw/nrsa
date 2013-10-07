@@ -1,0 +1,35 @@
+\name{modalClass}
+\alias{modalClass}
+\title{Determines most common classes, based on counts for each class.  Counts are
+expected to occur in the same row (i.e. long format).  This function is
+intended to be called from within a loop.  In the case of ties, all modal
+classes will be included, separated by a comma and a space. e.g.}
+\usage{
+  modalClass(x, values, classes)
+}
+\arguments{
+  \item{x}{named values of interest, e.g. a single row of a
+  dataframe}
+
+  \item{values}{list of column names in x containing cover
+  or other values on which the modal class will be based.}
+
+  \item{classes}{list of class names associated with the
+  columns, given in the order that the values are listed.}
+}
+\value{
+  a character vector
+}
+\description{
+  foo<-subset(df, select='uid') foo$mode <- NA for(i in
+  1:nrow(df)) { foo$mode[i] <- modalClass(df[i] ,
+  c('count1','count2','count3'...)  ,
+  c('ones','twos','threes',...)  ) }
+}
+\details{
+  ASSUMPTIONS Column names listed by values arg occur in x.
+  The list of class names is in the same order as the list
+  of The number of elements in values is the number of
+  elements in classes.
+}
+

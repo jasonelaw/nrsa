@@ -4,7 +4,15 @@
 \usage{
   calculateS_RP100(xslope, sddepth)
 }
+\arguments{
+  \item{xslope}{mean site slope}
+
+  \item{sddepth}{standard deviation of thalweg depth}
+}
+\value{
+  the s_rp100 metric
+}
 \description{
-  Not even sure what this modified metric is...
+  Wish I knew.
 }
 

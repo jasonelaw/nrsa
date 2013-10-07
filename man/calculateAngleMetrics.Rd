@@ -5,7 +5,7 @@
 \usage{
   calculateAngleMetrics(uid, azimuth, distance)
 
-  calculateSlopeMetrics()
+  calculateSlopeMetrics(uid, transect, slope, proportion)
 }
 \arguments{
   \item{uid}{a vector of site identifiers}
@@ -25,7 +25,7 @@
 \details{
   The general strategy for calculationg slope and bearing
   metrics using these functions is: \enumerate{ \item
-  Calculate wadeable transect spacing for wadeable as:
+  Calculate transect spacing for wadeable as:
   \code{increment * nWadeableStationsPerTransect} \item
   Calculate wadeable distance for each slope/bearing as
   \code{transp * proportion} \item Calculate boatable

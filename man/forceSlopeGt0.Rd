@@ -4,7 +4,13 @@
 \usage{
   forceSlopeGt0(slope)
 }
+\arguments{
+  \item{slope}{a vector of slopes}
+}
+\value{
+  a vector of slopes with slopes < .01, replaced by 0.01
+}
 \description{
-  Make slope slightly positive
+  Make slopes slightly positive if they are less than 0.01.
 }
 
