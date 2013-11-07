@@ -16,10 +16,15 @@ test_that("Boatable littoral substrate metrics work correctly", {
   uid <- rep(1, 15)
   classes <- c('RS', 'RR', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA',
                'FN', 'HP', 'WD', 'OT', 'BL', 'OM', 'RC')
+  classesNA <- classes
+  is.na(classesNA) <- 1
   ans <- calculateBoatLittoralSubstrateMetrics(uid, classes, classes, classes, classes)
   
   expect_that(sort(ans$metric), is_identical_to(expected.metrics))
   expect_that(ans$result, equals(rep(1/15, 60)))
+  
+  ans <- calculateBoatLittoralSubstrateMetrics(uid, classesNA, classesNA, classesNA, classesNA)
+  expect_that(ans$result, equals(rep(rep(c(0,1/14), times = c(1, 14)), 4)))
   
 })
 
