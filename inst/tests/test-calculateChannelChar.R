@@ -1,5 +1,5 @@
 context('Channel Characteristics')
-
+source(system.file('tests/expect_metric_equal.R', package = 'nrsa'))
 uid           <- rep(1, 10)
 shor2rip      <- 1:10
 see.over.bank <- rep(c(F,T), each = 5)
@@ -11,7 +11,7 @@ test_that("Channel Characteristics return correct results", {
               equals(c(1, 10, 5.5)))
   
   expect_that(calculateProportionSeeOverBank(uid, see.over.bank)$result,
-              equals(as.numeric(0.5)))
+              equals(as.numeric(50)))
   
   expect_that(calculateChannelConstraint(uid, constraint)$result,
               equals(c(30,30,20,20)))
@@ -30,11 +30,10 @@ test_that("Channel characteristics return correct metrics as character vectors",
 })
 
 test_that("Channel characteristics return correct values for EPA test data", {
-  
+  metrics <- c("conbankfull", "confeatures", "conpattern", "conpercent", 
+               "constraint", "convalley", "convalleybox", "mnshor", "mxshor", 
+               "pct_ovrb", "pctch_b", "pctch_c", "pctch_n", "pctch_u", "xshor2vg")
   load( file = system.file('tests', 'data', 'ChannelChar.testData.Rdata', package = 'nrsa'))
-  load( file = system.file('tests', 'data', 'ChannelChar.expectedResults.Rdata', package = 'nrsa'))
-  load( file = system.file('tests', 'data', "ChannelConstraint.testData.Rdata", package = 'nrsa'))
-  
   m1 <- calculateShoreToVegDistance(test$UID, test$SHOR2RIP)
   m2 <- calculateProportionSeeOverBank(test$UID, test$SEEOVRBK)
   m3 <- calculateChannelConstraint(test$UID, test$CONSTRT)
@@ -42,7 +41,12 @@ test_that("Channel characteristics return correct values for EPA test data", {
   load( file = system.file('tests', 'data', "ChannelConstraint.testData.Rdata", package = 'nrsa'))
   m4 <- with(ChannelConstraint.testData, nrsa:::getChannelConstraint(UID, PARAMETER, RESULT))
   
-  m  <- rbindMetrics(m1, m2, m3, m4)
-  check <- merge(m, expected, by = c('uid', 'metric'), all = T)
-  test_that(check$result.x, equals(check$result.y))
+  load( file = system.file('tests', 'data', 'ChannelChar.expectedResults.Rdata', package = 'nrsa'))
+  expected <- castMetrics(expected)
+  m  <- castMetrics(rbind(m1, m2, m3, m4))
+  
+  expect_true(setequal(m$uid, expected$uid))
+  expected <- expected[match(m$uid, expected$uid),]
+  
+  for (i in metrics) expect_metric_equal(m, expected, i)
 })

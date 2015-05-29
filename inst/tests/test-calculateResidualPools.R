@@ -1,6 +1,6 @@
 context("Residual pools")
 
-dim <- calculatePoolDimensions(c(0,1), depth = c(1,5), slope = 0.1)
+dim <- nrsa:::calculatePoolDimensions(c(0,1), depth = c(1,5), slope = 0.1)
 
 test_that("calculatePoolDimensions works correctly", {
   
@@ -29,6 +29,6 @@ test_that("cutDimensions works correctly", {
   dimens <- cbind(depth = c(0, 1, 1, 1, 0, -1),
                   length = 1:6)
   expected <- matrix(c(rep(1,3), 0, rep(1,4)), ncol = 2)
-  expect_that(cutDimensions(dimens), is_equivalent_to(expected))
+  expect_that(nrsa:::cutDimensions(dimens), is_equivalent_to(expected))
               
 })

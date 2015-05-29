@@ -44,9 +44,10 @@ test_that("calculateSlopeMetrics returns correct values for EPA data", {
   test2 <- na.omit(subset(test1, select = c(uid, transect, slope, proportion)))
   smet <- with(test1,
                calculateSlopeMetrics(uid[,drop = T], transect, slope, proportion))
-  mets <- rbindMetrics(amet, smet, unique(meltMetrics(test1[,c('uid', 'transpc')])))
+  tran.spacing <- calculateTransectSpacing(test1$uid, test1$transpc)
+  mets <- rbindMetrics(amet, smet, tran.spacing)
   check <- merge(mets, expected, by = c('uid', 'metric'), all = T)
-  expect_that(check$result.x, equals(check$result.y))
+  expect_that(check$result.x, equals(check$result.y, tolerance = 1e-5))
 })
 
-
+                       

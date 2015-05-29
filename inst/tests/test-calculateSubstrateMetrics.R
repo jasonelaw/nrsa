@@ -24,7 +24,7 @@ test_that("Boatable littoral substrate metrics work correctly", {
   expect_that(ans$result, equals(rep(1/15, 60)))
   
   ans <- calculateBoatLittoralSubstrateMetrics(uid, classesNA, classesNA, classesNA, classesNA)
-  expect_that(ans$result, equals(rep(rep(c(0,1/14), times = c(1, 14)), 4)))
+  expect_that(ans$result, equals(rep(rep(c(0,1/14), times = c(1, 14)), each = 4)))
   
 })
 
