@@ -1,3 +1,9 @@
+kHICategories                <- c("0", "P", "C", "B")
+kHIAgriculturalParameters    <- c('row', 'past')
+kHINonAgriculturalParameters <- c("build", "landfl", "log", "mine", "park", 
+                                  "pave", "pipes", "road", "wall")
+kHIParameters                <- c(kHIAgriculturalParameters, 
+                                  kHINonAgriculturalParameters)
 #'Calculate human influence metrics
 #'
 #'This function calculates the human influence metrics.  The parameter names are
@@ -9,44 +15,70 @@
 #'C (present < 10 m), B (present on bank)
 #'
 #'@return returns a dataframe with three columns: uid, metric, result
-#'@importFrom abind abind
-#'@importFrom plyr ddply rbind.fill mapvalues arrange
+#'@import plyr
 #'@export
+#'@examples
+#'hi <- expand.grid(uid = 1:1000, transect = letters[1:10], 
+#'                  parameter = c("wall", "build", "pave", "road", "pipes", "landfl", "park", 
+#'                                "row", "past", "log", "mine"), 
+#'                  result = sample(c('0', 'C', 'B', 'P')), n = 11 * 10 * 1000)
+#'calculateHumanInfluence(hi$uid, hi$parameter, hi$result)
 calculateHumanInfluence <- function(uid, parameter, result){
-  #TODO: Add a 'bank hardening' metric which is sum of percentages for each transect.
-  stopifnot(length(uid) == c(length(parameter), length(uid) == length(result)))
-  levels(parameter) <- tolower(levels(parameter))
-  ag.pars <- c('row', 'past')
-  noag.pars <- setdiff(levels(parameter), ag.pars)
-  # Calculate sums by parameter category over the transects and transect directions
-  # and divide by number of observations per parameter.  
-  denom <- table(uid, parameter)
-  tbl   <- table(uid, parameter, result)
-  tbl.CB <- tbl[,, 'B', drop = F] + tbl[,, 'C', drop = F]
-  dimnames(tbl.CB)[[3]] <- 'CB'
-  tbl  <- abind(tbl, tbl.CB, along = 3)
-  hall <- sweep(tbl, 1:2, denom, '/')
-  # Do the weighted sums
-  w1h <- sweep(hall[,,c('0','P', 'C', 'B')], 3, c(0.0, 0.6667, 1.0, 1.5), '*')
-  w1h <- margin.table(w1h, 1:2)
-  w1_hag   <- rowSums(w1h[, ag.pars])
-  w1_hnoag <- rowSums(w1h[, noag.pars])
-  w1_hall  <- w1_hag + w1_hnoag
-  w1h      <- cbind(w1h, ag = w1_hag, noag = w1_hnoag, all = w1_hall)
-  # Add sums across the parameters
-  hag   <- margin.table(hall[, ag.pars,, drop = F], c(1,3))
-  hnoag <- margin.table(hall[, noag.pars,, drop = F], c(1,3))
-  hall  <- margin.table(hall, c(1,3))
+  parameter <- tolower(parameter)
+  stopifnot(length(uid) == length(parameter), 
+            length(uid) == length(result),
+            parameter %in% kHIParameters,
+            result %in% kHICategories)
+  parameter <- factor(parameter, kHIParameters)
+  result    <- factor(as.character(result), kHICategories)
+  hprop <- calculateHIProportions(uid, parameter, result)
+  w1h   <- calculateHIWeightedSums(hprop)
+  hi    <- calculateHIParameterSums(hprop)
+  
   # Put everything together and clean up names
-  ans  <- meltMetrics(hag = hag, hnoag = hnoag, hall = hall, w1h = w1h)
-  ans2 <- ddply(subset(ans, metric %in% c('B', 'C', 'P')), .(.id, uid), 
+  w1h$.id <- 'w1h'
+  ans  <- rbind.fill(w1h, hi)
+  ans2 <- ddply(ans[ans$metric %in% c('B', 'C', 'P'),], .(.id, uid), 
                 summarize, result = sum(result))
   ans  <- rbind.fill(ans, ans2)
-  ans  <- subset(ans, !(metric %in% '0'))
+  ans  <- ans[!(ans$metric %in% '0'), ]
   ans$metric <- renameHumanInfluenceMetrics(ans$.id, ans$metric)
   ans$.id <- NULL
   progressReport('Done with human influence mean mets')
   arrange(ans, uid, metric)
+}
+
+calculateHIParameterSums <- function(x){
+  xag   <- x[, kHIAgriculturalParameters,, drop = F]
+  xnoag <- x[, kHINonAgriculturalParameters,, drop = F]
+  hag   <- margin.table(xag, c(1,3))
+  hnoag <- margin.table(xnoag, c(1,3))
+  hall  <- margin.table(x, c(1,3))
+  meltMetrics(hag = hag, hnoag = hnoag, hall = hall)
+}
+
+#' Calculate weighted human influence metrics
+#' 
+#' Calculate weighted human influence metrics
+#' @param proportions a uid x parameter x category matrix of proportions
+#' @param weights a weight vector for categories 0, P, C, and B.
+calculateHIWeightedSums <- function(proportions, weights = c(0.0, 0.6667, 1.0, 1.5)){
+  proportions <- proportions[, , kHICategories, drop = F]
+  w1h <- sweep(proportions, 3, weights, '*')
+  w1h      <- rowSums(w1h, dims = 2)
+  w1_hall  <- rowSums(w1h)
+  w1_hag   <- rowSums(w1h[, kHIAgriculturalParameters, drop = F])
+  w1_hnoag <- rowSums(w1h[, kHINonAgriculturalParameters, drop = F])
+  meltMetrics(cbind(w1h = w1h, ag = w1_hag, noag = w1_hnoag, all = w1_hall))
+}
+
+calculateHIProportions <- function(uid, parameter, result){
+  tbl <- table(uid, parameter, result)
+  n   <- rowSums(tbl, dims = 2)
+  tbl  <- abind::abind(tbl, 
+                       CB = tbl[,, 'B'] + tbl[,, 'C'],
+                       along = 3)
+  sweep(tbl, 1:2, n, '/')
 }
 
 #'Calculate human influence standard deviation metrics
@@ -59,7 +91,7 @@ calculateHumanInfluence <- function(uid, parameter, result){
 #'C (present < 10 m), B (present on bank)
 #'
 #'@return returns a dataframe with three columns: uid, metric, result
-#'@importFrom plyr ddply rename
+#'@import plyr
 #'@export
 calculateHumanInfluenceSD <- function(uid, transect, result){
   x <- data.frame(uid = uid, transect = transect, result = result)
@@ -88,7 +120,7 @@ calculateHumanInfluenceSD <- function(uid, transect, result){
 #'
 #'@param group a vector of groups based on the names passed to meltMetrics
 #'@param metric a vector metric indicators
-#'@importFrom plyr mapvalues revalue
+#'@import plyr
 renameHumanInfluenceMetrics <- function(group, metric){
   metric <- mapvalues(as.character(metric), NA, '')
   metric <- revalue(metric, c('B' = 'b', 'C' = 'c', 'CB' = 'cb', 'P' = 'f'))
@@ -114,11 +146,11 @@ renameHumanInfluenceMetrics <- function(group, metric){
 #'@param parameter a vector of parameter names for the 11 human influence parameters
 #'@param result a vector of results 0 (not present), P (present > 10 m), 
 #'C (present < 10 m), B (present on bank)
-#'@importFrom plyr ddply
+#'@import plyr
 #'@export
 calculateBankHardening <- function(uid, transect, plot, parameter, result){
   x <- data.frame(uid = uid, transect = transect, plot = plot, parameter = parameter, result = result)
-  x <- subset(x, parameter %in% c('build', 'pave', 'wall', 'road'))
+  x <- x[x$parameter %in% c('build', 'pave', 'wall', 'road'), ]
   plot.data <- ddply(x, .(uid, transect, plot), function(x){
     if(all(is.na(x$result))){
       return(c(is.hardened = NA))

@@ -1,3 +1,4 @@
+
 # Vegetative cover pars;
 veg.cov <- c(xcl = "r_canbtre", 
              xcs = "r_canstre", 
@@ -10,11 +11,15 @@ veg.cov <- c(xcl = "r_canbtre",
 setClassLevels <- function(from.classes, to.classes){
   f <- function(x){
     if(!is.subset(na.omit(x), from.classes)){
-      warning('Unexpected class encountered.')
+      warning(sprintf('Unexpected class(es) encountered: %s', 
+                      toString(setdiff(x, from.classes))))
     }
-    factor(x, levels = from.classes, labels = to.classes)
+    factor(as.character(x), 
+           levels = from.classes, 
+           labels = to.classes)
   }
 }
+
 setVegClassLevels <- setClassLevels(c('C', 'D', 'E', 'M', 'N'), c('c', 'd', 'e', 'm', 'n'))
 
 #'Format Riparian Vegetation data for calculations
@@ -33,8 +38,7 @@ setVegClassLevels <- setClassLevels(c('C', 'D', 'E', 'M', 'N'), c('c', 'd', 'e',
 #'@param result the measured result for each parameter.  A vegetation class for
 #'"underveg" and "canveg" and 0-4 for the others.
 #'@return a data frame in wide format with the parameters necessary for metric calculation
-#'@importFrom reshape2 melt dcast
-#'@importFrom plyr "."
+#'@import plyr
 formatRiparianVegetation <- function(uid, transect, transdir, parameter, result){
   parameter <- tolower(parameter)
   visrip <- data.frame(uid, transect, transdir, parameter, result)
@@ -43,10 +47,10 @@ formatRiparianVegetation <- function(uid, transect, transdir, parameter, result)
                "gcwdy", "gcnwdy", "bare")
   visrip$presence <- visrip$result != '0'
   visrip          <- rename(visrip, c('result' = 'r', 'presence' = 'p'))
-  vm <- melt(visrip, measure.var = c('r', 'p'))
+  vm <- reshape2::melt(visrip, measure.var = c('r', 'p'))
   sub.expr <- .((parameter %in% r.pars & variable == 'r') |
                 (parameter %in% p.pars & variable == 'p'))
-  vc <- dcast(vm, uid + transect + transdir ~ variable + parameter, subset = sub.expr)
+  vc <- reshape2::dcast(vm, uid + transect + transdir ~ variable + parameter, subset = sub.expr)
   vc[veg.cov] <- lapply(vc[veg.cov], function(x){
     x <- as.factor(x)
     x <- revalue(x, c('0' = 0, '1' = 0.05, '2' = 0.25, '3' = 0.575, '4' = 0.875),
@@ -93,8 +97,7 @@ calculateVegetationTypes <- function(r_underveg, r_canveg, uid){
 #'@param result a vector of visual riparian estimates; 0-4 for the cover estimates and
 #'(D, C, E, M, N) for the vegetation types.
 #'@return a data frame of riparian vegetation metrics
-#'@importFrom reshape2 melt dcast
-#'@importFrom plyr '.'
+#'@import plyr
 #'@export
 calculateRiparianVegetation <- function(uid, transect, transdir, parameter, result){
   vc <- formatRiparianVegetation(uid, transect, transdir, parameter, result)
@@ -107,10 +110,10 @@ calculateRiparianVegetation <- function(uid, transect, transdir, parameter, resu
   vc <- cbind(vc, class.comb)
   
   # Presence and vegetation class metrics
-  pres.mets <- calculateVegPresence(p_canbtre, p_canstre, p_undwdy, p_undnwdy,
-                                    p_gcwdy, p_gcnwdy)
+  pres.mets <- calculateVegPresence(vc$p_canbtre, vc$p_canstre, vc$p_undwdy, vc$p_undnwdy,
+                                    vc$p_gcwdy, vc$p_gcnwdy)
   veg.types.mets <- calculateVegetationTypes(vc$r_underveg, vc$r_canveg, vc$uid)
-  vc <- cbind(vc, presMets)
+  vc <- cbind(vc, pres.mets)
   
   # Rename veg.cov to metric names for those parameters                                      
   names(vc) <- mapvalues(names(vc), veg.cov, names(veg.cov))
@@ -120,7 +123,7 @@ calculateRiparianVegetation <- function(uid, transect, transdir, parameter, resu
   vcmat     <- as.matrix(vc[mean.mets])
   mean.mets <- rowmean(vcmat, vc$uid, reorder = T, na.rm = T)
   #rownames(mean.mets) <- sort(unique(vc$uid))
-  mean.mets   <- meltMetric(mean.mets)
+  mean.mets   <- meltMetrics(mean.mets)
   
   mets <- rbindMetrics(mean.mets, veg.types.mets)
   is.na(mets$result) <- is.nan(mets$result)

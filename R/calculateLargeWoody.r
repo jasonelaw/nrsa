@@ -3,7 +3,7 @@
 #'\code{getNumTransects} counts the number of observed transects per site
 #'@param uid a vector of site-visit indicators
 #'@param transect a vector of transect ids
-#'@importFrom plyr ddply
+#'@import plyr
 #'@export
 getNumTransects <- function (uid, transect) {
   ans <- ddply(data.frame(transect = transect, uid = uid), .(uid),
@@ -17,14 +17,13 @@ getNumTransects <- function (uid, transect) {
 #'\code{calculateBankfullWidthGeomean} returns the mean of the bankfull width at each site
 #'@param x a vector of bankfull width measurements
 #'@param uid a vector of site-visit indicators
-#'@importFrom Rigroup igroupMeans
 calculateBankfullWidthGeomean <- function(x, uid){
   if (!is.factor(uid)){
     uid <- as.factor(uid)
   }
-  result <- igroupMeans(x, as.numeric(uid), na.rm = T)
+  xbkf_w <- tapply(x, uid, mean, na.rm = T)
   progressReport("Finished calculating mean bankfull width at each site.")
-  return(data.frame(uid = as.numeric(levels(uid)), xbkf_w = result))
+  return(convertNamedVectorToMetricDF(xbkf_w))
 }
 
 #'LWD class metadata
@@ -53,7 +52,10 @@ WoodClassesData <- function(){
      d.upper = c(0.3, 0.6, 0.8, 2, 0.3, 0.6, 0.8, 2, 0.3, 0.6, 0.8, 2, 0.6, 0.8, 1, 2, 0.6, 0.8, 1, 2, 0.6, 0.8, 1, 2), 
      l.lower = c(1.5, 1.5, 1.5, 1.5, 5, 5, 5, 5, 15, 15, 15, 15, 5, 5, 5, 5, 15, 15, 15, 15, 30, 30, 30, 30), 
      l.upper = c(5, 5, 5, 5, 15, 15, 15, 15, 30, 30, 30, 30, 15, 15, 15, 15, 30, 30, 30, 30, 75, 75, 75, 75), 
-     volume = c(0.0581776417331443, 0.335103216382911, 0.930842267730309, 3.0159289474462, 0.181805130416076, 1.0471975511966, 2.90888208665722, 9.42477796076938, 0.436332312998582, 2.51327412287183, 6.98131700797732, 22.6194671058465, 1.0471975511966, 2.90888208665722, 4.9160107264507, 11.6355283466289, 2.51327412287183, 6.98131700797732, 11.7984257434817, 27.9252680319093, 5.65486677646163, 15.707963267949, 26.5464579228338, 62.8318530717959), 
+     volume = c(0.0581776417331443, 0.335103216382911, 0.930842267730309, 3.0159289474462, 0.181805130416076, 1.0471975511966, 
+                2.90888208665722, 9.42477796076938, 0.436332312998582, 2.51327412287183, 6.98131700797732, 22.6194671058465, 
+                1.0471975511966, 2.90888208665722, 4.9160107264507, 11.6355283466289, 2.51327412287183, 6.98131700797732, 
+                11.7984257434817, 27.9252680319093, 5.65486677646163, 15.707963267949, 26.5464579228338, 62.8318530717959), 
      size = structure(c(1L, 2L, 2L, 3L, 2L, 3L, 4L, 4L, 3L, 4L, 4L, 5L, 1L, 2L, 2L, 3L, 2L, 3L, 4L, 4L, 3L, 4L, 4L, 5L), 
                       .Label = c("T", "S", "M", "L", "X"), class = "factor"), 
      diameter.name = structure(c(1L, 2L, 3L, 4L, 1L, 2L, 3L, 4L, 1L, 2L, 3L, 4L, 1L, 2L, 3L, 4L, 1L, 2L, 3L, 4L, 1L, 2L, 3L, 4L), .Label = c("s", "m", "l", "x"), class = "factor"), 
@@ -75,8 +77,7 @@ WoodClassesData <- function(){
 #'@param in.bankfull logical vector; true if the lwd was within bankfull
 #'@param uid vector of site-visit indicators
 #'@param transect vector of transect names
-#'@importFrom plyr ddply rename revalue
-#'@importFrom reshape2 dcast melt
+#'@import plyr
 #'@export
 observedLWDTransects <- function(uid, transect, count, in.bankfull){
   if(nrsa.options()$ProgressReports){
@@ -90,7 +91,7 @@ observedLWDTransects <- function(uid, transect, count, in.bankfull){
   observed.transect        <- ddply(x, .(uid, in.bankfull), numObserved)
   observed.transect        <- rename(observed.transect, c("in.bankfull" = "metric"))
   observed.transect$metric <- revalue(as.character(observed.transect$metric), c('FALSE' = 'ns', 'TRUE' = 'nc'))
-  observed.transect <- dcast(melt(observed.transect, measure.var = 'result'), uid ~ metric)
+  observed.transect <- reshape2::dcast(reshape2::melt(observed.transect, measure.var = 'result'), uid ~ metric)
   return(observed.transect)
 }
 
@@ -103,10 +104,22 @@ observedLWDTransects <- function(uid, transect, count, in.bankfull){
 #'@param length the length category of the lwd piece
 #'@param diameter the diamter cateogry of the lwd piece 
 #'@param count vector of counts of LWD pieces
-#'@importFrom reshape2 melt
-#'@importFrom plyr revalue
+#'@import plyr
 #'@export
 calculateLWDCounts <- function(uid, in.bankfull, length, diameter, count){
+  #stopifnot(is.logical(in.bankfull), unique(length) %in% c('s', 'm', 'l'),
+  #          unique(diameter %in% c('s', 'm', 'l', 'x')))
+  kDimensionMap  <- c('Sum' = 't')
+  kInBankfullMap <- c('Sum' = 't', 'TRUE' = 'w','FALSE' = 'd')
+  kMetricMap <- c(rchdsdtl = "smdrydia", rchwsdtl = "smwetdia", 
+                  rchtsdtl = "smdiatot", rchdmdtl = "mddrydia", rchwmdtl = "mdwetdia", 
+                  rchtmdtl = "mddiatot", rchdldtl = "lgdrydia", rchwldtl = "lgwetdia", 
+                  rchtldtl = "lgdiatot", rchdxdtl = "xldrydia", rchwxdtl = "xlwetdia", 
+                  rchtxdtl = "xldiatot", rchdtdsl = "shdrylen", rchwtdsl = "shwetlen", 
+                  rchttdsl = "shlentot", rchdtdml = "mddrylen", rchwtdml = "mdwetlen", 
+                  rchttdml = "mdlentot", rchdtdll = "lgdrylen", rchwtdll = "lgwetlen", 
+                  rchttdll = "lglentot", rchdtdtl = "rchdryt", rchwtdtl = "rchwett", 
+                  rchttdtl = "rchwdt")
   x <- data.frame(count = count, uid = uid, in.bankfull = in.bankfull, 
                   length = length, diameter = diameter)
   x <- merge(x, WoodClassesData(), by = c('diameter', 'length'), all.x = T)
@@ -120,32 +133,20 @@ calculateLWDCounts <- function(uid, in.bankfull, length, diameter, count){
   # mar.counts <- acast(df1bm, UID ~ zone ~ length.name ~ diameter.name ~ variable,
   #                     fun.aggregate = sum, na.rm = T,
   #                     margins = c('zone', 'length.name', 'diameter.name'))
-  mar.counts <- tapply(x$count,
-                       x[c('uid', 'in.bankfull', 'length.name', 'diameter.name')], 
-                       sum, na.rm = T)
-  mar.counts <- addmargins(mar.counts, 2:4)
-  
-  mar.counts <- melt(mar.counts, c('uid', 'in.bankfull', 'length.name', 'diameter.name'), 
-                     value.name = 'result')
-  fix <- c(Sum = 't')
-  levs <- c(rchdsdtl = "smdrydia", rchwsdtl = "smwetdia", 
-            rchtsdtl = "smdiatot", rchdmdtl = "mddrydia", rchwmdtl = "mdwetdia", 
-            rchtmdtl = "mddiatot", rchdldtl = "lgdrydia", rchwldtl = "lgwetdia", 
-            rchtldtl = "lgdiatot", rchdxdtl = "xldrydia", rchwxdtl = "xlwetdia", 
-            rchtxdtl = "xldiatot", rchdtdsl = "shdrylen", rchwtdsl = "shwetlen", 
-            rchttdsl = "shlentot", rchdtdml = "mddrylen", rchwtdml = "mdwetlen", 
-            rchttdml = "mdlentot", rchdtdll = "lgdrylen", rchwtdll = "lgwetlen", 
-            rchttdll = "lglentot", rchdtdtl = "rchdryt", rchwtdtl = "rchwett", 
-            rchttdtl = "rchwdt")
-  mar.counts <- within(mar.counts, {
-    length.name   <- revalue(length.name, fix)
-    diameter.name <- revalue(diameter.name, fix)
-    in.bankfull   <- revalue(in.bankfull, c('Sum' = 't', 'TRUE' = 'w','FALSE' = 'd'))
-    metric <- tolower(paste('rch', in.bankfull, diameter.name, 'd', length.name, 'l', sep = ''))
-    metric <- revalue(as.factor(metric), levs)
-  })
+  counts <- tapply(x$count,
+                   x[c('uid', 'in.bankfull', 'length.name', 'diameter.name')], 
+                   sum, na.rm = T)
+  counts <- addmargins(counts, 2:4)
+  counts <- reshape2::melt(counts, c('uid', 'in.bankfull', 'length.name', 'diameter.name'), 
+                           value.name = 'result')
+  counts <- revalueDataFrame(counts,
+                             list(in.bankfull = kInBankfullMap, 
+                                  diameter.name = kDimensionMap, 
+                                  length.name = kDimensionMap))
+  counts$metric <- tolower(paste('rch', counts$in.bankfull, counts$diameter.name, 'd', counts$length.name, 'l', sep = ''))
+  counts <- revalueDataFrame(counts, list(metric = kMetricMap))
   progressReport("Finished calculating counts of lwd in each size class.")
-  mar.counts
+  counts
 }
 
 #'Calculate length of area sampled for LWD
@@ -155,7 +156,7 @@ calculateLWDCounts <- function(uid, in.bankfull, length, diameter, count){
 #'
 #'@param lwdlength a vector of site lengths as returned by calculateLWDSiteLength
 #'@param xbkf_w a vector of average bankfull width
-#'@param protocol a logical vector; \code{TRUE} if the site was wadeable
+#'@param is.wadeable a logical vector; \code{TRUE} if the site was wadeable
 #'@export
 calculateLWDSiteArea <- function(lwdlength, xbkf_w, is.wadeable){
   # Calculates the area in which LWD data is collected
@@ -171,7 +172,7 @@ calculateLWDSiteArea <- function(lwdlength, xbkf_w, is.wadeable){
 #'
 #'@param reachlen a vector of reachlengths for the sites
 #'@param numtran a vector with the number of transects sampled
-#'@param protocol a logical vector; \code{TRUE} if the site was wadeable
+#'@param is.wadeable a logical vector; \code{TRUE} if the site was wadeable
 #'@export
 calculateLWDSiteLength <- function(reachlen, numtran, is.wadeable){
   # Calculates the length of stream reach over which LWD data is collected
@@ -192,8 +193,7 @@ calculateLWDSiteLength <- function(reachlen, numtran, is.wadeable){
 #'@param count counts of lwd pieces
 #'@param size the size class of the LWD pieces
 #'@param volume the calculated volume of the LWD size class
-#'@importFrom plyr ddply
-#'@importFrom reshape2 melt
+#'@import plyr
 #'@export
 calculateLWDVolumeMetrics <- function(uid, zone, lwdlength, lwdarea, count, size, volume){
   x <- data.frame(uid = uid, zone = zone, count = count, size = size, volume = volume,
@@ -215,8 +215,8 @@ calculateLWDVolumeMetrics <- function(uid, zone, lwdlength, lwdarea, count, size
     return(c(ans, m100, msq))
   }
   class.metrics <- ddply(x, .(uid, zone), calcVols)
-  class.metrics <- melt(class.metrics, id.var = c('uid', 'zone'), 
-                        variable.name = 'metric', value.name = 'result')
+  class.metrics <- reshape2::melt(class.metrics, id.var = c('uid', 'zone'), 
+                                  variable.name = 'metric', value.name = 'result')
   class.metrics$metric <- sprintf(as.character(class.metrics$metric), 
                                   as.character(class.metrics$zone))
   class.metrics$zone <- NULL
@@ -226,15 +226,15 @@ calculateLWDVolumeMetrics <- function(uid, zone, lwdlength, lwdarea, count, size
 }
 
 #'@rdname calculateLWDVolumeMetrics
-#'@importFrom plyr ldply arrange
-#'@importFrom reshape2 melt acast
+#'@import plyr
 #'@export
 calculateLWDVolumeMetrics2 <- function(uid, zone, lwdlength, lwdarea, count, size, volume){
+  stopifnot(identical(levels(size), c('T', 'S', 'M', 'L', 'X')))
   x <- data.frame(uid = uid, zone = zone, count = count, size = size, volume = volume,
                   lwdlength = lwdlength, lwdarea = lwdarea)
   x$volume <- x$volume * x$count
-  xm <- melt(x, id.var = c('uid', 'zone', 'size'), measure.var = c('count', 'volume'))
-  xc <- acast(xm, size ~ uid ~ zone ~ variable, fun.aggregate = sum)
+  xm <- reshape2::melt(x, id.var = c('uid', 'zone', 'size'), measure.var = c('count', 'volume'))
+  xc <- reshape2::acast(xm, size ~ uid ~ zone ~ variable, fun.aggregate = sum)
   xc1 <- apply(xc, 2:4, function(x) cumsum(rev(x)))
   xc2 <- sweep(xc1, 
                2, tapply(x$lwdlength, x$uid, unique), '/') * 100

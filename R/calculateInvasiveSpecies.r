@@ -9,7 +9,7 @@
 #' species was present at that transect
 #' @return a 'metric' data.frame
 #' @export
-#' @importFrom plyr ddply mapvalues
+#' @import plyr
 calculatePropTranInvPresent <- function(uid, species, is.present){
   x <- data.frame(uid, species, is.present)
   f <- function(x){

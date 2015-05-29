@@ -1,13 +1,13 @@
+#'Calculates Substrate Embeddedness metrics
+#'\code{calculateSubstrateEmbed} calculates substrate embeddedness metrics:
+#'N33, N55, VCEMBED, VEMBED, XCEMBED, XEMBED.
+#'@param uid a vector of site-visit indicators
+#'@param embed numeric vector of embeddedness values (0 - 100).
+#'@param is.center a logical vector describing whether the embeddedness
+#'is from a center point
+#'@export
+#'@import plyr
 calculateSubstrateEmbed <- function(uid, embed, is.center){
-  #'Calculates Substrate Embeddedness metrics
-  #'\code{calculateSubstrateEmbed} calculates substrate embeddedness metrics:
-  #'N33, N55, VCEMBED, VEMBED, XCEMBED, XEMBED.
-  #'@param uid a vector of site-visit indicators
-  #'@param embed a vector of embeddedness values
-  #'@param is.center a logical vector describing whether the embeddedness
-  #'is from a center point
-  #'@export
-  #'@importFrom plyr ddply summarize '.'
   if (is.character(embed) || is.factor(embed)){
     embed <- as.numeric(as.character(embed))
   }

@@ -22,7 +22,7 @@
 #' @param transect a vector of transect identifiers
 #' @param station a vector of station identifiers
 #' @param by 
-#' @importFrom plyr ddply
+#' @import plyr
 #' @export
 #' @examples
 #' 

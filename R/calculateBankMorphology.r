@@ -10,7 +10,7 @@
 #' @return a 'metric' data.frame
 #' @export
 #' @aliases calculateWadeAngleMetrics calculateWadeUndercutMetrics
-#' @importFrom plyr ddply
+#' @import plyr
 calculateWadeBankMetrics <- function(uid, angle, undercut){
   if (!is.numeric(angle)){
     angle <- as.numeric(as.character(angle))
@@ -56,6 +56,7 @@ calculateWadeAngleMetrics <- function(angle){
 #' @param uid a vector of site identifiers
 #' @param wetwid a vector of wetted width measurements
 #' @return a 'metric' data.frame
+#' @import plyr
 #' @export
 calculateBoatNumberWettedWidth <- function(uid, wetwid){
   x   <- data.frame(as.character(uid), wetwid)
@@ -73,7 +74,7 @@ calculateBoatNumberWettedWidth <- function(uid, wetwid){
 #' @param angle a vector of bank angle categories: '0-5', '5-30', '30-75', '75-100'.
 #' @return a 'metric' data.frame
 #' @export
-#' @importFrom plyr revalue
+#' @import plyr
 calculateBoatAngleMetrics <- function(uid, angle){
   kModalAngleMetricMap <- c(`0-5` = "low", `5-30` = "med", `30-75` = "stp", 
                             `75-100` = "vst", `0-5, 5-30` = "low-med", 

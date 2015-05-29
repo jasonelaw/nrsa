@@ -5,14 +5,13 @@
 #' on the side channel using an aggregation function.  All measurements done at
 #' the transect (rather than at a station) are assumed to be at station 0 for purposes
 #' this function.  This allows us to do the join in one pass rather than separately.
-#' @importFrom plyr ddply
-#' @importFrom stringr str_replace
+#' @import plyr
 #' @export
 #' @examples
 #' d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), station = c(0,0), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
 #' do.call('joinExtraTransects', d)
 joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt, incishgt){
-  transect <- str_replace(transect, 'X', '')
+  transect <- stringr::str_replace(transect, 'X', '')
   x <- data.frame(uid, transect, station, wetwid, bankwid, bankhgt, incishgt)
   f <- function(x){
     suppressWarnings(
@@ -50,7 +49,7 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
 #' @param bankhgt a vector of bankfull heights; max of extra transect pairs
 #' @export
 #' @examples
-#' d <- data.frame(uid = rep(1:10, 11), wetwid = runif(110), bankwid = runif(110), incishgt = runif(110), bankhgt = runif(110))
+#' d <- data.frame(uid = rep(1:10, 11), bankwid = runif(110), incishgt = runif(110), bankhgt = runif(110))
 #' calculateChannelMetrics(d$uid, d$wetwid, d$bankwid, d$incishgt, d$bankhgt)
 calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
   kNamesMap <- c("mean.bankwid" = "xbkf_w",  "sd.bankwid" = "sdbkf_w", "count.bankwid" = "n_bw",
@@ -82,7 +81,7 @@ calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
 #' @param uid a vector of site identifiers
 #' @param wetwid a vector of wetted widths; uses the max of the extra transect pairs
 #' @return a 'metric' data.frame
-#' @importFrom plyr ddply
+#' @import plyr
 #'@export
 calculateWettedWidthMetrics <- function(uid, wetwid){
   x <- data.frame(uid, wetwid)
@@ -108,7 +107,7 @@ calculateWettedWidthMetrics <- function(uid, wetwid){
 #' @param depth a vector of thalweg depths
 #' @return a 'metric' data.frame
 #' @export
-#' @importFrom plyr ddply
+#' @import plyr
 calculateThalwegRatios <- function(uid, wetwid, depth){
   wdprod <- wetwid * depth
   wdratio <- wetwid / depth
@@ -141,7 +140,7 @@ calculateThalwegRatios <- function(uid, wetwid, depth){
 #' @param bankwid a vector of bankfull widths; EPA uses the sum of the extra transects.
 #' @param bankhgt a vector of bankfull heights; EPA uses the mean of the extra transects.
 #' @param depth a vector of thalweg depths
-#' @importFrom plyr ddply
+#' @import plyr
 #'@export
 calculateTransectRatios <- function(uid, bankwid, bankhgt, depth){
   bfwd <- bankwid / (bankhgt + depth)
@@ -171,7 +170,7 @@ calculateTransectRatios <- function(uid, bankwid, bankhgt, depth){
 #' @param depth a vector of thalweg depths
 #' @param desired output units.  Can be one of \code{"m"}, \code{"cm"}, or \code{"mixed"}.
 #' @return a 'metric' data.frame
-#' @importFrom plyr ddply
+#' @import plyr
 #' @export
 calculateThalwegDepthMetrics <- function(uid, is.wadeable, depth, units = c('m', 'cm', 'mixed')){
   #ensure units match: some notes and code about converting from m to cm

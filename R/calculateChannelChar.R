@@ -4,8 +4,8 @@
 #'riparian vegetation distance over the reach.  For boatable sites only.
 #'@param uid a vector of site identifiers
 #'@param shor2rip a vector of distances from the shore to riparian vegeatation
-#'@importFrom Rigroup igroupMeans igroupMaxs igroupMins
 #'@return a 'metric' data.frame (i.e., one with uid, metric, result fields)
+#'@import plyr
 #'@export
 calculateShoreToVegDistance <- function(uid, shor2rip){
   uid <- as.factor(uid)
@@ -31,7 +31,7 @@ calculateShoreToVegDistance <- function(uid, shor2rip){
 #' @param see.over.bank a logical vector or vector containing the character string
 #' 'YES'.
 #' @return a 'metric' data.frame (i.e., one with uid, metric, result fields)
-#' @importFrom Rigroup igroupMeans
+#' @import plyr
 #' @export
 #' @examples
 #' uid <- rep(1:10, each = 11)
@@ -42,9 +42,8 @@ calculateProportionSeeOverBank <- function(uid, see.over.bank){
   if (!is.logical(see.over.bank)){
     see.over.bank <- see.over.bank == 'YES'
   }
-  pct_ovrb <- igroupMeans(see.over.bank, uid, na.rm = T)
-  mets <- data.frame(uid      = levels(uid),
-                     pct_ovrb = pct_ovrb)
+  mets <- ddply(data.frame(uid, see.over.bank), .(uid), 
+                function(x) c(pct_ovrb = mean(x$see.over.bank, na.rm = T) * 100))
   mets <- meltMetrics(mets)
   progressReport("Finished with pct_ovrb.")
   return(mets)

@@ -11,75 +11,66 @@
 #'
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size class codes
+#'@import plyr
 #'@export
 #'@examples
 #'d <- expand.grid(uid = 1:2, 
-#'size.class = c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", "XB", "BL", "RS", "RR", "RC"))
+#'size.class = c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", "XB", "RS", "RR", "RC"))
 #'addWadeSubstrateSizes(d$uid, d$size.class)
 #'d <- expand.grid(uid = 1:2,
 #'size.class =c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'))
 #'addBoatSubstrateSizes(d$uid, d$size.class)
 addWadeSubstrateSizes <- function(uid, size.class){
-  x <- data.frame(uid = uid, result = size.class)
-  result.levels <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", 
-                     "XB", "BL", "RS", "RR", "RC")
-  x$result <- factor(x$result, levels = result.levels)
+  kWadeSubstrateSizes <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", 
+                           "XB", "BL", "RS", "RR", "RC")
+  kResultSizes        <- kWadeSubstrateSizes[kWadeSubstrateSizes != 'BL']
+  kCollapseBoulder    <- c(XB = 'BL', SB = 'BL')
+  kTTDropClasses      <- setNames(rep(NA, 7), c("OM", "OT", "WD", "HP",  "RS", "RR", "RC"))
+  
   sizes <-
-    data.frame('class' = structure(1:15,
-                                   .Label = result.levels, 
-                                   class = "factor"),
+    data.frame('class' = factor(kWadeSubstrateSizes, kWadeSubstrateSizes),
                'min'   = c(NA, NA, NA, NA, 0.001, 0.06, 2, 16, 64, 250, 1000,
                            250, 4000, 4000, 4000),
                'max'   = c(NA, NA, NA, NA, 0.06, 2, 16, 64, 250, 1000, 4000,
                            4000, 8000, 8000, 8000))
   sizes$diam <- apply(sizes[,2:3], 1, gmean)
   sizes$lDiam <- log10(sizes$diam)
-  # Modify result field to create the four subsets mentioned above
-  bl <- list(OT = "OT", WD = "WD", HP = "HP", FN = "FN", SA = "SA", GF = "GF", 
-             GC = "GC", CB = "CB", BL = c("XB", "SB"), RS = "RS", RR = "RR", 
-             RC = "RC")
-  tt <- list(FN = "FN", SA = "SA", GF = "GF", GC = "GC", CB = "CB", SB = "SB", 
-             XB = "XB")
-  ttbl <- list(FN = "FN", SA = "SA", GF = "GF", GC = "GC", CB = "CB", 
-               BL = c("XB", "SB"))
-  x$result.ttbl <- x$result.tt <- x$result.bl <- x$result
-  levels(x$result.bl) <- bl
-  levels(x$result.tt) <- tt
-  levels(x$result.ttbl) <- ttbl
-  x <- merge(x, sizes[, c('class', 'min', 'max')], by.x = 'result', by.y = 'class', all.x = TRUE)
-  for (i in c('result', 'result.tt', 'result.bl', 'result.ttbl')){
-    suffix <- sprintf('.%s', strsplit(i, '\\.')[[1]][2])
-    x <- merge(x, sizes[,c('class', 'diam', 'lDiam')], 
-               by.x = i, by.y = 'class', all.x = TRUE,
-               suffixes = c('', suffix))
-  }
-  x <- x[, c('uid', 'result', 'result.tt', 'min', 'max', 'lDiam', 
-             'lDiam.tt', 'diam.tt', 'lDiam.bl', 'lDiam.ttbl', 'diam.ttbl')]
+  
+  x <- data.frame(uid = uid, 
+                  result = factor(as.character(size.class), kResultSizes))
+  x$result.bl <- revalue(x$result, kCollapseBoulder)
+  x$result.tt <- revalue(x$result, kTTDropClasses)
+  x$result.ttbl <- revalue(x$result.tt, kCollapseBoulder)
+  i <- lapply(x[c('result', 'result.bl', 'result.tt', 'result.ttbl')], match, table = sizes$class)
+  x$min        <- sizes$min[i$result]
+  x$max        <- sizes$max[i$result]
+  x$lDiam      <- sizes$lDiam[i$result]
+  x$lDiam.tt   <- sizes$lDiam[i$result.tt]
+  x$diam.tt    <- sizes$diam[i$result.tt]
+  x$lDiam.bl   <- sizes$lDiam[i$result.bl]
+  x$lDiam.ttbl <- sizes$lDiam[i$result.ttbl]
+  x$diam.ttbl  <- sizes$diam[i$result.ttbl]
+  x$result.bl <- x$result.ttbl <- NULL
   progressReport('Created numeric size classes for wadeable')
   x
 }
 
 #'@rdname addWadeSubstrateSizes
+#'@import plyr
 #'@export
 addBoatSubstrateSizes <- function(uid, size.class){
+  kBoatSubstrateClasses <- c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT')
+  kMetrics              <- paste0('pct_', tolower(kBoatSubstrateClasses))
   x <- data.frame(uid = uid, result = size.class)
   # SIZE_CLS from the rivers have slightly different gmeans.
-  sizes <- data.frame(class = c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'),
+  sizes <- data.frame(class = factor(kBoatSubstrateClasses, kBoatSubstrateClasses),
                       min = c(4000, 250, 64, 2, 0.06, 0.001, NA),
-                      max = c(8000, 4000, 250, 64, 2, 0.06, NA),
-                      stringsAsFactors=FALSE)
-  sizes$class <- factor(sizes$class, 
-                        levels = c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'),
-                        labels = c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'))
+                      max = c(8000, 4000, 250, 64, 2, 0.06, NA))
   sizes$diam <- apply(sizes[,2:3], 1, gmean)
   sizes$lDiam <- log10(sizes$diam)
   ans <- merge(x, sizes, by.x = 'result', by.y = 'class', all.x = TRUE)
-  ans$result.no.ot <- as.factor(ans$result)
-  levels(ans$result.no.ot) <- list(BH = 'BH', BL = 'BL', CB = 'CB', GR = 'GR', SA = 'SA', FN = 'FN')
-  all.levels <- c('BH', 'BL', 'CB', 'GR', 'SA', 'FN', 'OT')
-  ans$result <- factor(ans$result,
-                       levels = all.levels,
-                       labels =  paste('pct_', tolower(all.levels), sep = ''))
+  ans$result.no.ot <- mapvalues(ans$result, 'OT', NA)
+  ans$result       <- mapvalues(ans$result, kBoatSubstrateClasses, kMetrics)
   progressReport('Created numeric size classes for non-wadeable')
   return(ans)
 }
@@ -97,8 +88,7 @@ addBoatSubstrateSizes <- function(uid, size.class){
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size classes
 #'
-#'@importFrom plyr ddply
-#'@importFrom reshape2 melt
+#'@import plyr
 #'@export
 calculateWadeSubstrateMetrics <- function(uid, size.class){
   x <- addWadeSubstrateSizes(uid, size.class)
@@ -179,8 +169,7 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size classes
 #'
-#'@importFrom plyr ddply
-#'@importFrom reshape2 melt
+#'@import plyr
 #'@export
 calculateBoatThalwegSubstrateMetrics <- function(uid, size.class){
   x <- addBoatSubstrateSizes(uid, size.class)
@@ -204,13 +193,12 @@ calculateBoatThalwegSubstrateMetrics <- function(uid, size.class){
 #'@param ds dominant, shoreline substrate classes
 #'@param sb secondary, bottom substrate classes
 #'@param ss secondary, shoreline substrate classes
-#'@importFrom reshape2 melt
 #'@export
 calculateBoatLittoralSubstrateMetrics <- function(uid, db, ds, sb, ss){
   kAllowedClasses <- c('RS', 'RR', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA',
                        'FN', 'HP', 'WD', 'OT', 'BL', 'OM', 'RC')
   x <- data.frame(uid, db, ds, sb, ss)
-  x <- melt(x, id.var = 'uid', variable.name = 'parameter', value.name = 'metric')
+  x <- reshape2::melt(x, id.var = 'uid', variable.name = 'parameter', value.name = 'metric')
   x$metric <- factor(x$metric, levels = kAllowedClasses)
   metrics <- prop.table(table(x), 1:2)
   metrics <- as.data.frame(metrics, responseName = 'result')

@@ -44,7 +44,7 @@ fetchNRSAResults <- function(..., chan, tblName, operator = 'AND', wide = FALSE)
     df[levs] <- lapply(df[levs], type.convert)
   } else if (wide && identical(n.par, 1L)){
     if(any(tapply(df$unit, df$subparameter, function(x) length(unique(x))) > 1)){
-      warning('Some parameters have have more than unit in the same vector!')
+      warning('Some parameters have have more than one unit in the same vector!')
     }
     levs <- unique(df$subparameter)
     dfm <- melt(df, id.var = c('batchno', 'entity', 'observation_id', 'date', 'parameter', 'subparameter', 'method', 'observer', 'equipment'), measure.var = 'result')

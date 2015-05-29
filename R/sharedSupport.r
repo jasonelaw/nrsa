@@ -296,6 +296,29 @@ rowmean <- function(x, group, reorder = TRUE, ...){
   rs / n
 }
 
+vswitch <- function(x, f, ...){
+  funlist <- list(...)
+  if (is.list(funlist[[1]])){
+    funlist <- funlist[[1]]
+  }
+  if(is.list(f)){
+    f <- interaction(f)
+  } else {
+    f   <- as.factor(f)
+  }
+  lev <- setNames(levels(f), levels(f))
+  xs  <- split(x, f)
+  stopifnot(length(setdiff(lev, names(funlist))) < 1)
+  ret <- lapply(lev, function(i) funlist[[i]](xs[[i]]))
+  len <- sapply(ret, length)
+  collapse <- identical(as.integer(sum(len)), length(x))
+  if (collapse){
+    ret <- unsplit(ret, f)
+  } else {
+    ret <- unlist(ret)
+  }
+  ret
+}
 # deprecated: use revalue
 # replace.levels <- function(f, list){
 #   lev <- levels(f)

@@ -11,17 +11,17 @@
 #' \code{calculateRefinedCriticalDiameter} is used to calculate the metrics 
 #' ldmb_bw4 (with old.version = T), ldmb_bw5, and s_ldmb_bw5 (when the rp100
 #' argument is as returned by \link{calculateS_RP100}).
-#' @parm xdepth average depth
-#' @param xslope average slope
-#' @param rp100 average residual depth
-#' @param xbkf_h average bankfull height
+#' @param xdepth average depth in centimeters
+#' @param xslope average slope in percent
+#' @param rp100 average residual depth in centimeters
+#' @param xbkf_h average bankfull height in meters
 #' @param v1w_msq volume lwd  in cubic meters / 100 square meeters
 #' @param old.version Calculate old version of logged critical diameter that were based on the
 #' wood density when it accidentally used the wetted widths instead of the
 #' bankfull widths.
-#' @param xbkf_w average bankfull width; must be supplied when old.version = T.
-#' @param xwidth average width; must be supplied when old.version = T.
-#' @param lsub_dmm mean log10(substrate diameter)
+#' @param xbkf_w average bankfull width in meters; must be supplied when old.version = T.
+#' @param xwidth average width in meters; must be supplied when old.version = T.
+#' @param lsub_dmm mean log10(substrate diameter) in millimeters
 #' @return the log10(critical diameter)
 #' @references
 #' Kaufmann, P.R. et al., A roughness-corrected index of relative bed stability
@@ -156,6 +156,7 @@ calculateRefinedCriticalDiameter <- function(xdepth, xslope, rp100, xbkf_h,
 #' @rdname calculateRefinedCriticalDiameter
 #' @export
 calculateCrudeCriticalDiameter <- function(xdepth, xslope){
+  stopifnot(xslope <= 100, xslope >= 0)
   critdia <- 13.7 * (0.5 * xdepth * 10) * (xslope / 100)
   is.na(critdia) <- critdia <= 0
   return(log10(critdia))

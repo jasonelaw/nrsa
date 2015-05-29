@@ -3,8 +3,6 @@
 # 03/02/10 cws Created
 #  3/25/10 cws Changed diff() calls to dfCompare().
 #
-require(RUnit)
-
 interpolatePercentile <- function(df, classVar, percentile, pcltVar, classBounds){
 # Estimate size at a specified percentile within a sample based on recorded
 # class memberships and the size boundaries of those classes at each UID.

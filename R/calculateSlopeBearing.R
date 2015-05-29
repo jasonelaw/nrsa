@@ -18,12 +18,20 @@
 #'  treats the channel geometry as a single line string and calculates the length
 #'  of the line string and the distance from the first to last point.  It calculates
 #'  xbearing as the azimuth between the first and last points.
+#'  
+#' Function calculateTransectSpacing calculates the transect spacing. These should be the same for every transect. 
+#' But for some sites, it's possible to get discrepancies between
+#' transects because of numerical issues. In that case the transect spacing 
+#' won't be exactly the same at every transect. For that reason,
+#' we take the mean of the the transect spacing values for the site.
+#'  
 #'  @param uid a vector of site identifiers
 #'  @param transect a vector of transect identifiers
 #'  @param azimuth a vector of bearings; more properly azimuths
 #'  @param distance a vector of distances
+#'  @param transpc a vector of transect spacing values
 #'  @export
-#'  @importFrom plyr ddply
+#'  @import plyr
 #'  @examples
 #'  d <- data.frame(uid = c(1,1), azimuth = c(180,90), distance = c(1,1))
 #'  calculateAngleMetrics(d$uid, d$azimuth, d$distance)
@@ -53,7 +61,7 @@ calculateAngleMetrics <- function(uid, azimuth, distance){
 }
 
 #' @rdname calculateAngleMetrics
-#' @importFrom plyr ddply
+#' @import plyr
 #' @export
 calculateSlopeMetrics <- function(uid, transect, slope, proportion){
   uid <- as.character(uid)
@@ -88,16 +96,20 @@ calculateSlopeMetrics <- function(uid, transect, slope, proportion){
 #' @export
 fillSlopeBearingData <- function(uid, transect, is.wadeable, increment, n.station, distance, proportion, slope_percent, slope_cm, azimuth, is.slope.length = F){
   transpc <- increment * n.station
-  i <- interaction(uid, transect, drop = T)
-  dsum <- tapply(distance, i, sum)[i]
-  transpc     <- ifelse(is.wadeable, transpc, dsum)
-  distance    <- ifelse(is.wadeable, transpc * proportion, distance)
-  proportion  <- ifelse(is.wadeable, proportion, distance / transpc)
+  transpc[!is.wadeable]    <- ave(distance, uid, transect, FUN = sum)[!is.wadeable]
+  distance[is.wadeable]    <- (transpc * proportion)[is.wadeable]
+  proportion[!is.wadeable] <- (distance / transpc)[!is.wadeable]
   
-  slope <- ifelse(is.na(slope_percent), 
-                  calcGrade(slope_cm, distance * 100, unit = 'percent', is.slope.length = is.slope.length),
-                  slope_percent)
-  return(data.frame(uid, transect, is.wadeable, transpc, distance, proportion, slope, azimuth))
+  slope_percent[is.na(slope_percent)] <- calcGrade(slope_cm, distance * 100, unit = 'percent', is.slope.length = is.slope.length)[is.na(slope_percent)]
+  
+  return(data.frame(uid, transect, is.wadeable, transpc, distance, proportion, slope = slope_percent, azimuth))
+}
+
+#' @rdname calculateAngleMetrics
+#' @import plyr
+#' @export
+calculateTransectSpacing <- function(uid, transpc){
+  meltMetrics(ddply(data.frame(uid, transpc), .(uid), summarize, transpc = mean(transpc)))
 }
 
 #' Returns a vector of point to point distances for a line.
@@ -108,15 +120,7 @@ fillSlopeBearingData <- function(uid, transect, is.wadeable, increment, n.statio
 #' @param x a two column matrix
 #' @return a vector of distances
 p2pDistance <- function(x, y){
-  x <- cbind(x, y)
-  sq.diff <- apply(x, 2, diff)^2
-  if (is.matrix(sq.diff)){
-    return(sqrt(rowSums(sq.diff)))
-  } else if (is.numeric(sq.diff)){
-    return(sqrt(sum(sq.diff)))
-  } else {
-    stop('Data type problem')
-  }
+  sqrt(diff(x)^2 + diff(y)^2)
 }
 
 #' Calculate the grade from rise and run
@@ -205,3 +209,44 @@ getDisplacementFromDistAzimuth <- function(azimuth, distance, units = c('radian'
   y <- cos(azimuth) * distance
   cbind(x = x, y = y)
 }
+
+Traverse <- function(radius, azimuth, inclination, degrees = T){
+  ret <- cbind(radius, azimuth, inclination)
+  class(ret) <- 'Traverse'
+  ret
+}
+
+coords <- function(x){
+  UseMethod('coords')
+}
+
+coords.Traverse <- function(x, system = 'cartesian'){
+  ret <- apply(.cartesian(x), 2, cumsum)
+  Points(ret[,1], ret[,2], ret[,3])
+}
+
+Points <- function(x, y, z){
+  ret <- cbind(x, y, z)
+  class(ret) <- 'Points'
+  ret
+}
+
+cartesian <- function(x){
+  UseMethod('cartesian')
+}
+
+.cartesian <- function(r, a, i){
+  x <- r * sin(i) * cos(a)
+  y <- r * sin(i) * sin(a)
+  z <- r * cos(i)
+  cbind(x,y,z)
+}
+
+.spherical <- function(x, y, z){
+  r <- sqrt(x^2 + y^2 + z^2)
+  i <- acos(z / r)
+  a <- atan2(y, x)
+  cbind(r, a, i)
+}
+#obj1 <- Traverse(c(1,1, 1, 1), nrsa:::degToRad(c(0, 90, 180, 270)), nrsa:::degToRad(c(92, 93, 95, 90)))
+#coords(obj1)

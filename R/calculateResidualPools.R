@@ -17,7 +17,6 @@
 #'   thalweg point as the base depth.
 #' @examples
 #' allResidualDepth(0:9, runif(10), .01)
-#' @importFrom abind abind
 calculatePoolDimensions <- function(distance, depth, slope){
   stopifnot(identical(length(distance), length(depth)), !is.na(slope))
   # Set up the data
@@ -31,7 +30,7 @@ calculatePoolDimensions <- function(distance, depth, slope){
   # set values before the base point to missing.
   residual.depth[upper.tri(residual.depth)] <- NA 
   dist.mat[upper.tri(dist.mat)] <- NA
-  return(abind(depth = residual.depth, length = dist.mat, along = 3))
+  return(abind::abind(depth = residual.depth, length = dist.mat, along = 3))
 }
 
 #' Determines basic information about a sequence of pools
@@ -117,6 +116,7 @@ cutDimensions <- function(x, na.omit = T){
 #' @param base.point a vector as long as the thalweg profile with the base point
 #'   for each pool
 #' @param is.pool logical vector, \code{TRUE} if the depth represents a pool.
+#' @import plyr
 extractResidualPoolDimensions <- function(dimensions, base.point, is.pool){
   # extract the base points which actually define pools from columns of all
   # potential base points
@@ -146,7 +146,7 @@ extractResidualPoolDimensions <- function(dimensions, base.point, is.pool){
 #'   each site
 #' @param convert.stack logical, if \code{TRUE} the slope is converted using the
 #'   formula of Stack (1988).
-#' @importFrom plyr ddply
+#' @import plyr
 #' @export
 calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F) {
   if (convert.stack) {
@@ -181,7 +181,7 @@ calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F)
 #' @param reachlen a vector of reach lengths for each uid; 
 #' @return a metric data.frame
 #' @export
-#' @importFrom plyr rename ddply
+#' @import plyr
 calculatePoolMetrics <- function(uid, pool, depth, length, area, reachlen, ...){
   calcPoolSummaries <- function(x){
     depmet.names <- c('0%' = 'mindep', '25%' = 'dep25', '50%' = 'meddep', 
@@ -261,7 +261,7 @@ calculatePoolMetrics <- function(uid, pool, depth, length, area, reachlen, ...){
 #' performed separately for group defined by \code{uid}
 #' @return a vector of distances
 #' @export
-#' @importFrom plyr dlply
+#' @import plyr
 #' @examples
 #' calculateDistanceAlongThalweg(0:9, rep(5,10))
 #' calculateDistanceAlongThalweg(c(0:8,11), rep(5,10))
@@ -292,7 +292,7 @@ calculateDistanceAlongThalweg <- function(station, increment, is.wadeable, uid =
   }
 }
 
-#' @importFrom plyr ddply
+#' @import plyr
 calculatePoolReachLength <- function(uid, loc, increment){
   x <- data.frame(uid, loc, increment)
   ans <- ddply(x, .(uid), function(x){
@@ -319,7 +319,7 @@ identifyIncompleteSites <- function(uid, loc, depth, minimum.proportion = 0.85){
   incomplete[uid]
 }
 
-#' @importFrom plyr arrange mapvalues
+#' @import plyr
 createSiteSequence <- function(uid, transect, station, is.wadeable){
   is.wadeable[is.na(is.wadeable)] <- TRUE #assume wadeable if missing
   d <- data.frame(uid, transect, station)
@@ -361,7 +361,7 @@ createSiteSequence <- function(uid, transect, station, is.wadeable){
   arrange(ans, uid, loc)
 }
 
-#' @importFrom plyr ddply join
+#' @import plyr
 createNickPoints <- function(uid, loc, depth, increment, slope, is.wadeable, ...){
   i <- loc == 1
   if(!all(unique(uid[i]) %in% unique(uid))){
@@ -393,7 +393,7 @@ createNickPoints <- function(uid, loc, depth, increment, slope, is.wadeable, ...
 #' @param minimum.proportion the minimum proportion sampled necessary for the
 #'   site to be included.
 #' @export
-#' @importFrom plyr rbind.fill
+#' @import plyr
 organizeThalwegData <- function(uid, transect, station, is.wadeable, depth, increment, slope, minimum.proportion = 0.85){
   x <- data.frame(uid, transect, station, depth, increment, slope, is.wadeable)
   site.seq <- createSiteSequence(x$uid, x$transect, x$station, x$is.wadeable)

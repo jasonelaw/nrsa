@@ -15,3 +15,12 @@ convertNamedVectorToMetricDF <- function(x){
              result = x, 
              stringsAsFactors = F)
 }
+
+#' @rdname convertNamedVectorToMetricDF
+#' @export
+convertVectorsToMetricDF <- function(...){
+  f <- function(x){
+    data.frame(uid = names(x), result = x)
+  }
+  ldply(list(...), f, .id = 'metric')
+}
