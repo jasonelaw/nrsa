@@ -1,13 +1,13 @@
 Package: nrsa
 Type: Package
 Title: Calculate metrics for NRSA protocol data.
-Version: 0.2
+Version: 0.4.0
 Date: 2011-10-20
 Author: Curt Seeliger, Marlys Cappaert, Jason Law
 Maintainer: Jason Law <jason.law@portlandoregon.gov>
 Description: Calculate metrics for NRSA protocol data.
 Depends: R (>= 2.13.0)
-Imports: reshape2, plyr, NARSShared, RODBC, Rigroup
+Imports: reshape2, plyr, RODBC, stringr, dplyr
 Suggests: testthat
 License: GPL-3
 LazyLoad: yes
