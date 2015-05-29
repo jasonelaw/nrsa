@@ -13,5 +13,6 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
 BuildType: Package
-PackageInstallArgs: --no-multiarch
+PackagePath: Y:/Code/nrsa
+PackageInstallArgs: --no-multiarch --with-keep.source
 PackageRoxygenize: rd,namespace
