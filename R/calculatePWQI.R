@@ -30,7 +30,7 @@ clamp <- function(x, a, b) pmax(a, pmin(x, b))
 
 iclamp <- Curry(clamp, a = kIndexRange[1], b = kIndexRange[2])
 
-within <- function(x, r) (x > r[1]) & (x < r[2])
+is.within <- function(x, r) (x > r[1]) & (x < r[2])
 
 #' Function to deal with annoying discontinuities in index; goal is
 #' to get index function as close to continous as possible. Solve
@@ -48,10 +48,10 @@ createIndexFun <- function(x){
   s10 <- Re(Filter(function(x) Im(x) == 0, s10))
   s100 <- Re(Filter(function(x) Im(x) == 0, s100))
   if (length(s10) > 1) {
-    s10 <- Filter(function(x) within(x, solve(deriv(p))), solve(p, 10))
+    s10 <- Filter(function(x) is.within(x, solve(deriv(p))), solve(p, 10))
   }
   if (length(s100) > 1){
-    s100 <- Filter(function(x) within(x, solve(deriv(p))), solve(p, 100))
+    s100 <- Filter(function(x) is.within(x, solve(deriv(p))), solve(p, 100))
   }
   if (s10 < s100){
     f <- Compose(Curry(clamp, a = s10, b = s100), as.function(p), iclamp)
