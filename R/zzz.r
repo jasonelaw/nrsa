@@ -12,8 +12,9 @@
 {
     ## we can't do this in .onLoad
     unlockBinding(".nrsa.Options", asNamespace("nrsa"))
-    packageStartupMessage("Package `nrsa', version 0.1\n",
-        "Jason Law\n",
+    pdescr <- packageDescription("nrsa")
+    packageStartupMessage("Package ", pdescr$Package, "\nversion ", pdescr$Version, "\n",
+        pdescr$Maintainer, "\n",
         "Type help(nrsa) for summary information\n")
     invisible()
 }
