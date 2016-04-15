@@ -20,12 +20,13 @@ kHIParameters                <- c(kHIAgriculturalParameters,
 #'@examples
 #'hi <- expand.grid(uid = 1:1000, transect = letters[1:10], 
 #'                  parameter = c("wall", "build", "pave", "road", "pipes", "landfl", "park", 
-#'                                "row", "past", "log", "mine"), 
-#'                  result = sample(c('0', 'C', 'B', 'P')), n = 11 * 10 * 1000)
+#'                                "row", "past", "log", "mine"))
+#'hi$result <- sample(c('0', 'C', 'B', 'P'), size = 11 * 10 * 1000, replace = T)
 #'calculateHumanInfluence(hi$uid, hi$parameter, hi$result)
 calculateHumanInfluence <- function(uid, parameter, result){
   parameter <- tolower(parameter)
-  stopifnot(length(uid) == length(parameter), 
+  stopifnot(!is.na(result),
+            length(uid) == length(parameter),
             length(uid) == length(result),
             parameter %in% kHIParameters,
             result %in% kHICategories)
