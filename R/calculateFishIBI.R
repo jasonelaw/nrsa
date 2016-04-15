@@ -91,6 +91,8 @@ calculateFishIBI <- function(site, order, species, length, anomaly, join.traits.
 #' @param zero numeric vector. The raw metric score representing a 0 subindex score. Can be of length 2, in which case the
 #' first value is for stream order 1 and the second is for larger stream orders.
 #' @param ten numeric vector of length 1 or 2. It is the value of the raw metric score that represents a 10 subindex score.
+#' Can be of length 2, in which case the
+#' first value is for stream order 1 and the second is for larger stream orders.
 #' 
 #' Returns a function that accepts two arguments, raw metric score and stream order and
 #' returns the subindex score for the mapping specified.
