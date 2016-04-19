@@ -8,7 +8,7 @@
 #'    \item Calculate transect spacing for wadeable as: \code{increment * nWadeableStationsPerTransect}
 #'    \item Calculate wadeable distance for each slope/bearing as \code{transp * proportion}
 #'    \item Calculate boatable transect spacing as \code{sum(distance)} and proportion as \code{distance / sum(distance)}
-#'    \item Calculate grade (as %) from boatable elevation change measurements in centimeters, if applicable.
+#'    \item Calculate grade (as percent) from boatable elevation change measurements in centimeters, if applicable.
 #'    \item Calculate angle metrics using \code{calculateAngleMetrics}
 #'    \item Calculate slope metrics using \code{calculateSlopeMetrics}
 #'  }
