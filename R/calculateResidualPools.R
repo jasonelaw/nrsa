@@ -166,7 +166,7 @@ calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F)
     pool.info <- ddply(x, .(uid), splat(f), .progress = plyrProgress())
   }
   progressReport("Residual pool dimensions are finished.")
-  return(pool.info)
+  return(pool.info[pool.info$is.pool, ])
 }
 
 #' Calculate residual pool metrics
@@ -227,11 +227,11 @@ calculatePoolMetrics <- function(uid, pool, depth, length, area, reachlen, ...){
   }
   
   x <- data.frame(uid, pool, depth, length, area, reachlen)
-  pool.summaries <- ddply(x, .(uid, pool), calcPoolSummaries, progress = plyrProgress())
+  pool.summaries <- ddply(x, .(uid, pool), calcPoolSummaries, .progress = plyrProgress())
   pool.summaries <- merge(pool.summaries, unique(x[,c('uid', 'reachlen')]), by = 'uid')
-  site.summaries <- ddply(pool.summaries, .(uid), calcUidSummaries, progress = plyrProgress())
+  site.summaries <- ddply(pool.summaries, .(uid), calcUidSummaries, .progress = plyrProgress())
   
-  site.pool.summaries <- ddply(x, .(uid), calcSitePoolSummaries, progress = plyrProgress())
+  site.pool.summaries <- ddply(x, .(uid), calcSitePoolSummaries, .progress = plyrProgress())
 
   ans <- merge(site.summaries, site.pool.summaries, by = 'uid')
   progressReport('Finished calculating residual pool metrics.')
