@@ -17,7 +17,7 @@ calculateCanopyCover <- function(uid, is.bank, densiometer){
   kMetrics <- c(outer(kBaseMetrics, c('mid', 'bnk'), paste0))
   dots <- list(vcden = ~sd(result, na.rm = T),
                xcden = ~mean(result, na.rm = T),
-               n     = ~nrsa:::count(result))
+               n     = ~count.notna(result))
   mets <-
     dplyr::data_frame(uid     = as.character(uid), 
                       is.bank = mapvalues(is.bank, c(F, T), c('mid', 'bnk')), 
@@ -40,7 +40,7 @@ calculateCanopyCover2 <- function(uid, is.bank, densiometer){
   calc <- function(x){
     c(vcden = sd(x$result, na.rm=T), 
       xcden = mean(x$result, na.rm=T), 
-      n     = count(x$result))
+      n     = count.notna(x$result))
   }
   mets <- ddply(x, .(uid, is.bank), calc)
   mets <- reshape2::melt(mets, id.var = c('uid', 'is.bank'), 

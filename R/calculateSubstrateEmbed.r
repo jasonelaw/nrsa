@@ -13,12 +13,12 @@ calculateSubstrateEmbed <- function(uid, embed, is.center){
   }
   x <- data.frame(uid = uid, is.center = is.center, embed = embed)
   met1 <- ddply(x, .(uid), summarize, 
-                n55    = count(embed), 
+                n55    = count.notna(embed), 
                 xembed = mean(embed, na.rm = T), 
                 vembed = sd(embed, na.rm = T))
   cx <- subset(x, x$is.center)
   met2 <- ddply(cx, .(uid), summarize, 
-                n33     = count(embed), 
+                n33     = count.notna(embed), 
                 xcembed = mean(embed, na.rm = T), 
                 vcembed = sd(embed, na.rm = T))
   met <- merge(met1, met2, by = 'uid', all = T)

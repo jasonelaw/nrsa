@@ -175,7 +175,7 @@ calculateBoatThalwegSubstrateMetrics <- function(uid, size.class){
   x <- addBoatSubstrateSizes(uid, size.class)
   f <- function(x){
     lDiam <- na.omit(x$lDiam)
-    sizes <- c(count(x$result.no.ot), summary.nrsa(lDiam))
+    sizes <- c(count.notna(x$result.no.ot), summary.nrsa(lDiam))
     names(sizes) <- c('n', 'lsub_d16', 'lsub_d25', 'lsub_d50', 'lsub_d75', 
                       'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr')
     proportions <- prop.table(table(x$result)) * 100

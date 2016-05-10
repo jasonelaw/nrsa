@@ -84,7 +84,7 @@ calculateSlopeMetrics <- function(uid, transect, slope, proportion){
   f <- function(x){
     c(xslope = mean(x$tmean),
       vslope = sd(x$tmean),
-      nslp   = count(x$tmean))
+      nslp   = count.notna(x$tmean))
   }
   ans <- ddply(tmean, .(uid), f)
   ans <- meltMetrics(ans)
@@ -173,9 +173,6 @@ coordinatesFromTraverse <- function(azimuth, distance, start = c(0,0)){
 #' Returns the angle from the y axis for a two dimenisonal vector (x,y).
 #' @param x the x coordinate
 #' @param y the y coordinate
-#' @param azimuth a vector of azimuths
-#' @param distance a vector of distances
-#' @param units the angle units of azimuths
 #' @return the angle in radians for \code{getAngleFromDisplacement}; angles in the
 #' appropriate units for \code{degToRad} and \code{radToDeg}; Displacement distances
 #' for each azimuth distance pair for \code{getDisplacementFromDistAzimuth}.
