@@ -3,9 +3,11 @@
 #' Returns the number of non-misingused to determine sample size.  
 #' @param x vector to determine n
 #' @return n
-count <- function(x) { 
+count.notna <- function(x) { 
     sum(!is.na(x))
 }
+
+count <- count.notna
 
 #' Calculate the geometric mean
 #' 

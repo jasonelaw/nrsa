@@ -313,7 +313,7 @@ identifyIncompleteSites <- function(uid, loc, depth, minimum.proportion = 0.85){
   uid <- factor(uid)
   n.expected <- tapply(loc, uid, max, na.rm = T)
   n.missing  <- tapply(depth, uid, function(x) sum(is.na(x)))
-  n.present  <- tapply(loc, uid, count)
+  n.present  <- tapply(loc, uid, count.notna)
   prop.sampled <- (n.present - n.missing) / n.expected
   incomplete   <- prop.sampled < minimum.proportion
   incomplete[uid]

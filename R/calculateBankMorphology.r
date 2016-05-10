@@ -31,7 +31,7 @@ calculateWadeBankMetrics <- function(uid, angle, undercut){
 #' @rdname calculateWadeBankMetrics
 #' @export
 calculateWadeUndercutMetrics <- function(undercut){
-  n_un <- count(undercut)
+  n_un <- count.notna(undercut)
   mets <- summary.nrsa(uncercut, probs = c(0.25, 0.5, .75), na.rm = T)
   mets <- c(n_un, mets)
   names(mets) <- c('n_un', 'bkun_q1', 'medbkun', 'bkun_q3',  'xun', 
@@ -42,7 +42,7 @@ calculateWadeUndercutMetrics <- function(undercut){
 #' @rdname calculateWadeBankMetrics
 #' @export
 calculateWadeAngleMetrics <- function(angle){
-  n_ba <- count(angle)
+  n_ba <- count.notna(angle)
   mets <- summary.nrsa(angle, probs = c(0.25, 0.5, .75), na.rm = T)
   mets <- c(n_ba, mets)
   names(mets) <- c('n_ba', 'bka_q1','medbk_a', 'bka_q3', 'xbka', 'sdbk_a', 
@@ -76,14 +76,20 @@ calculateBoatNumberWettedWidth <- function(uid, wetwid){
 #' @export
 #' @import plyr
 calculateBoatAngleMetrics <- function(uid, angle){
-  kModalAngleMetricMap <- c(`0-5` = "low", `5-30` = "med", `30-75` = "stp", 
-                            `75-100` = "vst", `0-5, 5-30` = "low-med", 
-                            `5-30, 30-75` = "med-stp", `30-75, 75-100` = "stp-vst")
-  kAngleMetricMap <- c(`0-5` = "bap_low", `5-30` = "bap_med", `30-75` = "bap_stp",
+  kModalAngleMetricMap <- c(`0-5`           = "low", 
+                            `5-30`          = "med", 
+                            `30-75`         = "stp", 
+                            `75-100`        = "vst", 
+                            `0-5, 5-30`     = "low-med", 
+                            `5-30, 30-75`   = "med-stp", 
+                            `30-75, 75-100` = "stp-vst")
+  kAngleMetricMap <- c(`0-5`    = "bap_low", 
+                       `5-30`   = "bap_med", 
+                       `30-75`  = "bap_stp",
                        `75-100` = "bap_vstp")
-  
-  angle <- factor(as.character(angle), 
-                  levels = c('0-5', '5-30', '30-75', '75-100'))
+  kAllowedAngles <- c('0-5', '5-30', '30-75', '75-100')
+
+  angle <- factor(as.character(angle), levels = kAllowedAngles)
   ang.counts    <- table(uid = uid, metric = angle)
   ang.prop      <- prop.table(ang.counts, 1) * 100
   ang.prop.list <- as.data.frame(unclass(ang.prop))
