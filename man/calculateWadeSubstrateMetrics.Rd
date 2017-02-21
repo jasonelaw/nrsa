@@ -20,4 +20,13 @@ lsub_dmm_nor,lsub_iqr,n,n_nor,pct_bdrk,pct_bigr,pct_bl,pct_cb,pct_fn,pct_gc,
 pct_gf,pct_hp,pct_org,pct_om,pct_ot,pct_rc,pct_rr,pct_rs,pct_sa,pct_safn,pct_sb,
 pct_sfgf,pct_wd,pct_xb,sub2dmm_nor,subd2sd_nor,subd_sd_nor,sub_dmm_nor
 }
+\details{
+\describe{
+  \item{d16,d50,d84}{ definition }
+  \item{lsub2d16,lsub2d25,lsub2d50,lsub2d75,lsub2d84}{definition}
+  \item{pct_bdrk,pct_bigr,pct_bl,pct_cb,pct_fn,pct_gc, 
+pct_gf,pct_hp,pct_org,pct_om,pct_ot,pct_rc,pct_rr,pct_rs,pct_sa,pct_safn,pct_sb,
+pct_sfgf,pct_wd,pct_xb}{definition}
+}
+}
 

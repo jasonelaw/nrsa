@@ -44,6 +44,18 @@ test_that("calculateChannelHabitatProportions returns correct results for EPA te
   load(system.file('tests', 'data', 'ChannelHabitat.expectedResults.Rdata', package = 'nrsa'))
   mets <- calculateChannelHabitatProportions(test$UID, test$RESULT, test$SAMPLE_TYPE == 'PHAB_THALW')
   check <- merge(mets, expected, by = c('uid', 'metric'), all = T)
+  
   expect_that(check$result.x, equals(check$result.y))
   
+})
+
+test_that("calculateChannelHabitatProportions returns same results as aquamet package", {
+  library(aquamet)
+  data(thalwegEx)
+  testChanHab <- suppressCat(metsChannelHabitat(thalwegEx))
+  d <- dcast(thalwegEx, UID + TRANSECT + STATION ~ PARAMETER, value.var = 'RESULT')
+  ans <- calculateChannelHabitatProportions(d$UID, d$CHANUNCD, !is.na(d$DEPTH))
+  names(ans) <- toupper(names(ans))
+  ans <- merge(ans, testChanHab, by = c('UID', 'METRIC'), all = T)
+  expect_equal(ans$RESULT.x, ans$RESULT.y)
 })

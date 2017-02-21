@@ -7,7 +7,7 @@
 gmean(x)
 }
 \arguments{
-\item{x}{numeric vectr}
+\item{x}{numeric vector}
 }
 \value{
 the geometric mean of the vector

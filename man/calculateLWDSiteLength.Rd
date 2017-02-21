@@ -7,14 +7,21 @@
 calculateLWDSiteLength(reachlen, numtran, is.wadeable)
 }
 \arguments{
-\item{reachlen}{a vector of reachlengths for the sites}
+\item{reachlen}{a vector of reachlength metrics for the sites. For wadeable,
+sites use \link{calculateWadeableReachLength}. For Non-wadeable sites, use 
+\link{calculateBoatableReachLength}.}
 
-\item{numtran}{a vector with the number of transects sampled}
+\item{numtran}{a vector with the number of transects sampled. Use \link{observedLWDTransects},
+to determine the number of lwd transects measured.}
 
 \item{is.wadeable}{a logical vector; \code{TRUE} if the site was wadeable}
 }
 \description{
 \code{calculateLWDSiteLength} is used to calculate the length of the sampled
-area so that counts/length and counts/area can be calculated.
+area so that counts/length and counts/area can be calculated. For wadeable,
+sites the length of stream where lwd is sampled is just the total reach length
+for the site, because the lwd plots are the entire area between the transects.
+For non-wadeable sites, the site length is the number of sampled transects * 20,
+because each littoral plot is 20 m long.
 }
 

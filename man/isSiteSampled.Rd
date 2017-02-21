@@ -16,7 +16,7 @@ site was sampled: BOATABLE, PARBYBOAT, ALTERED, INTWADE, PARBYWADE, WADEABLE}
 a 'metric' data.frame
 }
 \description{
-Function returns the 'sampled' metric based on the data in the from the stream
+Function returns the 'sampled' metric based on the data from the stream
 verification form (field VALXSITE from the VERIFICATION table).
 }
 

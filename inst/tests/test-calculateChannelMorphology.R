@@ -27,7 +27,15 @@ test_that("Channel Morphology return correct metrics for EPA test data: should f
 
 })
 
-
+test_that("Channel Morphology return correct metrics for EPA test data: should fail until EPA explains why they don't use transect K", {
+  library(aquamet)
+  data("bankgeomEx")
+  data("thalwegEx")
+  data("visitsEx")
+  testChanMorph <- metsChannelMorphology(bankgeomEx,thalwegEx,visitsEx)
+  
+  
+  })
 
 # d1 <- metsChannelMorphology.createBankGeometryData()
 # d2 <- metsChannelMorphology.createThalwegData()

@@ -10,6 +10,10 @@ WoodClassesData()
 A data frame with the metadata
 }
 \description{
-A data frame of LWD size class metadata that is in the LWD metric calculations.
+A data frame of LWD size class metadata that is in the LWD metric calculations. The volume
+of a piece of LWD is determined by the forumla:
+Volume = pi * [0.5*(minDiam + (maxDiam - minDiam)/3)]^2 * [minLength + (maxLength - minLength)/3]
+The size variable is used to calculate the cumulative volume and cumulative 
+count metrics (i.e., c1d, c1d_msq, etc).
 }
 

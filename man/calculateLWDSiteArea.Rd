@@ -7,9 +7,9 @@
 calculateLWDSiteArea(lwdlength, xbkf_w, is.wadeable)
 }
 \arguments{
-\item{lwdlength}{a vector of site lengths as returned by calculateLWDSiteLength}
+\item{lwdlength}{a vector of site lengths as returned by \link{calculateLWDSiteLength}}
 
-\item{xbkf_w}{a vector of average bankfull width}
+\item{xbkf_w}{a vector of average bankfull width as returned by \link{calculateChannelMetrics}}
 
 \item{is.wadeable}{a logical vector; \code{TRUE} if the site was wadeable}
 }

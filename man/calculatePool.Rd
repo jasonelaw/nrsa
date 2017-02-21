@@ -4,7 +4,8 @@
 \alias{calculatePool}
 \title{Determine which depths in a vector of depths represent pools}
 \usage{
-calculatePool(distance, depth, slope, uid = NULL, convert.stack = F)
+calculatePool(distance, depth, slope, uid = NULL, convert.stack = F,
+  pool.only = F)
 }
 \arguments{
 \item{distance}{a vector of cumulative distance for the thalweg profile}
@@ -20,6 +21,9 @@ each site}
 
 \item{convert.stack}{logical, if \code{TRUE} the slope is converted using the
 formula of Stack (1988).}
+
+\item{pool.only}{logical, if \code{TRUE}, any nonpool points are removed from the
+data.frame that is returned.}
 }
 \description{
 Determine which depths in a vector of depths represent pools and return 

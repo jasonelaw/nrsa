@@ -1,5 +1,5 @@
 context("Fish IBI")
-
+library(plyr)
 kMetrics <- c('n.native.species', 'n.native.families', 'n.native.benthic.species',
               'n.native.watercolumn', 'n.sensitive', 'n.nlns', 'percent.tolerant', 'n.hider',
               'percent.filter.feeding', 'percent.top.carnivore', 'percent.omnivorous',
@@ -17,7 +17,7 @@ zero.ans <- data.frame(n.native.species = 0, n.native.families = 0, n.native.ben
                        percent.filter.feeding = 0, percent.top.carnivore = 0, percent.omnivorous = 10,
                        percent.lunker = 0, percent.anomaly = 10)
 
-raw.scale.range <- data.frame(n.native.species = , n.native.families = 10, n.native.benthic.species = 10,
+raw.scale.range <- data.frame(n.native.species = 10, n.native.families = 10, n.native.benthic.species = 10,
                        n.native.watercolumn = 0, n.sensitive = 0, n.nlns = 0, percent.tolerant = 10, n.hider = 0,
                        percent.filter.feeding = 0, percent.top.carnivore = 0, percent.omnivorous = 10,
                        percent.lunker = 0, percent.anomaly = 10)

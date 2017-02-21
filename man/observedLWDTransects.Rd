@@ -4,7 +4,8 @@
 \alias{observedLWDTransects}
 \title{Calculate number of LWD observed transects}
 \usage{
-observedLWDTransects(uid, transect, count, in.bankfull)
+observedLWDTransects(uid, transect, size.class, count, is.wadeable,
+  strict.epa = T)
 }
 \arguments{
 \item{uid}{vector of site-visit indicators}
@@ -13,10 +14,19 @@ observedLWDTransects(uid, transect, count, in.bankfull)
 
 \item{count}{vector of counts of LWD pieces}
 
+\item{strict.epa}{whether the numtran metric should be calculated like EPA.}
+
 \item{in.bankfull}{logical vector; true if the lwd was within bankfull}
 }
 \description{
 \code{observedLWDTransects} is used to calculate the number of transects that
-were observed for the LWD data.
+were observed for the LWD data: nc for 'wet' LWD data, ns for 'dry' LWD data,
+and numtran which is used in \link{calculateLWDSiteLength}.
+}
+\details{
+If \code{strict.epa = TRUE}, then numtran just 
+returns the number of transects per site submitted to the function. If 
+\code{strict.epa = TRUE}, the function returns the number of \bold{completely
+observed} transects per site for numtran.
 }
 

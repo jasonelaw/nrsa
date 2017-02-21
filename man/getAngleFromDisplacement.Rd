@@ -20,12 +20,6 @@ getDisplacementFromDistAzimuth(azimuth, distance, units = c("radian",
 \item{x}{the x coordinate}
 
 \item{y}{the y coordinate}
-
-\item{azimuth}{a vector of azimuths}
-
-\item{distance}{a vector of distances}
-
-\item{units}{the angle units of azimuths}
 }
 \value{
 the angle in radians for \code{getAngleFromDisplacement}; angles in the
