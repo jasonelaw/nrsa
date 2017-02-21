@@ -61,13 +61,12 @@ calculateBoatableReachLength <- function(uid, actransp){
 
 #' Calculates the reach length for a wadeable site
 #' 
-#' Calculates the reach length for a wadeable site using the number of stations per transect
-#' and the increment between stations.  The number of stations per transect
-#' must be calculated using \link{nWadeableStationsPerTransect} prior to passing
-#' to this function.  There is one unique increment per site and as many n.station
-#' as there are transects at a site.
+#' Calculates the reach length for a wadeable site using the number of stations per site
+#' and the increment between stations.  The number of stations per site
+#' must be calculated using \link{nWadeableStations} prior to passing
+#' to this function.  Thus, the data passed to this function is site-level data.
 #' @param uid a vector of site identifiers
-#' @param n.station the number of station per transect
+#' @param n.station the number of station per site
 #' @param increment the distance between stations at a wadeable site
 #' @return a 'metric' data.frame
 #' @export
@@ -78,10 +77,8 @@ calculateBoatableReachLength <- function(uid, actransp){
 #' d <- merge(increment, n.sta, by = 'uid')
 #' calculateWadeableReachLength(d$uid, d$n.sta, d$increment)
 calculateWadeableReachLength <- function(uid, n.station, increment){
-  n.station <- tapply(n.station, uid, sum) # total stations at site
-  increment <- tapply(increment, uid, unique)
   # There are 1 fewer increments than number of stations, so we must substract one
-  reachlen  <- n.station * increment - increment
+  reachlen  <- setNames(n.station * increment - increment, uid)
   ans <- convertNamedVectorToMetricDF(reachlen)
   progressReport("Finished boatable reach length: reachlen.")
   return(ans)
@@ -89,7 +86,7 @@ calculateWadeableReachLength <- function(uid, n.station, increment){
 
 #' Determines whether a site was sampled from x site validation data
 #' 
-#' Function returns the 'sampled' metric based on the data in the from the stream
+#' Function returns the 'sampled' metric based on the data from the stream
 #' verification form (field VALXSITE from the VERIFICATION table).
 #' @param uid a vector of site identifiers
 #' @param valxsite a vector of sampling methods.  The following ones indicate the

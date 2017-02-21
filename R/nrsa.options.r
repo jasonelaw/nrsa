@@ -1,3 +1,10 @@
+#'Set nrsa package options
+#'
+#'Sets nrsa package options. The only current option is the \code{ProgressReports} option.
+#'Setting this option to \code{TRUE} will result in the functions of the package issuing 
+#'progress reports when they are complete.
+#'@param ... package options in tag = value form
+#'@export
 nrsa.options <- function (...) 
 {
     if (nargs() == 0) 

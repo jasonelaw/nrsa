@@ -3,7 +3,7 @@
 #' Returns the number of non-misingused to determine sample size.  
 #' @param x vector to determine n
 #' @return n
-count.notna <- function(x) { 
+count.notna <- function(x){ 
     sum(!is.na(x))
 }
 
@@ -13,7 +13,7 @@ count <- count.notna
 #' 
 #' Calculates a geometric mean for a numeric vector.
 #'
-#' @param x numeric vectr
+#' @param x numeric vector
 #' @return the geometric mean of the vector
 gmean <- function(x){
   exp(mean(log(x)))
@@ -30,7 +30,7 @@ gmean <- function(x){
 #' @return the interdecile range
 idr <- function(x, method=2){
   ans <- quantile(x, probs = c(0.1, 0.9), na.rm = T, 
-                  names = F, type = method)
+                  names = F, type = methodz)
   diff(ans)
 }
 

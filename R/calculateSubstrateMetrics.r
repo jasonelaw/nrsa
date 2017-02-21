@@ -4,10 +4,14 @@
 #'different sets of the size class data. This function convert the size classes
 #'to a diameter and logDiameter for each of those size classes (geometric mean
 #'of the extreme sizes) for each of these sets. There are three data sets we
-#'need to work with (1) ALL the size_classes (mm) (2) subclasses excluding HP,
-#'RD, RR, RS, RC, OT, WD (tt) (3) subclasses including all classes and lumps the
-#'boulder class (XB+SB= BL)  (bl) (4) subclasses excluding HP, RD, RR, RS, RC,
-#'OT, WD, and lumps the boulder class (XB+SB= BL)  (ttbl)
+#'need to work with (1) ALL the size_classes (mm) (2) mobile subclasses; i.e., excluding HP,
+#'RD, RR, RS, RC, OT, WD (tt) (3)  all classes and lumps the
+#'boulder class (XB+SB= BL)  (bl) (4) mobile subclasses (i.e., excluding HP, RD, RR, RS, RC,
+#'OT, WD) and lumps the boulder class (XB+SB= BL)  (ttbl)
+#'
+#'The unexported wadeSubstrateSizes returns a data.frame of wadeable substrate sizes.
+#'The "BL" class is included because although it isn't directly observed, it is needed 
+#'for the lumped boulder data sets above.
 #'
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size class codes
@@ -21,38 +25,45 @@
 #'size.class =c('BH', 'BL' ,'CB',  'GR' ,'SA',  'FN' ,'OT'))
 #'addBoatSubstrateSizes(d$uid, d$size.class)
 addWadeSubstrateSizes <- function(uid, size.class){
-  kWadeSubstrateSizes <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", 
-                           "XB", "BL", "RS", "RR", "RC")
-  kResultSizes        <- kWadeSubstrateSizes[kWadeSubstrateSizes != 'BL']
-  kCollapseBoulder    <- c(XB = 'BL', SB = 'BL')
-  kTTDropClasses      <- setNames(rep(NA, 7), c("OM", "OT", "WD", "HP",  "RS", "RR", "RC"))
+  kCollapseBoulder <- c(XB = 'BL', SB = 'BL')
+  kTTDropClasses   <- setNames(rep(NA, 7), c("OM", "OT", "WD", "HP", "RS", "RR", "RC"))
+  kResultFields    <- list('result'      = c('class', 'min', 'max', 'diam', 'lDiam'), 
+                           'result.bl'   = c('class', 'lDiam'), 
+                           'result.tt'   = c('class', 'diam', 'lDiam'), 
+                           'result.ttbl' = c('class', 'diam', 'lDiam'))
   
-  sizes <-
-    data.frame('class' = factor(kWadeSubstrateSizes, kWadeSubstrateSizes),
-               'min'   = c(NA, NA, NA, NA, 0.001, 0.06, 2, 16, 64, 250, 1000,
-                           250, 4000, 4000, 4000),
-               'max'   = c(NA, NA, NA, NA, 0.06, 2, 16, 64, 250, 1000, 4000,
-                           4000, 8000, 8000, 8000))
-  sizes$diam <- apply(sizes[,2:3], 1, gmean)
-  sizes$lDiam <- log10(sizes$diam)
-  
-  x <- data.frame(uid = uid, 
-                  result = factor(as.character(size.class), kResultSizes))
-  x$result.bl <- revalue(x$result, kCollapseBoulder)
-  x$result.tt <- revalue(x$result, kTTDropClasses)
+  sizes       <- wadeSubstrateSizes()
+  result.levs <- setdiff(sizes$class, "BL") # Boulder class not actually observed
+  x <- data.frame(uid    = uid, 
+                  result = factor(as.character(size.class), result.levs),
+                  order  = 1:length(uid))
+  x$result.bl   <- revalue(x$result, kCollapseBoulder)
+  x$result.tt   <- revalue(x$result, kTTDropClasses)
   x$result.ttbl <- revalue(x$result.tt, kCollapseBoulder)
-  i <- lapply(x[c('result', 'result.bl', 'result.tt', 'result.ttbl')], match, table = sizes$class)
-  x$min        <- sizes$min[i$result]
-  x$max        <- sizes$max[i$result]
-  x$lDiam      <- sizes$lDiam[i$result]
-  x$lDiam.tt   <- sizes$lDiam[i$result.tt]
-  x$diam.tt    <- sizes$diam[i$result.tt]
-  x$lDiam.bl   <- sizes$lDiam[i$result.bl]
-  x$lDiam.ttbl <- sizes$lDiam[i$result.ttbl]
-  x$diam.ttbl  <- sizes$diam[i$result.ttbl]
-  x$result.bl <- x$result.ttbl <- NULL
+  x <- merge(x, sizes[,kResultFields$result],      by.x = 'result',      by.y = 'class', all.x = TRUE)
+  x <- merge(x, sizes[,kResultFields$result.tt],   by.x = 'result.tt',   by.y = 'class', all.x = TRUE, suffix = c('', '.tt'))
+  x <- merge(x, sizes[,kResultFields$result.bl],   by.x = 'result.bl',   by.y = 'class', all.x = TRUE, suffix = c('', '.bl'))
+  x <- merge(x, sizes[,kResultFields$result.ttbl], by.x = 'result.ttbl', by.y = 'class', all.x = TRUE, suffix = c('', '.ttbl'))
+
+  x <- x[order(x$order), ]
+  x$order <- x$result.bl <- x$result.ttbl <- NULL
   progressReport('Created numeric size classes for wadeable')
   x
+}
+
+#'@rdname addWadeSubstrateSizes
+wadeSubstrateSizes <- function(){
+  kWadeSubstrateSizes <- c("OM", "OT", "WD", "HP", "FN", "SA", "GF", "GC","CB", "SB", 
+                           "XB", "BL", "RS", "RR", "RC")
+  sizes <-
+    data.frame('class' = factor(kWadeSubstrateSizes, kWadeSubstrateSizes),
+               'min'   = c(NA, NA, NA, 4000, 0.001, 0.06, 2, 16, 64, 250, 1000,
+                           250, 4000, 4000, 4000),
+               'max'   = c(NA, NA, NA, 8000, 0.06, 2, 16, 64, 250, 1000, 4000,
+                           4000, 8000, 8000, 8000))
+  sizes$diam  <- apply(sizes[,2:3], 1, gmean)
+  sizes$lDiam <- log10(sizes$diam)
+  return(sizes)
 }
 
 #'@rdname addWadeSubstrateSizes
@@ -85,6 +96,14 @@ addBoatSubstrateSizes <- function(uid, size.class){
 #'pct_gf,pct_hp,pct_org,pct_om,pct_ot,pct_rc,pct_rr,pct_rs,pct_sa,pct_safn,pct_sb,
 #'pct_sfgf,pct_wd,pct_xb,sub2dmm_nor,subd2sd_nor,subd_sd_nor,sub_dmm_nor
 #'
+#'\describe{
+#'   \item{d16,d50,d84}{ definition }
+#'   \item{lsub2d16,lsub2d25,lsub2d50,lsub2d75,lsub2d84}{definition}
+#'   \item{pct_bdrk,pct_bigr,pct_bl,pct_cb,pct_fn,pct_gc, 
+#'pct_gf,pct_hp,pct_org,pct_om,pct_ot,pct_rc,pct_rr,pct_rs,pct_sa,pct_safn,pct_sb,
+#'pct_sfgf,pct_wd,pct_xb}{definition}
+#' }
+#'
 #'@param uid a vector of site-visit indicators
 #'@param size.class a vector size classes
 #'
@@ -104,20 +123,24 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
     result.tt <- na.omit(x$result.tt)
     ans <- 
       c(# mm calcs
-        summary.nrsa(lDiam.mm),
+        setNames(summary.nrsa(lDiam.mm), 
+                 c('lsub2d16', 'lsub2d25', 'lsub2d50', 'lsub2d75', 
+                   'lsub2d84', 'lsub2dmm', 'lsubd2sd', 'lsub2iqr')),
         # summaries for the tt dataset (NOR) (ldiam AND diam)
-        mean(lDiam.tt), 10^mean(lDiam.tt), sd(lDiam.tt), mean(diam.tt), 
-        sd(diam.tt),
+        lsub2dmm_nor = mean(lDiam.tt), 
+        dgm          = 10^mean(lDiam.tt), 
+        lsubd2sd_nor = sd(lDiam.tt), 
+        sub2dmm_nor  = mean(diam.tt), 
+        subd2sd_nor  = sd(diam.tt),
         # bl calcs: all the same metrics for the subset with the lumped boulder classes
-        summary.nrsa(lDiam.bl),
+        setNames(summary.nrsa(lDiam.bl), 
+                 c('lsub_d16', 'lsub_d25', 'lsub_d50', 'lsub_d75', 
+                   'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr')),
         # ttbl calcs: special few extra summaries that use the lumped boulder class for the NOR
-        mean(lDiam.ttbl), sd(lDiam.ttbl), mean(diam.ttbl), sd(diam.ttbl))
-    names(ans) <- 
-      c('lsub2d16', 'lsub2d25', 'lsub2d50', 'lsub2d75', 'lsub2d84', 'lsub2dmm',
-        'lsubd2sd', 'lsub2iqr', 'lsub2dmm_nor', 'dgm', 'lsubd2sd_nor', 
-        'sub2dmm_nor', 'subd2sd_nor', 'lsub_d16', 'lsub_d25', 'lsub_d50', 
-        'lsub_d75', 'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr', 
-        'lsub_dmm_nor', 'lsubd_sd_nor', 'sub_dmm_nor', 'subd_sd_nor')
+        lsub_dmm_nor = mean(lDiam.ttbl), 
+        lsubd_sd_nor = sd(lDiam.ttbl), 
+        sub_dmm_nor  = mean(diam.ttbl), 
+        subd_sd_nor  = sd(diam.ttbl))
     # substrate category proportions
     tbl <- table(x$result)
     n     <- sum(tbl[c('RS', 'RR', 'RC', 'HP', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA', 'FN')])
@@ -197,10 +220,10 @@ calculateBoatThalwegSubstrateMetrics <- function(uid, size.class){
 calculateBoatLittoralSubstrateMetrics <- function(uid, db, ds, sb, ss){
   kAllowedClasses <- c('RS', 'RR', 'XB', 'SB', 'CB', 'GC', 'GF', 'SA',
                        'FN', 'HP', 'WD', 'OT', 'BL', 'OM', 'RC')
-  x <- data.frame(uid, db, ds, sb, ss)
-  x <- reshape2::melt(x, id.var = 'uid', variable.name = 'parameter', value.name = 'metric')
-  x$metric <- factor(x$metric, levels = kAllowedClasses)
-  metrics <- prop.table(table(x), 1:2)
+  x <- data.frame(uid       = uid, 
+                  parameter = rep(c('db', 'ds', 'sb', 'ss'), each = length(uid)),
+                  metric    = factor(c(db, ds, sb, ss), levels = kAllowedClasses))
+  metrics <- prop.table(table(x), 1:2) * 100
   metrics <- as.data.frame(metrics, responseName = 'result')
   metrics$metric <- paste('pct_', metrics$parameter, tolower(metrics$metric), sep = '')
   metrics$parameter <- NULL

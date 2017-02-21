@@ -146,9 +146,11 @@ extractResidualPoolDimensions <- function(dimensions, base.point, is.pool){
 #'   each site
 #' @param convert.stack logical, if \code{TRUE} the slope is converted using the
 #'   formula of Stack (1988).
+#' @param pool.only logical, if \code{TRUE}, any nonpool points are removed from the
+#' data.frame that is returned.
 #' @import plyr
 #' @export
-calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F) {
+calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F, pool.only = F) {
   if (convert.stack) {
     #slope formula according to Stack (1988)
     slope <- 0.12 + 0.25 * slope
@@ -165,8 +167,11 @@ calculatePool <- function(distance, depth, slope, uid = NULL, convert.stack = F)
     x         <- data.frame(uid, distance, depth, slope)
     pool.info <- ddply(x, .(uid), splat(f), .progress = plyrProgress())
   }
+  if (pool.only){
+    pool.info <- pool.info[pool.info$is.pool, ]
+  }
   progressReport("Residual pool dimensions are finished.")
-  return(pool.info[pool.info$is.pool, ])
+  return(pool.info)
 }
 
 #' Calculate residual pool metrics

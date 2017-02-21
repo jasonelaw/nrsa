@@ -7,12 +7,17 @@ kHIParameters                <- c(kHIAgriculturalParameters,
 #'Calculate human influence metrics
 #'
 #'This function calculates the human influence metrics.  The parameter names are
-#'assumed to be in lower case
+#'assumed to be in lower case. Missing data is not allowed and will result
+#'in an error.
 #'
-#'@param uid a vector that differentiates among sites or site visits.
-#'@param parameter a vector of parameter names for the 11 human influence parameters
-#'@param result a vector of results 0 (not present), P (present > 10 m), 
-#'C (present < 10 m), B (present on bank)
+#'@param uid a vector that differentiates among sites or site visits. Metrics will be
+#'calculated for each value of \code{uid}.
+#'@param parameter a vector of parameter names for the 11 human influence parameters:
+#'must be one of \code{"row"}, \code{"past"}, \code{"build"}, \code{"landfl"}, \code{"log"},
+#'\code{"mine"}, \code{"park"}, \code{"pave"}, \code{"row"}, \code{"pipes"}, \code{"road"}, 
+#'or \code{"wall"}.
+#'@param result a vector of results \code{0} (not present), \code{P} (present > 10 m), 
+#'\code{C} (present < 10 m), \code{B} (present on bank).
 #'
 #'@return returns a dataframe with three columns: uid, metric, result
 #'@import plyr
@@ -25,6 +30,10 @@ kHIParameters                <- c(kHIAgriculturalParameters,
 #'calculateHumanInfluence(hi$uid, hi$parameter, hi$result)
 calculateHumanInfluence <- function(uid, parameter, result){
   parameter <- tolower(parameter)
+  assert_is_a_non_missing_nor_empty_string(result)
+  assert_all_are_same_length(uid, parameter, result)
+  assert_is_subset(parameter, kHIParameters)
+  assert_is_subset(result, kHICategories)
   stopifnot(!is.na(result),
             length(uid) == length(parameter),
             length(uid) == length(result),

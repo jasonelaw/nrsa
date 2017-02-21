@@ -12,7 +12,7 @@
 #'@param densiometer a vector of densiometer measurments from 0-17.
 #'@import plyr
 #'@export
-calculateCanopyCover <- function(uid, is.bank, densiometer){
+calculateCanopyCover2 <- function(uid, is.bank, densiometer){
   kBaseMetrics <- c('vcden', 'xcden', 'n')
   kMetrics <- c(outer(kBaseMetrics, c('mid', 'bnk'), paste0))
   dots <- list(vcden = ~sd(result, na.rm = T),
@@ -33,7 +33,7 @@ calculateCanopyCover <- function(uid, is.bank, densiometer){
   return(mets)
 }
 
-calculateCanopyCover2 <- function(uid, is.bank, densiometer){
+calculateCanopyCover <- function(uid, is.bank, densiometer){
   is.bank <- mapvalues(is.bank, c(F, T), c('mid', 'bnk'))
   x <- data.frame(uid = uid, is.bank = is.bank, result = densiometer)
   x$result <- x$result / 17 * 100

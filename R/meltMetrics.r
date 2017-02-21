@@ -13,6 +13,8 @@ meltMetrics <- function(...){
     } else if (is.matrix(x)){
       return(reshape2::melt(x, varnames = c('uid', 'metric'), 
                   value.name = 'result'))
+    } else if (is.array(x)){
+      return(reshape2:::melt(x, value.name = 'result'))
     } else {
       stop("Arguments must either matrix or data.frame")
     }

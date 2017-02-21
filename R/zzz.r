@@ -1,12 +1,5 @@
 ".nrsa.Options" <-
-    list(NRSACalcLocation = 'S:/jlaw/pawmap/metric_calculation/out/',
-         NRSAvalidationLocation = 'S:/jlaw/pawmap/out/validation/',
-         NRSAKeyColumns = c('UID', 'BATCHNO','TRANSECT','TRANSDIR','STATION','REP'
-                   ,'LINE', 'PAGE', 'TRANLINE','BANK','ANALYTE', 'SAMPLE_TYPE'
-                   ,'SAMPLE_CAT'
-                   ),
-         NRSADSN = c('NRSA_REP_64'),
-         ProgressReports = FALSE)
+    list(ProgressReports = TRUE)
 
 .onAttach <- function(library, pkg)
 {
@@ -17,4 +10,12 @@
         pdescr$Maintainer, "\n",
         "Type help(nrsa) for summary information\n")
     invisible()
+}
+
+suppressCat <- function(x){
+  sink(tmp <- tempfile())
+  ret <- force(x)
+  sink()
+  file.remove(tmp)
+  ret 
 }
