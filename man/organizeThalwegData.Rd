@@ -30,4 +30,3 @@ site to be included.}
 This function adds a sequence indicator to a thalweg profile, creates
 additional 'nick points', and removes incomplete sites.
 }
-

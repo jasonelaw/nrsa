@@ -30,4 +30,3 @@ Determine which depths in a vector of depths represent pools and return
 information about them.  A residual pool is any area in a pool that holds 
 water when the discharge is 0.
 }
-

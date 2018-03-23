@@ -32,4 +32,3 @@ f <- function(x, i, ...){
 }
 system.time(fastSummaries(d$result, d[c('uid', 'class', 'zone')], FUN = f))
 }
-

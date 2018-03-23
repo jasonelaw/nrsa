@@ -26,4 +26,3 @@ a data frame of riparian vegetation metrics
 \code{calculateRiparianVegetation} is used to calculate riparian vegetation metrics
 from the visual riparian estimates section of the NRSA forms.
 }
-

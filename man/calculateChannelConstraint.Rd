@@ -24,4 +24,3 @@ uid <- rep(1:10, each = 11)
 constraint <- sample(c('B', 'C', 'N', 'U'), 10*11, replace = T)
 calculateChannelConstraint(uid, constraint)
 }
-

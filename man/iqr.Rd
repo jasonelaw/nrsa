@@ -19,4 +19,3 @@ SAS to within 10^-6 100% of the time (for 2008 data); this is at odds with
 the R documentation which specifies type 3 imitates SAS.  FWIW, type 5 
 differs from SAS only 7% of the time under the same conditions.
 }
-

@@ -20,4 +20,3 @@ the coordinates for the traverse
 Computes the coordinates for a two dimensional traverse with an arbitrary start
 point (assumed to be (0,0)).
 }
-

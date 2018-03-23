@@ -30,4 +30,4 @@ test_that("Subindex scaling functions correct", {
   expect_that(nrsa:::rescaleMetrics(zero)[,kMetrics], equals(zero.ans))
 })
 
-calculateFishIBI(d$site, 1L, d$species, d$length, F, join.traits.by = 'species')
+calculateFishIBI(d$site, 1L, d$species, d$length, F, join.traits.by = 'species', return.subindices = T, return.raw.metrics = T)

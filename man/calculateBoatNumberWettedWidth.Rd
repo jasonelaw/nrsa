@@ -17,4 +17,3 @@ a 'metric' data.frame
 \description{
 Calculate boat protocol number of observed wetted widths: n_w
 }
-

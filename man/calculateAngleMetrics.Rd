@@ -53,4 +53,3 @@ we take the mean of the the transect spacing values for the site.
                  slope = rep(c(10, 20, 30), 2), proportion = rep(1,6) / 3)
  with(d, calculateSlopeMetrics(uid, transect, slope, proportion))
 }
-

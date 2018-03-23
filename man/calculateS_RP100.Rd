@@ -17,4 +17,3 @@ the s_rp100 metric
 \description{
 Wish I knew.
 }
-

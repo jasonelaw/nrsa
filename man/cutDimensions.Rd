@@ -26,4 +26,3 @@ difference between thalweg sampling points (i.e., only the length
 attributable to that point, rather than the cumulative length of the pool up
 that point).
 }
-

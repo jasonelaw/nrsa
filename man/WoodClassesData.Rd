@@ -16,4 +16,3 @@ Volume = pi * [0.5*(minDiam + (maxDiam - minDiam)/3)]^2 * [minLength + (maxLengt
 The size variable is used to calculate the cumulative volume and cumulative 
 count metrics (i.e., c1d, c1d_msq, etc).
 }
-

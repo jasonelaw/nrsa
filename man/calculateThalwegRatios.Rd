@@ -24,4 +24,3 @@ depth: xwxd, sdwxd, n_wd, xwd_rat, sdwd_rat, and n_wdr.
 These are station level data (i.e., from the thalweg form) and so do not need any special
 extra transect treatment.
 }
-

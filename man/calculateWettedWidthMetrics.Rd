@@ -21,4 +21,3 @@ Calculates wetted width metrics: xwidth, sdwidth, and n_w.
 Uses the max wetted width of the transect - extra transect pair as returned 
 by \link{joinExtraTransects}.
 }
-

@@ -4,7 +4,7 @@
 \alias{calculateHumanInfluence}
 \title{Calculate human influence metrics}
 \usage{
-calculateHumanInfluence(uid, parameter, result)
+calculateHumanInfluence(uid, parameter, result, na.rm = F)
 }
 \arguments{
 \item{uid}{a vector that differentiates among sites or site visits. Metrics will be
@@ -33,4 +33,3 @@ hi <- expand.grid(uid = 1:1000, transect = letters[1:10],
 hi$result <- sample(c('0', 'C', 'B', 'P'), size = 11 * 10 * 1000, replace = T)
 calculateHumanInfluence(hi$uid, hi$parameter, hi$result)
 }
-

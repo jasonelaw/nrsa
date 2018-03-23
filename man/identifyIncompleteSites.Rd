@@ -18,4 +18,3 @@ identifyIncompleteSites(uid, loc, depth, minimum.proportion = 0.85)
 \description{
 Identify sites whose proportion of non-missing depths falls below a minimum.
 }
-

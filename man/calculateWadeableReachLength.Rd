@@ -29,4 +29,3 @@ n.sta <- nWadeableStations(d$uid, d$transects, d$station, by = 'site')
 d <- merge(increment, n.sta, by = 'uid')
 calculateWadeableReachLength(d$uid, d$n.sta, d$increment)
 }
-

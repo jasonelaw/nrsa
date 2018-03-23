@@ -1,7 +1,7 @@
 Package: nrsa
 Type: Package
 Title: Calculate metrics for NRSA protocol data.
-Version: 0.4.0
+Version: 0.4.1
 Date: 2011-10-20
 Author: Curt Seeliger, Marlys Cappaert, Jason Law
 Maintainer: Jason Law <jason.law@portlandoregon.gov>
@@ -20,4 +20,4 @@ Suggests:
     testthat
 License: GPL-3
 LazyLoad: yes
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

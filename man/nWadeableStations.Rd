@@ -44,4 +44,3 @@ d <- expand.grid(uid = 1:10, transects = LETTERS[1:11], station = 0:9)
 nWadeableStations(d$uid, d$transects, d$station, by = 'site')
 nWadeableStationsPerTransect(d$uid, d$transects, d$station)
 }
-

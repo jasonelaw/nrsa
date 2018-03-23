@@ -23,4 +23,3 @@ function(x) {if(all(is.na(x))) { NA } else {all(x, na.rm=TRUE) } }
 e <- expand.grid(e1 = c(NA, T, F), e2 = c(NA, T, F))
 e$e1 \%&\% e$e2
 }
-

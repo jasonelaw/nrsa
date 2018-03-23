@@ -15,4 +15,3 @@ removeSideChannels(x, transect)
 \code{removeSideChannels} removes side channels from a dataframe using the 
 transect codes
 }
-

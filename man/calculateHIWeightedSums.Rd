@@ -14,4 +14,3 @@ calculateHIWeightedSums(proportions, weights = c(0, 0.6667, 1, 1.5))
 \description{
 Calculate weighted human influence metrics
 }
-

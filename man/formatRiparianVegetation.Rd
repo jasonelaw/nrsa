@@ -30,4 +30,3 @@ are TRUE whenever for any parameter with a nonzero vegetation cover class.  The
 latter parameters are the cover classes converted to the arithmetic means of 
 end points of the cover classes to numerically characterize each class.
 }
-

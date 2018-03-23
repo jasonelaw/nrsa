@@ -24,4 +24,3 @@ metric name.
 my_metric <- c('uid1' = 0.1, 'uid2' = 0.2, 'uid3' = 0.3)
 convertNamedVectorToMetricDF(my_metric)
 }
-

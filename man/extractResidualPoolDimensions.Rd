@@ -21,4 +21,3 @@ every possible pool while treating each successive depth as a potential base
 point. This function extracts those dimensions that actually represent pools
 from the array. It returns a 3 * n matrix of residual length, depth and area.
 }
-

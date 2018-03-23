@@ -15,4 +15,3 @@ n
 \description{
 Returns the number of non-misingused to determine sample size.
 }
-

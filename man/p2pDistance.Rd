@@ -17,4 +17,3 @@ For a line which is represented by a two dimensional matrix with x and y
 coordinate columns, this function returns a vector of distances from each
 point to the next point.  The vector is of length \code{nrow(x) - 1}.
 }
-

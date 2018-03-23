@@ -19,4 +19,3 @@ These should be the original nrsa codes: ALGAE, BOULDR, LVTREE, etc}
 names, converts cover codes to proportions and returns a data frame that can be
 used as input to the other fish cover metric functions.
 }
-

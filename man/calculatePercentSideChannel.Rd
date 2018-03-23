@@ -21,4 +21,3 @@ a 'metric' data.frame
 Calculates the proportion of the reach that has side channels.  The input data
 is 'SIDCHN' for wadeable and OFF_CHAN for boatable sites.
 }
-

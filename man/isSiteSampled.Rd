@@ -19,4 +19,3 @@ a 'metric' data.frame
 Function returns the 'sampled' metric based on the data from the stream
 verification form (field VALXSITE from the VERIFICATION table).
 }
-

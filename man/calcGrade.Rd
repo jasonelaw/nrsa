@@ -29,4 +29,3 @@ and then used in subsequent calculations.
 “Grade (slope).” Wikipedia, the Free Encyclopedia, September 2, 2013. 
 \url{http://en.wikipedia.org/w/index.php?title=Grade_(slope)&oldid=571239608}.
 }
-

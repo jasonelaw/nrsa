@@ -28,12 +28,12 @@ kHIParameters                <- c(kHIAgriculturalParameters,
 #'                                "row", "past", "log", "mine"))
 #'hi$result <- sample(c('0', 'C', 'B', 'P'), size = 11 * 10 * 1000, replace = T)
 #'calculateHumanInfluence(hi$uid, hi$parameter, hi$result)
-calculateHumanInfluence <- function(uid, parameter, result){
+calculateHumanInfluence <- function(uid, parameter, result, na.rm = F){
   parameter <- tolower(parameter)
-  assert_is_a_non_missing_nor_empty_string(result)
+  checkmate::assertCharacter(result)
+  checkmate::assertSubset(parameter, kHIParameters)
+  checkmate::assertSubset(result,    kHICategories)
   assert_all_are_same_length(uid, parameter, result)
-  assert_is_subset(parameter, kHIParameters)
-  assert_is_subset(result, kHICategories)
   stopifnot(!is.na(result),
             length(uid) == length(parameter),
             length(uid) == length(result),
@@ -41,7 +41,7 @@ calculateHumanInfluence <- function(uid, parameter, result){
             result %in% kHICategories)
   parameter <- factor(parameter, kHIParameters)
   result    <- factor(as.character(result), kHICategories)
-  hprop <- calculateHIProportions(uid, parameter, result)
+  hprop <- calculateHIProportions(uid, parameter, result) 
   w1h   <- calculateHIWeightedSums(hprop)
   hi    <- calculateHIParameterSums(hprop)
   

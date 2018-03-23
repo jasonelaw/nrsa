@@ -24,4 +24,3 @@ str(iris)
 str(iris <- allFacToChar(iris))
 str(allCharToFac(iris))
 }
-

@@ -22,4 +22,3 @@ Formats the channel constraint form data as metrics.  There is only one form
 per site so no calculations are required; just some formatting.  
 For boatable sites only.
 }
-

@@ -32,4 +32,3 @@ residual depth > 0 is in a pool represents a thalweg point that is in a pool.
 \examples{
 allResidualDepth(0:9, runif(10), .01)
 }
-

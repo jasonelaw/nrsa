@@ -22,4 +22,3 @@ implementation is somewhat more obtuse.  \code{calculateLittoralDepth2} uses
 calculateLittoralDepth(uid = rep(1:10, each = 10), depth = rnorm(100))
 calculateLittoralDepth(uid = rep(1, 5), depth = rep(NA, 5))
 }
-

@@ -18,4 +18,3 @@ a 'metric' data.frame
 Calculate boat protocol bank angle metrics: bangmode, bap_low, bap_med, bap_mis
 ,bap_stp, bap_vst, n_ba.
 }
-

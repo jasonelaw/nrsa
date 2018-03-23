@@ -26,4 +26,3 @@ and extract the first and last elements in each run from the lengths of each run
 first(c(1,1,2,2))
 last(c(1,1,2,2))
 }
-

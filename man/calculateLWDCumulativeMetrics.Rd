@@ -37,4 +37,3 @@ The \code{lwdlength} and \code{lwdarea} argument should be as
 calculated by \link{calculateLWDSiteLength} and \link{calculateLWDSiteArea}
 functions, respectively.
 }
-

@@ -29,4 +29,3 @@ The \code{bankwid} argument is the sum of the extra transect pairs, the \code{in
 d <- data.frame(uid = rep(1:10, 11), bankwid = runif(110), incishgt = runif(110), bankhgt = runif(110))
 calculateChannelMetrics(d$uid, d$wetwid, d$bankwid, d$incishgt, d$bankhgt)
 }
-

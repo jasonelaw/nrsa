@@ -19,4 +19,3 @@ Calculates the reach length for a boatable site based on the actual transect
 spacing recorded on the transect form.  There should be one input value for each
 transect at the site.
 }
-

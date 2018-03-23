@@ -18,4 +18,3 @@ code for how the group vector and metric vector are created and what the values 
 This is definitely not to be called outside the nrsa package because it depends
 expicitly on the code in calculateHumanInfluence.
 }
-

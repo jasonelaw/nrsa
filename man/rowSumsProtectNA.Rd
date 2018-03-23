@@ -22,4 +22,3 @@ m
 rowSums(m, na.rm = T)
 rowSumsProtectNA(m)
 }
-

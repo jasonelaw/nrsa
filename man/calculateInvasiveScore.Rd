@@ -27,4 +27,3 @@ so that only the species on the original EPA NRSA list (f_myrspi, f_hydver,
 f_eiccra, f_nympel, f_lytsal, f_arudon, f_butumb, f_tamspp, f_rosmul, 
 f_eupesu) are included in the calculation.
 }
-

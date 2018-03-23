@@ -35,4 +35,3 @@ of fish assemblage integrity"
 \details{
 The \code{fishTraits} (unexported, use nrsa:::fishTraits to view code) function returns a \code{data.frame} with trait data for the IBI.
 }
-

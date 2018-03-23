@@ -19,4 +19,3 @@ Jason rewrote on 2011-11-02 and changed the test to reflect that the mode
 will always be the smallest value if there are ties.  One test value returned
 7 for a case with a 7 and 2 with three values each.
 }
-

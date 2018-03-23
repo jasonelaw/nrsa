@@ -41,4 +41,3 @@ calculateDistanceAlongThalweg(0:9, rep(5,10))
 calculateDistanceAlongThalweg(c(0:8,11), rep(5,10))
 calculateDistanceAlongThalweg(rep(0:4, times = 2), rep(5,10), rep(1:2, each = 5))
 }
-

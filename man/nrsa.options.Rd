@@ -14,4 +14,3 @@ Sets nrsa package options. The only current option is the \code{ProgressReports}
 Setting this option to \code{TRUE} will result in the functions of the package issuing 
 progress reports when they are complete.
 }
-

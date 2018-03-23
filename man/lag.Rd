@@ -20,4 +20,3 @@ Returns the lag of a vector.
 \examples{
 lag(1:5)
 }
-

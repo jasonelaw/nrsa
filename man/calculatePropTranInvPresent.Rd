@@ -22,4 +22,3 @@ Calculates the proportion of transects at which the species was observed.  The
 species id is used in the metric name, except species on the original NRSA EPA list
 are mapped to the NRSA metric names.
 }
-

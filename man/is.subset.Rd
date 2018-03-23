@@ -18,4 +18,3 @@ logical, \code{TRUE} if a is a subset of b
 Returns TRUE if elements in vector a are a subset of the elements in vector 
 b, or FALSE otherwise.
 }
-

@@ -29,4 +29,3 @@ returns the number of transects per site submitted to the function. If
 \code{strict.epa = TRUE}, the function returns the number of \bold{completely
 observed} transects per site for numtran.
 }
-

@@ -18,4 +18,3 @@ a 'metric' data.frame (i.e., one with uid, metric, result fields)
 Calculates the metrics xshor2vg, mxshor, mnshor which summarize the shore to
 riparian vegetation distance over the reach.  For boatable sites only.
 }
-

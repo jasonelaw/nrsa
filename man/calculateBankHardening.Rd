@@ -22,4 +22,3 @@ C (present < 10 m), B (present on bank)}
 Calculates a bank hardening metric for City of Portland use.  The percentage of bank
 where either bldg, pave, wall, or road are marked 'B' is calculated.
 }
-

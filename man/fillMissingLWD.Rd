@@ -22,4 +22,3 @@ fillMissingLWD(NA, 1)
 fillMissingLWD(NA, 0)
 fillMissingLWD(3, 1)
 }
-

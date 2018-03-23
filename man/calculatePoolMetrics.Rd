@@ -26,4 +26,3 @@ a metric data.frame
 Calculates residual pool metrics from data set where the residual pool length,
 depth, and area have been calculated separately for each depth in a thalweg profile.
 }
-

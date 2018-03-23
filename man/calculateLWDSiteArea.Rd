@@ -17,4 +17,3 @@ calculateLWDSiteArea(lwdlength, xbkf_w, is.wadeable)
 \code{calculateLWDSiteLength} is used to calculate the area of the sampled
 lwd plots so that counts/area can be calculated.
 }
-

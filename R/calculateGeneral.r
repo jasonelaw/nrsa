@@ -11,7 +11,7 @@
 #' @examples
 #' d <- expand.grid(uid = 1:10, transect = c(LETTERS, 'XA'))
 #' calculateSideChannelCount(d$uid, d$transect)
-calculateSideChannelCount <- function(uid, transect){
+ calculateSideChannelCount <- function(uid, transect){
   kXtraTransects  <- paste0('X', LETTERS[1:11])
   is.side.channel <- transect %in% kXtraTransects
   sidecnt <- tapply(is.side.channel, uid, sum)

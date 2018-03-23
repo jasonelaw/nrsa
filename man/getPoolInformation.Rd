@@ -23,4 +23,3 @@ vector. Then it identifies the first point in each run.  Then sets the non
 pools to FALSE. Then identifies which points are still TRUE and substracts 1
 to get the previous point.
 }
-

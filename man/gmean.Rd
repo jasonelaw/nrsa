@@ -15,4 +15,3 @@ the geometric mean of the vector
 \description{
 Calculates a geometric mean for a numeric vector.
 }
-

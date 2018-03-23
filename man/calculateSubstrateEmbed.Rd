@@ -21,4 +21,3 @@ Calculates Substrate Embeddedness metrics
 \code{calculateSubstrateEmbed} calculates substrate embeddedness metrics:
 N33, N55, VCEMBED, VEMBED, XCEMBED, XEMBED.
 }
-

@@ -20,4 +20,3 @@ returns a dataframe with three columns: uid, metric, result
 \description{
 This function calculates the human influence standard deviation metrics.
 }
-

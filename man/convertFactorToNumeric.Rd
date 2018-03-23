@@ -22,4 +22,3 @@ factor as as.numeric would do.  See ?factor.
 \examples{
 convertFactorToNumeric(factor(rnorm(10)))
 }
-

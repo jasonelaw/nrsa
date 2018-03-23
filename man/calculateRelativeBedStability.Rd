@@ -29,4 +29,3 @@ a matrix of relative bed stability metrics.
 Calculates several version of relative bed stability metrics using two versions
 of substrate diamter and several critical diameter versions.
 }
-

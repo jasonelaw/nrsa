@@ -17,4 +17,3 @@ calculateChannelHabitatProportions(uid, habitat, is.wadeable)
 \code{calculateChannelHabitatProportions} is used to calculate the channel
 habitat metrics
 }
-

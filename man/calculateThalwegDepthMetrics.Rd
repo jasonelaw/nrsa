@@ -30,4 +30,3 @@ However, the EPA code reports the metrics for wadeable sites in centimeters.
 This code includes an argument \code{units}, which allows the user to specify
 the desired output units.  The \code{mixed} option mimics the EPA behavior.
 }
-

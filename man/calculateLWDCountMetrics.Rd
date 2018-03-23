@@ -22,4 +22,3 @@ Defaults to EPA style.}
 This function calculates LWD counts within each site, size class, and whether
 it is within the bankfull area
 }
-

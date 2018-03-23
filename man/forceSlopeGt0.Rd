@@ -15,4 +15,3 @@ a vector of slopes with slopes < .01, replaced by 0.01
 \description{
 Make slopes slightly positive if they are less than 0.01.
 }
-

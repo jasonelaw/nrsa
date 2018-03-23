@@ -24,4 +24,3 @@ for the site, because the lwd plots are the entire area between the transects.
 For non-wadeable sites, the site length is the number of sampled transects * 20,
 because each littoral plot is 20 m long.
 }
-

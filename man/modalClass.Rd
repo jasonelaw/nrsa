@@ -37,4 +37,3 @@ Column names listed by values arg occur in x.
 The list of class names is in the same order as the list of 
 The number of elements in values is the number of elements in classes.
 }
-

@@ -26,4 +26,3 @@ sum of the bankfull widths at the extra transect and regular transect and the
 mean of the bankfull height at the extra transect and the regular transect.  
 These values are returned by the \link{joinExtraTransects} function.
 }
-

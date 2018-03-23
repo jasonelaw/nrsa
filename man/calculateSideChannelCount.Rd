@@ -24,4 +24,3 @@ each site.
 d <- expand.grid(uid = 1:10, transect = c(LETTERS, 'XA'))
 calculateSideChannelCount(d$uid, d$transect)
 }
-

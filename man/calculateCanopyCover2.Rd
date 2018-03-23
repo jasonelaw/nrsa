@@ -22,4 +22,3 @@ xcdenmid xcdenbk vcdenmid vcdenbk nbnk nmid.
 Boatable Protocal:
 xcdenbk  vcdenbk nbnk
 }
-

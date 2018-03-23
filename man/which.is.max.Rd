@@ -15,4 +15,3 @@ the index of the maximum
 \description{
 From package nnet
 }
-
