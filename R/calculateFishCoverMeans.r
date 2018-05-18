@@ -92,7 +92,7 @@ calculateFishCoverMeans2 <- function(uid, parameter, cover){
       unite(metric, metric.root, parameter) %>%
       rbind_list(index.mets) %>%
       arrange(uid, metric)
-#   progressReport("Fish cover means finished.")
+  progressReport("Fish cover means finished.")
   return(x)
 }
 

@@ -33,7 +33,6 @@ calculateHumanInfluence <- function(uid, parameter, result, na.rm = F){
   checkmate::assertCharacter(result)
   checkmate::assertSubset(parameter, kHIParameters)
   checkmate::assertSubset(result,    kHICategories)
-  assert_all_are_same_length(uid, parameter, result)
   stopifnot(!is.na(result),
             length(uid) == length(parameter),
             length(uid) == length(result),
@@ -47,9 +46,9 @@ calculateHumanInfluence <- function(uid, parameter, result, na.rm = F){
   
   # Put everything together and clean up names
   w1h$.id <- 'w1h'
-  ans  <- rbind.fill(w1h, hi)
-  ans2 <- ddply(ans[ans$metric %in% c('B', 'C', 'P'),], .(.id, uid), 
-                summarize, result = sum(result))
+  ans  <- plyr::rbind.fill(w1h, hi)
+  ans2 <- plyr::ddply(ans[ans$metric %in% c('B', 'C', 'P'),], plyr::.(.id, uid), 
+                plyr::summarize, result = sum(result))
   ans  <- rbind.fill(ans, ans2)
   ans  <- ans[!(ans$metric %in% '0'), ]
   ans$metric <- renameHumanInfluenceMetrics(ans$.id, ans$metric)
@@ -101,14 +100,13 @@ calculateHIProportions <- function(uid, parameter, result){
 #'C (present < 10 m), B (present on bank)
 #'
 #'@return returns a dataframe with three columns: uid, metric, result
-#'@import plyr
 #'@export
 calculateHumanInfluenceSD <- function(uid, transect, result){
   x <- data.frame(uid = uid, transect = transect, result = result)
   #x <- subset(x, result %in% c('C', 'B'))
   x$result <- factor(tolower(x$result[, drop = T]))
   x$transect <- as.character(x$transect)
-  ans <- ddply(x, .(uid), function(x){
+  ans <- plyr::ddply(x, plyr::.(uid), function(x){
     tbl <- table(x$result, x$transect)[c('c', 'b'), ]
     cb <- tbl['b', ] + tbl['c', ]
     wcb <- 1.5 * tbl['b', ] + tbl['c', ]
@@ -130,20 +128,19 @@ calculateHumanInfluenceSD <- function(uid, transect, result){
 #'
 #'@param group a vector of groups based on the names passed to meltMetrics
 #'@param metric a vector metric indicators
-#'@import plyr
 renameHumanInfluenceMetrics <- function(group, metric){
-  metric <- mapvalues(as.character(metric), NA, '')
-  metric <- revalue(metric, c('B' = 'b', 'C' = 'c', 'CB' = 'cb', 'P' = 'f'))
-  metric <- revalue(metric, c('build' = 'bldg', 'landfl' = 'ldfl', 'log'  = 'log', 
-                              'mine'  = 'mine', 'park'   = 'park', 'past' = 'pstr', 
-                              'pave'  = 'pvmt', 'pipes'  = 'pipe', 
-                              'road'  = 'road', 'row'    = 'crop', 'wall' = 'wall'))
+  metric <- plyr::mapvalues(as.character(metric), NA, '')
+  metric <- plyr::revalue(metric, c('B' = 'b', 'C' = 'c', 'CB' = 'cb', 'P' = 'f'))
+  metric <- plyr::revalue(metric, c('build' = 'bldg', 'landfl' = 'ldfl', 'log'  = 'log', 
+                                    'mine'  = 'mine', 'park'   = 'park', 'past' = 'pstr', 
+                                    'pave'  = 'pvmt', 'pipes'  = 'pipe', 
+                                    'road'  = 'road', 'row'    = 'crop', 'wall' = 'wall'))
   metrics <- ifelse(group == 'w1h',
                     sprintf('%s_%s', group, metric),
                     sprintf('x%s_%s', metric, group))
   #Special cases
-  revalue(metrics, c('w1h_noag' = 'w1_hnoag', 'w1h_ag' = 'w1_hag', 
-                     'w1h_all'  = 'w1_hall', 'xcb_hnoag' = 'xcb_hnag'))
+  plyr::revalue(metrics, c('w1h_noag' = 'w1_hnoag', 'w1h_ag' = 'w1_hag', 
+                           'w1h_all'  = 'w1_hall', 'xcb_hnoag' = 'xcb_hnag'))
 }
 
 #'Calculates a bank hardening metric for City of Portland use.
@@ -156,12 +153,11 @@ renameHumanInfluenceMetrics <- function(group, metric){
 #'@param parameter a vector of parameter names for the 11 human influence parameters
 #'@param result a vector of results 0 (not present), P (present > 10 m), 
 #'C (present < 10 m), B (present on bank)
-#'@import plyr
 #'@export
 calculateBankHardening <- function(uid, transect, plot, parameter, result){
   x <- data.frame(uid = uid, transect = transect, plot = plot, parameter = parameter, result = result)
   x <- x[x$parameter %in% c('build', 'pave', 'wall', 'road'), ]
-  plot.data <- ddply(x, .(uid, transect, plot), function(x){
+  plot.data <- plyr::ddply(x, plyr::.(uid, transect, plot), function(x){
     if(all(is.na(x$result))){
       return(c(is.hardened = NA))
     } else {
@@ -169,7 +165,7 @@ calculateBankHardening <- function(uid, transect, plot, parameter, result){
     } 
   })
   plot.data$is.hardened <- factor(plot.data$is.hardened, levels = c('TRUE', 'FALSE'))
-  ans <- ddply(plot.data, .(uid), function(x) c(result = unname(prop.table(table(x$is.hardened))['TRUE'])))
+  ans <- plyr::ddply(plot.data, plyr::.(uid), function(x) c(result = unname(prop.table(table(x$is.hardened))['TRUE'])))
   ans$metric <- 'bankhard'
   progressReport("Finished with bank hardening metric: bankhard.")
   return(ans[,c('uid', 'metric', 'result')])
