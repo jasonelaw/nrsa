@@ -5,7 +5,6 @@
 #' on the side channel using an aggregation function.  All measurements done at
 #' the transect (rather than at a station) are assumed to be at station 0 for purposes
 #' this function.  This allows us to do the join in one pass rather than separately.
-#' @import plyr
 #' @export
 #' @examples
 #' d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), station = c(0,0), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
@@ -22,7 +21,7 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
         bankhgt.mx  = max(x$bankhgt, na.rm = T),
         bankhgt.mn  = mean(x$bankhgt, na.rm = T)))
   }
-  ans <- ddply(x, .(uid, transect, station), f)
+  ans <- plyr::ddply(x, c('uid', 'transect', 'station'), f)
   ans$incishgt.mx <- ifelse(is.na(ans$incishgt.mx) | ans$incishgt.mx == 0, 
                             ans$bankhgt.mx, 
                             ans$incishgt.mx)
@@ -63,10 +62,10 @@ calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
       sd    = sd(x$result, na.rm = T),
       count = count(x$result))
   }
-  ans <- ddply(xm, .(uid, parameter), f)
+  ans <- plyr::ddply(xm, c('uid', 'parameter'), f)
   ans <- melt(ans, id.var = c('uid', 'parameter'), variable.name = 'metric', value.name = 'result')
   ans$metric <- paste(ans$metric, ans$parameter, sep = '.')
-  ans$metric <- revalue(ans$metric, kNamesMap)
+  ans$metric <- plyr::revalue(ans$metric, kNamesMap)
   ans$parameter <- NULL
   progressReport("Finished with channel metrics: xbkf_w, sdbkf_w, n_bw, xinc_h, sdinc_h, n_incis, xbkf_h, sdbkf_h, n_bh.")
   return(ans)
@@ -81,7 +80,6 @@ calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
 #' @param uid a vector of site identifiers
 #' @param wetwid a vector of wetted widths; uses the max of the extra transect pairs
 #' @return a 'metric' data.frame
-#' @import plyr
 #'@export
 calculateWettedWidthMetrics <- function(uid, wetwid){
   x <- data.frame(uid, wetwid)
@@ -90,7 +88,7 @@ calculateWettedWidthMetrics <- function(uid, wetwid){
       sdwidth = sd(x$wetwid, na.rm = T),
       n_w     = count(x$wetwid))
   }
-  ans <- ddply(x, .(uid), f)
+  ans <- plyr::ddply(x, c('uid'), f)
   ans <- meltMetrics(ans)
   return(ans)
 }
@@ -107,7 +105,6 @@ calculateWettedWidthMetrics <- function(uid, wetwid){
 #' @param depth a vector of thalweg depths
 #' @return a 'metric' data.frame
 #' @export
-#' @import plyr
 calculateThalwegRatios <- function(uid, wetwid, depth){
   wdprod <- wetwid * depth
   wdratio <- wetwid / depth
@@ -120,7 +117,7 @@ calculateThalwegRatios <- function(uid, wetwid, depth){
       'sdwd_rat' = sd(x$wdratio, na.rm = T),
       'n_wdr'    = count(x$wdratio))
   }
-  ans <- ddply(x, .(uid), f)
+  ans <- plyr::ddply(x, c('uid'), f)
   ans <- meltMetrics(ans)
   progressReport("Finished with thalweg depth ratios: xwxd, sdwxd, n_wd, xwd_rat, sdwd_rat, n_wdr")
   return(ans)

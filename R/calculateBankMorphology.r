@@ -10,7 +10,6 @@
 #' @return a 'metric' data.frame
 #' @export
 #' @aliases calculateWadeAngleMetrics calculateWadeUndercutMetrics
-#' @import plyr
 calculateWadeBankMetrics <- function(uid, angle, undercut){
   if (!is.numeric(angle)){
     angle <- as.numeric(as.character(angle))
@@ -19,7 +18,7 @@ calculateWadeBankMetrics <- function(uid, angle, undercut){
     angle <- as.numeric(as.character(undercut))
   }
   x <- data.frame(uid, angle, undercut)
-  ans <- ddply(x, 'uid', function(x){
+  ans <- plyr::ddply(x, 'uid', function(x){
     c(calculateWadeAngleMetrics(x$angle),
       calculateWadeUndercutMetrics(x$undercut))
   })
@@ -60,7 +59,7 @@ calculateWadeAngleMetrics <- function(angle){
 #' @export
 calculateBoatNumberWettedWidth <- function(uid, wetwid){
   x   <- data.frame(as.character(uid), wetwid)
-  ans <- ddply(x, "uid", summarize, result = count(wetwid))
+  ans <- plyr::ddply(x, "uid", plyr::summarize, result = count(wetwid))
   ans$metric <- "n_w"
   progressReport("Finished with boatable metric n_w.")
   ans

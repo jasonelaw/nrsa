@@ -5,7 +5,6 @@
 #'@param uid a vector of site identifiers
 #'@param shor2rip a vector of distances from the shore to riparian vegeatation
 #'@return a 'metric' data.frame (i.e., one with uid, metric, result fields)
-#'@import plyr
 #'@export
 calculateShoreToVegDistance <- function(uid, shor2rip){
   uid <- as.factor(uid)
@@ -17,7 +16,7 @@ calculateShoreToVegDistance <- function(uid, shor2rip){
       mxshor   = max(x$shor2rip, na.rm = T),
       mnshor   = min(x$shor2rip, na.rm = T))
   }
-  mets <- ddply(data.frame(uid, shor2rip), .(uid), f)
+  mets <- plyr::ddply(data.frame(uid, shor2rip), c('uid'), f)
   mets <- meltMetrics(mets)
   progressReport("Finished with shore to vegetation metrics.")
   return(mets)
@@ -31,7 +30,6 @@ calculateShoreToVegDistance <- function(uid, shor2rip){
 #' @param see.over.bank a logical vector or vector containing the character string
 #' 'YES'.
 #' @return a 'metric' data.frame (i.e., one with uid, metric, result fields)
-#' @import plyr
 #' @export
 #' @examples
 #' uid <- rep(1:10, each = 11)
@@ -42,7 +40,7 @@ calculateProportionSeeOverBank <- function(uid, see.over.bank){
   if (!is.logical(see.over.bank)){
     see.over.bank <- see.over.bank == 'YES'
   }
-  mets <- ddply(data.frame(uid, see.over.bank), .(uid), 
+  mets <- plyr::ddply(data.frame(uid, see.over.bank), c('uid'), 
                 function(x) c(pct_ovrb = mean(x$see.over.bank, na.rm = T) * 100))
   mets <- meltMetrics(mets)
   progressReport("Finished with pct_ovrb.")

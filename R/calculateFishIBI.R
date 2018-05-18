@@ -44,7 +44,7 @@ calculateFishIBI <- function(site, order, species, length, anomaly, join.traits.
   x <- merge(x, traits, by = join.traits.by)
   
   # Metric calc
-  ret <- ddply(x, .(site, order), summarize,
+  ret <- plyr::ddply(x, c('site', 'order'), summarize,
                #n.target                 = sum(!is.na(lunker)),
                n.native.species         = nunique(species[native]),
                n.native.families        = nunique(family[native]),
@@ -57,7 +57,7 @@ calculateFishIBI <- function(site, order, species, length, anomaly, join.traits.
                percent.filter.feeding   = mean(filter.feed),
                percent.top.carnivore    = mean(top.carniv),
                percent.omnivorous       = mean(omnivore),
-               percent.lunker           = nunique(species[length > lunker]) / 7L#mean(length > lunker, na.rm = T),#sum(length > lunker, na.rm = T) / n.target,
+               percent.lunker           = nunique(species[length > lunker]) / 7L,#mean(length > lunker, na.rm = T),#sum(length > lunker, na.rm = T) / n.target,
                percent.anomaly          = mean(anomaly))
   # Fix divide by 0
   ret$percent.lunker[ret$n.target == 0] <- 0

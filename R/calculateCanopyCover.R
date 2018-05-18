@@ -10,7 +10,6 @@
 #'@param uid a vector of site-visits
 #'@param is.bank whether the measurement is a bank measurement or not
 #'@param densiometer a vector of densiometer measurments from 0-17.
-#'@import plyr
 #'@export
 calculateCanopyCover2 <- function(uid, is.bank, densiometer){
   kBaseMetrics <- c('vcden', 'xcden', 'n')
@@ -19,22 +18,22 @@ calculateCanopyCover2 <- function(uid, is.bank, densiometer){
                xcden = ~mean(result, na.rm = T),
                n     = ~count.notna(result))
   mets <-
-    dplyr::data_frame(uid     = as.character(uid), 
+    data_frame(uid     = as.character(uid), 
                       is.bank = mapvalues(is.bank, c(F, T), c('mid', 'bnk')), 
                       result  = densiometer/ 17 * 100) %>%
-    dplyr::group_by_(~uid, ~is.bank) %>%
-    dplyr::summarise_(.dots = dots) %>%
-    tidyr::gather_('metric1', 'result', kBaseMetrics) %>%
-    tidyr::unite_('metric', c('metric1', 'is.bank'), sep = '', remove = F) %>%
-    dplyr::select_('uid', 'metric', 'result') %>%
-    dplyr::arrange_('uid', 'metric') %>%
-    nrsa:::allFacToChar()
+    group_by_(~uid, ~is.bank) %>%
+    summarise_(.dots = dots) %>%
+    gather_('metric1', 'result', kBaseMetrics) %>%
+    unite_('metric', c('metric1', 'is.bank'), sep = '', remove = F) %>%
+    select_('uid', 'metric', 'result') %>%
+    arrange_('uid', 'metric') %>%
+    allFacToChar()
   progressReport('Canopy cover metrics done')
   return(mets)
 }
 
 calculateCanopyCover <- function(uid, is.bank, densiometer){
-  is.bank <- mapvalues(is.bank, c(F, T), c('mid', 'bnk'))
+  is.bank <- plyr::mapvalues(is.bank, c(F, T), c('mid', 'bnk'))
   x <- data.frame(uid = uid, is.bank = is.bank, result = densiometer)
   x$result <- x$result / 17 * 100
   calc <- function(x){
@@ -42,7 +41,7 @@ calculateCanopyCover <- function(uid, is.bank, densiometer){
       xcden = mean(x$result, na.rm=T), 
       n     = count.notna(x$result))
   }
-  mets <- ddply(x, .(uid, is.bank), calc)
+  mets <- plyr::ddply(x, c('uid', 'is.bank'), calc)
   mets <- reshape2::melt(mets, id.var = c('uid', 'is.bank'), 
                          variable.name = 'metric', 
                          value.name = 'result')

@@ -14,7 +14,6 @@
 #' Values restricted to be one of alg, rck, brs, lvt, aqm, ohv, hum, ucb, lwd.
 #' @param cover a vector of cover values as returned by \link{formatFishCover}.  These
 #' are not the raw cover values (0-4) from the field form.
-#' @import plyr
 #' @export
 #' @examples
 #' df <- expand.grid(uid = 1:10, transect = LETTERS[1:10], 
@@ -61,16 +60,15 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
 #   return(mets)
 }
 
-calculateFishCoverMeans2 <- function(uid, parameter, cover){
+calculateFishCoverMeans <- function(uid, parameter, cover){
   isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
   isBig     <- c('rck', 'hum', 'ucb', 'lwd')
   
-  x <- 
-    data.frame(uid = uid, parameter = parameter, cover = cover) %>%
-      mutate(presence = cover > 0) %>%
-      group_by(uid, parameter) %>%
-      summarize(xfc = mean(cover, na.rm = T),
-                pfc = mean(presence, na.rm = T)) 
+  x <- data.frame(uid = uid, parameter = parameter, cover = cover) %>%
+    mutate(presence = cover > 0) %>%
+    group_by(uid, parameter) %>%
+    summarize(xfc = mean(cover, na.rm = T),
+              pfc = mean(presence, na.rm = T)) 
   
   index.mets <-
     x %>%
@@ -98,7 +96,6 @@ calculateFishCoverMeans2 <- function(uid, parameter, cover){
 
 #'@rdname calculateFishCoverMeans
 #'@param parameter For calculateBankCoverVar, should a vector of 'ohv' or 'ucb' codes.
-#'@import plyr
 #'@export
 calculateBankCoverVar <- function(uid, parameter, cover){
   stopifnot(parameter %in% c('ohv', 'ucb'))
@@ -108,7 +105,7 @@ calculateBankCoverVar <- function(uid, parameter, cover){
       idr  = idr(x$cover), 
       iqr  = iqr(x$cover))
   }
-  mets <- ddply(x, .(uid, parameter), spread.calc)
+  mets <- plyr::ddply(x, c('uid', 'parameter'), spread.calc)
   mets <- reshape2::melt(mets, id.var = c('uid', 'parameter'), 
                value.name = 'result', 
                variable.name = 'metric')
