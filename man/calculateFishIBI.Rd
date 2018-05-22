@@ -2,14 +2,11 @@
 % Please edit documentation in R/calculateFishIBI.R
 \name{calculateFishIBI}
 \alias{calculateFishIBI}
-\alias{fishTraits}
 \title{Calculates Fish IBI}
 \usage{
 calculateFishIBI(site, order, species, length, anomaly,
   join.traits.by = "common_name", return.subindices = F,
   return.raw.metrics = F, ODFW.version = F)
-
-fishTraits()
 }
 \arguments{
 \item{site}{vector of site-visit identifiers}

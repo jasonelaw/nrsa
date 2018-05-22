@@ -25,42 +25,37 @@
 #' fcsd <- with(subset(fc, parameter %in% c('ohv', 'ucb')),
 #'              calculateBankCoverVar(uid, parameter, cover))
 calculateFishCoverMeans <- function(uid, parameter, cover){
-#   isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
-#   isBig     <- c('rck', 'hum', 'ucb', 'lwd')
-# 
-#   x <- data.frame(uid = uid, parameter = parameter, cover = cover)
-#   x$presence <- x$cover > 0
-#   x$is.big <- x$parameter %in% isBig
-#   x$is.natural <- x$parameter %in% isNatural
-# 
-#   xfc <- fastSummaries(x$cover,
-#                        x[,c('uid', 'parameter', 'is.big', 'is.natural')],
-#                        igroupMeans, na.rm = T)
-#   xfc$metric <- 'xfc'
-#   pfc <- fastSummaries(x$presence, 
-#                        x[,c('uid', 'parameter', 'is.big', 'is.natural')], 
-#                        igroupMeans, na.rm = T)
-#   pfc$metric <- 'pfc'
-#   x <- rbind(xfc, pfc)
-#   xc <- reshape2::dcast(x, ... ~ metric, value.var = 'result')
-#   sum.calc <- function(x){
-#     c(pfc_all = sum(x$pfc, na.rm = T),
-#       pfc_big = sum(x$pfc[x$is.big], na.rm = T),
-#       pfc_nat = sum(x$pfc[x$is.natural], na.rm = T),
-#       xfc_all = sum(x$xfc, na.rm = T),
-#       xfc_big = sum(x$xfc[x$is.big], na.rm = T),
-#       xfc_nat = sum(x$xfc[x$is.natural], na.rm = T))
-#   }
-#   index.mets <- ddply(xc, .(uid), sum.calc)
-#   index.mets <- meltMetrics(index.mets)
-#   x$metric   <- paste(x$metric, x$parameter, sep = '_')
-#   mets <- rbind(subset(x, select = c('uid', 'metric', 'result')),
-#                 index.mets)
-#   progressReport("Fish cover means finished.")
-#   return(mets)
+  isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
+  isBig     <- c('rck', 'hum', 'ucb', 'lwd')
+
+  x <- data.frame(uid = uid, parameter = parameter, cover = cover)
+  x$presence <- x$cover > 0
+  x$is.big <- x$parameter %in% isBig
+  x$is.natural <- x$parameter %in% isNatural
+  
+  x <- ddply(x, .(uid, parameter), function(x){
+    data.frame(xfc = mean(x$cover, na.rm = T),
+               pfc = mean(x$presence, na.rm = T))
+  })
+
+  sum.calc <- function(x){
+    c(pfc_all = sum(x$pfc, na.rm = T),
+      pfc_big = sum(x$pfc[x$is.big], na.rm = T),
+      pfc_nat = sum(x$pfc[x$is.natural], na.rm = T),
+      xfc_all = sum(x$xfc, na.rm = T),
+      xfc_big = sum(x$xfc[x$is.big], na.rm = T),
+      xfc_nat = sum(x$xfc[x$is.natural], na.rm = T))
+  }
+  index.mets <- ddply(x, .(uid), sum.calc)
+  index.mets <- meltMetrics(index.mets)
+  x$metric   <- paste(x$metric, x$parameter, sep = '_')
+  mets <- rbind(x[, c('uid', 'metric', 'result')],
+                index.mets)
+  progressReport("Fish cover means finished.")
+  return(mets)
 }
 
-calculateFishCoverMeans <- function(uid, parameter, cover){
+calculateFishCoverMeans2 <- function(uid, parameter, cover){
   isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
   isBig     <- c('rck', 'hum', 'ucb', 'lwd')
   
@@ -90,7 +85,7 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
       unite(metric, metric.root, parameter) %>%
       rbind_list(index.mets) %>%
       arrange(uid, metric)
-  progressReport("Fish cover means finished.")
+  #progressReport("Fish cover means finished.")
   return(x)
 }
 
