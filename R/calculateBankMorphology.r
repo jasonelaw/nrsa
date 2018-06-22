@@ -22,6 +22,7 @@ calculateWadeBankMetrics <- function(uid, angle, undercut){
     c(calculateWadeAngleMetrics(x$angle),
       calculateWadeUndercutMetrics(x$undercut))
   })
+  ans <- meltMetrics(ans)
   ans <- arrange(allFacToChar(ans), uid, metric)
   progressReport("Finished with wadeable bank metrics.")
   return(ans)
@@ -31,7 +32,7 @@ calculateWadeBankMetrics <- function(uid, angle, undercut){
 #' @export
 calculateWadeUndercutMetrics <- function(undercut){
   n_un <- count.notna(undercut)
-  mets <- summary.nrsa(uncercut, probs = c(0.25, 0.5, .75), na.rm = T)
+  mets <- summary.nrsa(undercut, probs = c(0.25, 0.5, .75), na.rm = T)
   mets <- c(n_un, mets)
   names(mets) <- c('n_un', 'bkun_q1', 'medbkun', 'bkun_q3',  'xun', 
                    'sdun', 'intqbkun')

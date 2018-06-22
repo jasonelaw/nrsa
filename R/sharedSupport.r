@@ -30,7 +30,7 @@ gmean <- function(x){
 #' @return the interdecile range
 idr <- function(x, method=2){
   ans <- quantile(x, probs = c(0.1, 0.9), na.rm = T, 
-                  names = F, type = methodz)
+                  names = F, type = method)
   diff(ans)
 }
 

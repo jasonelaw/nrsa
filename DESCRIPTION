@@ -7,7 +7,7 @@ Author: Curt Seeliger, Marlys Cappaert, Jason Law
 Maintainer: Jason Law <jason.law@portlandoregon.gov>
 Description: Calculate metrics for NRSA protocol data.
 Depends:
-    R (>= 2.13.0),dplyr
+    R (>= 2.13.0)
 Imports:
     reshape2,
     plyr,

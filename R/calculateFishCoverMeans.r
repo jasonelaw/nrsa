@@ -10,25 +10,30 @@
 #' sdfc_ucb, sdfc_ohv idrucb, idrohv, iqrucb, iqrohv.
 #'
 #' @param uid a vector of site-visit indicators
-#' @param parameter a vector parameter codes as returned by \link{formatFishCover}.
-#' Values restricted to be one of alg, rck, brs, lvt, aqm, ohv, hum, ucb, lwd.
-#' @param cover a vector of cover values as returned by \link{formatFishCover}.  These
-#' are not the raw cover values (0-4) from the field form.
+#' @param parameter a vector parameter codes: ALGAE, BOULDR, BRUSH, LVTREE, 
+#' MACPHY, OVRHNG, STRUCT, UNDCUT, WOODY.
+#' @param cover a vector of cover values: 0-4.
 #' @export
 #' @examples
 #' df <- expand.grid(uid = 1:10, transect = LETTERS[1:10], 
 #'                   parameter = c("ALGAE", "BOULDR", "BRUSH", "LVTREE", 
 #'                                 "MACPHY", "OVRHNG", "STRUCT", "UNDCUT", "WOODY"))
 #' df$cover <- sample(0:4, size = nrow(df), replace = T)
-#' fc <- formatFishCover(df$uid, df$parameter, df$cover)
-#' fcm <- calculateFishCoverMeans(fc$uid, fc$parameter, fc$cover)
-#' fcsd <- with(subset(fc, parameter %in% c('ohv', 'ucb')),
-#'              calculateBankCoverVar(uid, parameter, cover))
+#' calculateFishCover(df$uid, df$parameter, df$cover)
+calculateFishCover <- function(uid, parameter, cover){
+  fc <- formatFishCover(uid, parameter, cover)
+  fcm <- calculateFishCoverMeans(fc$uid, fc$parameter, fc$cover)
+  
+  fc   <- fc[fc$parameter %in% c('ohv', 'ucb'),]
+  fcsd <- calculateBankCoverVar(fc$uid, fc$parameter, fc$cover)
+  rbind(fcm, fcsd)
+}
+
 calculateFishCoverMeans <- function(uid, parameter, cover){
   isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
   isBig     <- c('rck', 'hum', 'ucb', 'lwd')
-
-  x <- data.frame(uid = uid, parameter = parameter, cover = cover)
+  
+  x <- data.frame(uid, parameter, cover)
   x$presence <- x$cover > 0
   x$is.big <- x$parameter %in% isBig
   x$is.natural <- x$parameter %in% isNatural
@@ -48,6 +53,7 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
   }
   index.mets <- ddply(x, .(uid), sum.calc)
   index.mets <- meltMetrics(index.mets)
+  x <- reshape2::melt(x, measure.vars = c('xfc', 'pfc'), variable.name = 'metric', value.name = 'result')
   x$metric   <- paste(x$metric, x$parameter, sep = '_')
   mets <- rbind(x[, c('uid', 'metric', 'result')],
                 index.mets)
@@ -55,43 +61,6 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
   return(mets)
 }
 
-calculateFishCoverMeans2 <- function(uid, parameter, cover){
-  isNatural <- c('rck', 'brs', 'lvt', 'ohv', 'ucb', 'lwd')
-  isBig     <- c('rck', 'hum', 'ucb', 'lwd')
-  
-  x <- data.frame(uid = uid, parameter = parameter, cover = cover) %>%
-    mutate(presence = cover > 0) %>%
-    group_by(uid, parameter) %>%
-    summarize(xfc = mean(cover, na.rm = T),
-              pfc = mean(presence, na.rm = T)) 
-  
-  index.mets <-
-    x %>%
-      mutate(is.big     = parameter %in% isBig,
-             is.natural = parameter %in% isNatural) %>%
-      group_by(uid) %>%
-      summarize(pfc_all = sum(pfc, na.rm = T),
-                pfc_big = sum(pfc[is.big], na.rm = T),
-                pfc_nat = sum(pfc[is.natural], na.rm = T),
-                xfc_all = sum(xfc, na.rm = T),
-                xfc_big = sum(xfc[is.big], na.rm = T),
-                xfc_nat = sum(xfc[is.natural], na.rm = T)) %>%
-      gather(metric, result, -uid) %>%
-      select(uid, metric, result)
-  
-  x <- 
-    x %>%
-      gather(metric.root, result, xfc, pfc) %>%
-      unite(metric, metric.root, parameter) %>%
-      rbind_list(index.mets) %>%
-      arrange(uid, metric)
-  #progressReport("Fish cover means finished.")
-  return(x)
-}
-
-#'@rdname calculateFishCoverMeans
-#'@param parameter For calculateBankCoverVar, should a vector of 'ohv' or 'ucb' codes.
-#'@export
 calculateBankCoverVar <- function(uid, parameter, cover){
   stopifnot(parameter %in% c('ohv', 'ucb'))
   x <- data.frame(uid = uid, parameter = parameter, cover = cover)
@@ -108,22 +77,8 @@ calculateBankCoverVar <- function(uid, parameter, cover){
                         paste(mets$metric, mets$parameter, sep = "_"), 
                         paste(mets$metric, mets$parameter, sep = ""))
   mets <- subset(mets, select = c('uid', 'metric', 'result'))
-  #progressReport('Bank cover variation metrics finished.')
+  progressReport('Bank cover variation metrics finished.')
   return(mets)
-}
-
-calculateBankCoverVar2 <- function(uid, parameter, cover){
-  stopifnot(parameter %in% c('ohv', 'ucb'))
-  data.frame(uid = uid, parameter = parameter, cover = cover) %>%
-    group_by(uid, parameter) %>%
-    summarize(sdfc = sd(cover, na.rm = T), 
-              idr  = idr(cover), 
-              iqr  = iqr(cover)) %>%
-    gather(met.prefix, result, -uid, -parameter) %>%
-    unite(metric, met.prefix, parameter, sep = '') %>%
-    mutate(metric = str_replace(metric, 'sdfc', 'sdfc_')) %>%
-    select(uid, metric, result)
-  #progressReport('Bank cover variation metrics finished.')
 }
 
 #' Format fish cover data for calculations

@@ -127,19 +127,19 @@ calculateWadeSubstrateMetrics <- function(uid, size.class){
                  c('lsub2d16', 'lsub2d25', 'lsub2d50', 'lsub2d75', 
                    'lsub2d84', 'lsub2dmm', 'lsubd2sd', 'lsub2iqr')),
         # summaries for the tt dataset (NOR) (ldiam AND diam)
-        lsub2dmm_nor = mean(lDiam.tt), 
-        dgm          = 10^mean(lDiam.tt), 
-        lsubd2sd_nor = sd(lDiam.tt), 
-        sub2dmm_nor  = mean(diam.tt), 
+        lsub2dmm_nor = mean(lDiam.tt),
+        dgm          = 10^mean(lDiam.tt),
+        lsubd2sd_nor = sd(lDiam.tt),
+        sub2dmm_nor  = mean(diam.tt),
         subd2sd_nor  = sd(diam.tt),
         # bl calcs: all the same metrics for the subset with the lumped boulder classes
         setNames(summary.nrsa(lDiam.bl), 
                  c('lsub_d16', 'lsub_d25', 'lsub_d50', 'lsub_d75', 
                    'lsub_d84', 'lsub_dmm', 'lsubd_sd', 'lsub_iqr')),
         # ttbl calcs: special few extra summaries that use the lumped boulder class for the NOR
-        lsub_dmm_nor = mean(lDiam.ttbl), 
-        lsubd_sd_nor = sd(lDiam.ttbl), 
-        sub_dmm_nor  = mean(diam.ttbl), 
+        lsub_dmm_nor = mean(lDiam.ttbl),
+        lsubd_sd_nor = sd(lDiam.ttbl),
+        sub_dmm_nor  = mean(diam.ttbl),
         subd_sd_nor  = sd(diam.ttbl))
     # substrate category proportions
     tbl <- table(x$result)
