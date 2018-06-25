@@ -12,23 +12,42 @@
 #'calculateLittoralDepth(uid = rep(1:10, each = 10), depth = rnorm(100))
 #'calculateLittoralDepth(uid = rep(1, 5), depth = rep(NA, 5))
 calculateLittoralDepth <- function(uid, depth){
-  kMetrics <- c('xlit', 'mnlit', 'mxlit', 'vlit')
-  nas <- expand.grid(uid = unique(uid), metric = kMetrics)
-  dots <- list(xlit  = ~mean(depth), 
-               mnlit = ~min(depth), 
-               mxlit = ~max(depth), 
-               vlit  = ~sd(depth))
-  ans <- 
-    dplyr::data_frame(uid = uid, depth = depth) %>%
-    na.omit() %>%
-    dplyr::group_by_(~uid) %>%
-    dplyr::summarize_(.dots = dots) %>%
-    tidyr::gather_('metric', 'result', kMetrics) %>%
-    dplyr::right_join(nas, by = c('uid', 'metric')) %>%
-    dplyr::arrange_(~uid, ~metric)
+  x <- data.frame(uid = as.factor(uid),
+                  depth = depth)
+  f <- function(x){
+    allna <- all(is.na(x$depth))
+    if(!allna){
+      return(c(xlit  = mean(x$depth, na.rm = T),
+               mnlit = min(x$depth, na.rm = T),
+               mxlit = max(x$depth, na.rm = T),
+               vlit  = sd(x$depth, na.rm = T)))
+    } else {
+      return(c(xlit = NA, mnlit = NA, mxlit = NA, vlit = NA))
+    }
+  }
+  ans <- ddply(x, .(uid), f)
   progressReport('Finished non-wadeable littoral depth metrics')
   return(ans)
 }
+
+# calculateLittoralDepth <- function(uid, depth){
+#   kMetrics <- c('xlit', 'mnlit', 'mxlit', 'vlit')
+#   nas <- expand.grid(uid = unique(uid), metric = kMetrics)
+#   dots <- list(xlit  = ~mean(depth), 
+#                mnlit = ~min(depth), 
+#                mxlit = ~max(depth), 
+#                vlit  = ~sd(depth))
+#   ans <- 
+#     dplyr::data_frame(uid = uid, depth = depth) %>%
+#     na.omit() %>%
+#     dplyr::group_by_(~uid) %>%
+#     dplyr::summarize_(.dots = dots) %>%
+#     tidyr::gather_('metric', 'result', kMetrics) %>%
+#     dplyr::right_join(nas, by = c('uid', 'metric')) %>%
+#     dplyr::arrange_(~uid, ~metric)
+#   progressReport('Finished non-wadeable littoral depth metrics')
+#   return(ans)
+# }
 
 #calculateLittoralDepth <- function(uid, depth){
 #   uid <- as.factor(uid)
@@ -46,21 +65,3 @@ calculateLittoralDepth <- function(uid, depth){
 #   ans
 #}
 
-# calculateLittoralDepth <- function(uid, depth){
-#   x <- data.frame(uid = as.factor(uid),
-#                   depth = depth)
-#   f <- function(x){
-#     allna <- all(is.na(x$depth))
-#     if(!allna){
-#       return(c(xlit  = mean(x$depth, na.rm = T),
-#                mnlit = min(x$depth, na.rm = T),
-#                mxlit = max(x$depth, na.rm = T),
-#                vlit  = sd(x$depth, na.rm = T)))
-#     } else {
-#       return(c(xlit = NA, mnlit = NA, mxlit = NA, vlit = NA))
-#     }
-#   }
-#   ans <- ddply(x, .(uid), f)
-#   progressReport('Finished non-wadeable littoral depth metrics')
-#   return(ans)
-# }
