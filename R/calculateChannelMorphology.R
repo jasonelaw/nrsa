@@ -1,3 +1,4 @@
+
 #' Join extra side channel transects
 #' 
 #' This function joins the extra side channel transects with the parallel transect.
@@ -105,9 +106,14 @@ calculateWettedWidthMetrics <- function(uid, wetwid){
 #' @param depth a vector of thalweg depths
 #' @return a 'metric' data.frame
 #' @export
-calculateThalwegRatios <- function(uid, wetwid, depth){
+calculateThalwegRatios <- function(uid, wetwid, depth, remove.inf.nan = T){
+  
   wdprod <- wetwid * depth
   wdratio <- wetwid / depth
+  if (remove.inf.nan){
+    is.inf.nan <- is.nan(wdratio) | is.infinite(wdratio)
+    wdratio <- ifelse(is.inf.nan, NA, wdratio)
+  }
   x <- data.frame(uid, wdprod, wdratio)
   f <- function(x){
     c('xwxd'     = mean(x$wdprod, na.rm = T),
