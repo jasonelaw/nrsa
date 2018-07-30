@@ -1,3 +1,4 @@
+
 #' Calculates number of side channel transects: 'sidecnt'
 #' 
 #' Calculates the number of side channel transects for wadeable sites only.  These are transects
@@ -35,7 +36,7 @@ calculatePercentSideChannel <- function(uid, transect, is.sidechannel){
   kSideChannelIndicator <- "Y"
   
   is.sidechannel <- is.sidechannel == kSideChannelIndicator
-  i <- transect %in% kXtraTransect
+  i <- !(transect %in% kXtraTransects)
   pct_side <- tapply(is.sidechannel[i], uid[i], mean, na.rm = T) * 100
   pct_side <- convertNamedVectorToMetricDF(pct_side)
   progressReport('Finished percent side channel: pct_side.')
