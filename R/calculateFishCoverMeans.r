@@ -38,7 +38,7 @@ calculateFishCoverMeans <- function(uid, parameter, cover){
   x$is.big <- x$parameter %in% isBig
   x$is.natural <- x$parameter %in% isNatural
   
-  x <- ddply(x, .(uid, parameter), function(x){
+  x <- ddply(x, .(uid, is.big, is.natural, parameter), function(x){
     data.frame(xfc = mean(x$cover, na.rm = T),
                pfc = mean(x$presence, na.rm = T))
   })
