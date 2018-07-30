@@ -8,30 +8,9 @@
 #'xcdenbk  vcdenbk nbnk
 #'
 #'@param uid a vector of site-visits
-#'@param is.bank whether the measurement is a bank measurement or not
+#'@param is.bank logical whether the measurement is a bank measurement (\code{TRUE}) or not (\code{FALSE}).
 #'@param densiometer a vector of densiometer measurments from 0-17.
 #'@export
-calculateCanopyCover2 <- function(uid, is.bank, densiometer){
-  kBaseMetrics <- c('vcden', 'xcden', 'n')
-  kMetrics <- c(outer(kBaseMetrics, c('mid', 'bnk'), paste0))
-  dots <- list(vcden = ~sd(result, na.rm = T),
-               xcden = ~mean(result, na.rm = T),
-               n     = ~count.notna(result))
-  mets <-
-    data_frame(uid     = as.character(uid), 
-                      is.bank = mapvalues(is.bank, c(F, T), c('mid', 'bnk')), 
-                      result  = densiometer/ 17 * 100) %>%
-    group_by_(~uid, ~is.bank) %>%
-    summarise_(.dots = dots) %>%
-    gather_('metric1', 'result', kBaseMetrics) %>%
-    unite_('metric', c('metric1', 'is.bank'), sep = '', remove = F) %>%
-    select_('uid', 'metric', 'result') %>%
-    arrange_('uid', 'metric') %>%
-    allFacToChar()
-  progressReport('Canopy cover metrics done')
-  return(mets)
-}
-
 calculateCanopyCover <- function(uid, is.bank, densiometer){
   is.bank <- plyr::mapvalues(is.bank, c(F, T), c('mid', 'bnk'))
   x <- data.frame(uid = uid, is.bank = is.bank, result = densiometer)
