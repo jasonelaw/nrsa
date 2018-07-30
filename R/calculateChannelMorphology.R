@@ -1,3 +1,16 @@
+#'Calculate channel morphology metrics
+#'
+#'This function joins extra transects and runs the metrics contained in \code{calculateChannelMetrics}
+#'and \code{calculateWettedWidthMetrics}.
+#'@export
+calculateChannelMorphology <- function(uid, transect, wetwid, bankwid, bankhgt, incishgt, depth){
+  x <- joinExtraTransects(uid, transect, wetwid, bankwid, bankhgt, incishgt)
+  x <- join(x, data.frame(uid, transect, depth), by = c('uid', 'transect'), type = 'left')
+  met.channel  <- calculateChannelMetrics(x$uid, x$bankwid.sm, x$incishgt.mx, x$bankhgt.mx)
+  met.wetwidth <- calculateWettedWidthMetrics(x$uid, x$wetwid.mx)
+  met.rats     <- calculateTransectRatios(x$uid, x$bankwid.sm, x$bankhgt.mn, x$depth)
+  rbindMetrics(met.channel, met.wetwidth, met.rats)
+}
 
 #' Join extra side channel transects
 #' 
@@ -8,11 +21,11 @@
 #' this function.  This allows us to do the join in one pass rather than separately.
 #' @export
 #' @examples
-#' d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), station = c(0,0), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
+#' d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
 #' do.call('joinExtraTransects', d)
-joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt, incishgt){
+joinExtraTransects <- function(uid, transect, wetwid, bankwid, bankhgt, incishgt){
   transect <- stringr::str_replace(transect, 'X', '')
-  x <- data.frame(uid, transect, station, wetwid, bankwid, bankhgt, incishgt)
+  x <- data.frame(uid, transect, wetwid, bankwid, bankhgt, incishgt)
   f <- function(x){
     suppressWarnings(
       c(wetwid.sm   = sumNA(x$wetwid, na.rm = T),
@@ -22,7 +35,7 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
         bankhgt.mx  = max(x$bankhgt, na.rm = T),
         bankhgt.mn  = mean(x$bankhgt, na.rm = T)))
   }
-  ans <- plyr::ddply(x, c('uid', 'transect', 'station'), f)
+  ans <- plyr::ddply(x, c('uid', 'transect'), f)
   ans$incishgt.mx <- ifelse(is.na(ans$incishgt.mx) | ans$incishgt.mx == 0, 
                             ans$bankhgt.mx, 
                             ans$incishgt.mx)
@@ -30,7 +43,7 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
     x[!is.finite(x)] <- NA
     return(x)
   }
-  ans[4:9] <- lapply(ans[4:9], replaceInfNaN)
+  ans[3:8] <- lapply(ans[3:8], replaceInfNaN)
   return(ans)
 }
 
@@ -52,22 +65,13 @@ joinExtraTransects <- function(uid, transect, station, wetwid, bankwid, bankhgt,
 #' d <- data.frame(uid = rep(1:10, 11), bankwid = runif(110), incishgt = runif(110), bankhgt = runif(110))
 #' calculateChannelMetrics(d$uid, d$wetwid, d$bankwid, d$incishgt, d$bankhgt)
 calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
-  kNamesMap <- c("mean.bankwid" = "xbkf_w",  "sd.bankwid" = "sdbkf_w", "count.bankwid" = "n_bw",
-                 "mean.incishgt" = "xinc_h", "sd.incishgt" = "sdinc_h", "count.incishgt" = "n_incis", 
-                 "mean.bankhgt" = "xbkf_h", "sd.bankhgt" = "sdbkf_h", "count.bankhgt" = "n_bh")
-
   x <- data.frame(uid, bankwid, incishgt, bankhgt)
-  xm <- melt(x, id.var = 'uid', variable.name = 'parameter', value.name = 'result')
   f <- function(x){
-    c(mean  = mean(x$result, na.rm = T),
-      sd    = sd(x$result, na.rm = T),
-      count = count(x$result))
+    data.frame(xbkf_w = mean(bankwid, na.rm = T),  sdbkf_w = sd(bankwid, na.rm = T),  n_bw =    count(bankwid),
+               xinc_h = mean(incishgt, na.rm = T), sdinc_h = sd(incishgt, na.rm = T), n_incis = count(incishgt),
+               xbkf_h = mean(bankhgt, na.rm = T),  sdbkf_h = sd(bankhgt, na.rm = T),  n_bh =    count(bankhgt))
   }
-  ans <- plyr::ddply(xm, c('uid', 'parameter'), f)
-  ans <- melt(ans, id.var = c('uid', 'parameter'), variable.name = 'metric', value.name = 'result')
-  ans$metric <- paste(ans$metric, ans$parameter, sep = '.')
-  ans$metric <- plyr::revalue(ans$metric, kNamesMap)
-  ans$parameter <- NULL
+  ans <- meltMetrics(plyr::ddply(x, .(uid), f))
   progressReport("Finished with channel metrics: xbkf_w, sdbkf_w, n_bw, xinc_h, sdinc_h, n_incis, xbkf_h, sdbkf_h, n_bh.")
   return(ans)
 }
