@@ -25,14 +25,14 @@
 #' won't be exactly the same at every transect. For that reason,
 #' we take the mean of the the transect spacing values for the site.
 #'  
-#'  @param uid a vector of site identifiers
-#'  @param transect a vector of transect identifiers
-#'  @param azimuth a vector of bearings; more properly azimuths
-#'  @param distance a vector of distances
-#'  @param transpc a vector of transect spacing values
-#'  @export
-#'  @import plyr
-#'  @examples
+#'@param uid a vector of site identifiers
+#'@param transect a vector of transect identifiers
+#'@param azimuth a vector of bearings; more properly azimuths
+#'@param distance a vector of distances
+#'@param transpc a vector of transect spacing values
+#'@export
+#'@import plyr
+#'@examples
 #'  d <- data.frame(uid = c(1,1), azimuth = c(180,90), distance = c(1,1))
 #'  calculateAngleMetrics(d$uid, d$azimuth, d$distance)
 #'  d <- data.frame(uid = rep(1,6), transect = rep(1:2,each = 3),
