@@ -4,7 +4,8 @@
 \alias{getChannelConstraint}
 \title{Formats the channel constraint form data as metrics}
 \usage{
-getChannelConstraint(uid, parameter, result)
+getChannelConstraint(uid, bankfull, constraint, features, pattern, percent,
+  valley, valleybox)
 }
 \arguments{
 \item{uid}{a vector of site identifiers}

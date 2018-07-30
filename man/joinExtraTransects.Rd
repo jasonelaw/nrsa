@@ -4,7 +4,7 @@
 \alias{joinExtraTransects}
 \title{Join extra side channel transects}
 \usage{
-joinExtraTransects(uid, transect, station, wetwid, bankwid, bankhgt, incishgt)
+joinExtraTransects(uid, transect, wetwid, bankwid, bankhgt, incishgt)
 }
 \description{
 This function joins the extra side channel transects with the parallel transect.
@@ -14,6 +14,6 @@ the transect (rather than at a station) are assumed to be at station 0 for purpo
 this function.  This allows us to do the join in one pass rather than separately.
 }
 \examples{
-d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), station = c(0,0), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
+d <- data.frame(uid = c(1,1), transect = c('A', 'XA'), wetwid = 1:2, bankwid = 1:2, bankhgt = 1:2, incishgt = 1:2)
 do.call('joinExtraTransects', d)
 }

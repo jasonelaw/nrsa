@@ -4,7 +4,7 @@
 \alias{calculateThalwegRatios}
 \title{Calculate thalweg width depth ratios}
 \usage{
-calculateThalwegRatios(uid, wetwid, depth)
+calculateThalwegRatios(uid, wetwid, depth, remove.inf.nan = T)
 }
 \arguments{
 \item{uid}{a vector site identifiers}
