@@ -11,7 +11,7 @@ test_that("Channel Morphology return correct metrics for EPA test data: should f
              calculateThalwegDepthMetrics(uid, protocol == 'WADEABLE', depth, units = 'mixed'))
   
   dcj <- with(test, 
-              joinExtraTransects(uid, transect, station, wetwid, bankwid, bankhgt, incishgt))
+              joinExtraTransects(uid, transect, wetwid, bankwid, bankhgt, incishgt))
   cm <- with(dcj, 
              calculateChannelMetrics(uid, bankwid.sm, incishgt.mx, bankhgt.mx))
   ww <- with(subset(dcj, !is.na(wetwid.mx)), 

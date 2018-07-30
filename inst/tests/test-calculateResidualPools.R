@@ -1,3 +1,4 @@
+library(plyr)
 context("Residual pools")
 
 dim <- nrsa:::calculatePoolDimensions(c(0,1), depth = c(1,5), slope = 0.1)
@@ -17,18 +18,19 @@ test_that("calculatePool works correctly", {
   ans <- calculatePool(c(0,1), depth = c(1, 5), slope = c(0.1, 0.1))
   
   expect_that(ans$is.pool, equals(c(F, T)))
-  expect_that(ans$base.pt, equals(c(T, F)))
+  expect_that(ans$base.point, equals(c(T, F)))
   expect_that(ans$depth, equals(c(NA, 5 - (1 + 0.1))))
   expect_that(ans$length, equals(c(NA, 1)))
   expect_that(ans$area, equals(ans$depth * ans$length))
   
 })
 
-test_that("cutDimensions works correctly", {
+test_that("createSiteSequence works correctly", {
+  f <- function(uid, n.station){ arrange(expand.grid(uid = uid, transect = LETTERS[1:10], station = 0:(n.station-1)), uid, transect, station)}
+  x <- mdply(data.frame(uid = 1:5, n.station = c(10,10,15,15,10)), f)
+  x$is.wadeable <- c(F,F,T,T,T)[x$uid]
   
-  dimens <- cbind(depth = c(0, 1, 1, 1, 0, -1),
-                  length = 1:6)
-  expected <- matrix(c(rep(1,3), 0, rep(1,4)), ncol = 2)
-  expect_that(nrsa:::cutDimensions(dimens), is_equivalent_to(expected))
-              
+  
 })
+
+
