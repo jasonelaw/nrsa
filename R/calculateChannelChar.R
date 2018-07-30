@@ -81,12 +81,13 @@ calculateChannelConstraint <- function(uid, constraint){
 #' PATTERN, PERCENT, VALLEY, VALLYBOX
 #' @param result a vector of results for each parameter
 #' @return a 'metric' data.frame
-getChannelConstraint <- function(uid, parameter, result){
-  x <- data.frame(uid = uid, metric = parameter, result = result) 
+getChannelConstraint <- function(uid, bankfull, constraint, features, pattern, percent, valley, valleybox){
+  x <- data.frame(uid, bankfull, constraint, features, pattern, percent, valley, valleybox)
+  x <- reshape2::melt(x, id.vars = 'uid', variable.name = 'metric', value.name = 'result')
   x$metric <- 
     factor(x      = as.character(x$metric), 
-           levels = c("BANKFULL", "CONSTRNT", "FEATURES", "PATTERN", 
-                      "PERCENT", "VALLEY", "VALLYBOX"),
+           levels = c("bankfull", "constraint", "features", "pattern", 
+                      "percent", "valley", "valleybox"),
            labels = c("conbankfull", "constraint", "confeatures", "conpattern",
                       "conpercent", "convalley", "convalleybox"))
 if(any(is.na(x$metric))){
