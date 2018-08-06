@@ -135,7 +135,7 @@ calculateLWDCumulativeMetrics <- function(uid, size.class, count, is.wadeable, l
   ccounts <- xtabs(cbind(volume, count) ~ size + in.bankfull + uid, x)
   ccounts <- addmargins(ccounts, 2)
   ccounts <- apply(ccounts, 2:4, function(x) cumsum(rev(x)))
-  m100 <- sweepSiteStatistic(x$lwdlength, x$uid, ccounts)
+  m100 <- sweepSiteStatistic(x$lwdlength, x$uid, ccounts) * 100
   msq  <- sweepSiteStatistic(x$lwdarea,   x$uid, ccounts[,"TRUE",,, drop = F])
   ret <- list(cumulative.counts      = ccounts, 
               cumulative.counts.m100 = m100, 
