@@ -67,9 +67,9 @@ joinExtraTransects <- function(uid, transect, wetwid, bankwid, bankhgt, incishgt
 calculateChannelMetrics <- function(uid, bankwid, incishgt, bankhgt){
   x <- data.frame(uid, bankwid, incishgt, bankhgt)
   f <- function(x){
-    data.frame(xbkf_w = mean(bankwid, na.rm = T),  sdbkf_w = sd(bankwid, na.rm = T),  n_bw =    count(bankwid),
-               xinc_h = mean(incishgt, na.rm = T), sdinc_h = sd(incishgt, na.rm = T), n_incis = count(incishgt),
-               xbkf_h = mean(bankhgt, na.rm = T),  sdbkf_h = sd(bankhgt, na.rm = T),  n_bh =    count(bankhgt))
+    data.frame(xbkf_w = mean(x$bankwid, na.rm = T),  sdbkf_w = sd(x$bankwid, na.rm = T),  n_bw =    count(x$bankwid),
+               xinc_h = mean(x$incishgt, na.rm = T), sdinc_h = sd(x$incishgt, na.rm = T), n_incis = count(x$incishgt),
+               xbkf_h = mean(x$bankhgt, na.rm = T),  sdbkf_h = sd(x$bankhgt, na.rm = T),  n_bh =    count(x$bankhgt))
   }
   ans <- meltMetrics(plyr::ddply(x, .(uid), f))
   progressReport("Finished with channel metrics: xbkf_w, sdbkf_w, n_bw, xinc_h, sdinc_h, n_incis, xbkf_h, sdbkf_h, n_bh.")
