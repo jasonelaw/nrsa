@@ -19,7 +19,7 @@ kSubindexRange <- list(n.native.species         = list(first = c(0,5), gt.first 
 #' Calculates a fish IBI based on Hughes et al "A process for developing and evaluating indices
 #' of fish assemblage integrity"
 #' 
-#' The \code{fishTraits} (unexported, use nrsa:::fishTraits to view code) function returns a \code{data.frame} with trait data for the IBI. 
+#' The \code{nrsa:::traits} \code{data.frame} contains trait data for the IBI.
 #' 
 #' @param site vector of site-visit identifiers
 #' @param order a numeric vector; stream order correspoding to the location

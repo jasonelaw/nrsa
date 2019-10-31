@@ -26,11 +26,44 @@ test_that("calculatePool works correctly", {
 })
 
 test_that("createSiteSequence works correctly", {
-  f <- function(uid, n.station){ arrange(expand.grid(uid = uid, transect = LETTERS[1:10], station = 0:(n.station-1)), uid, transect, station)}
-  x <- mdply(data.frame(uid = 1:5, n.station = c(10,10,15,15,10)), f)
-  x$is.wadeable <- c(F,F,T,T,T)[x$uid]
+  randomMissing <- function(x, percent = 0.1){
+    is.na(x) <- sample(c(TRUE, FALSE), size = length(x), replace = T, prob = c(percent, 1-percent))
+    x
+  }
+  f <- function(n.station, is.wadeable = T){
+    tlev <- factor(LETTERS[1:10])
+    slev <- factor(0:(n.station-1))
+    if (!is.wadeable){
+      tlev <- factor(tlev, rev(levels(tlev)))
+      slev <- factor(slev, rev(levels(slev)))
+    }
+    ret <- arrange(expand.grid(uid = 1, transect = tlev, station = slev), transect, station)
+    ret$depth <- runif(nrow(ret), 0, 10)
+    ret
+  }
+  d <- f(15)
+  # Problem: differentiate between structural missing data (data padded with extra unobserved stations) and actual missing data.
+  # Solution: filter all unobserved boatable stations where station number > 9
+  # Situtations:
+  #   Boatable with unequal # of stations on each transect, but no 'extra' unobserved stations. Trimmed data.
+  d <- f(12)
+  used <- data.frame(transect = LETTERS[1:10], last.station = sample(9:11, size = 10, replace = T))
+  d <- subset(join(d, used, by = 'transect'), as.numeric(as.character(station)) <= last.station, select = names(d))
+  
+  #   Boatable with 'extra' stations on every transect where depth unobserved. Padded data with constant 10 stations.
+  d <- f(12)
+  is.na(d$depth) <- d$station %in% 10:11
+  filterBoatable(d)
+  d$depth <- randomMissing(d$depth)
+  filterBoatable(d)
+  #   Boatable with 'extra' stations on every transect, but sometimes observed when extra stations are needed. Padded data with variable stations.
+  d <- f(12)
+  used <- data.frame(transect = LETTERS[1:10], last.station = sample(9:11, size = 10, replace = T))
+  d <- join(d, used, by = 'transect')
+  is.na(d$depth) <- as.numeric(as.character(d$station)) > d$last.station
+  d$last.station <- NULL
+  filterBoatable(d)
   
   
 })
-
 
